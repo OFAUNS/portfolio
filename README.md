@@ -57,7 +57,7 @@ An Astro portfolio template for designer, filmmaker, or any type of creator.
 
 ## 📹 Example Instances
 
-| [Bax Portfolio](https://bax.sorai.tw) |
+| [OFAUNS Portfolio](https://OFAUNS.sorai.tw) |
 | :--- |
 
 ---
@@ -287,7 +287,7 @@ bun run build
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
 
 > [!WARNING]
-> The license dose not include example or placeholder pictures contain in this template, all rights to these photos are reserved by Bax.
+> The license dose not include example or placeholder pictures contain in this template, all rights to these photos are reserved by OFAUNS.
 
 ---
 
@@ -308,7 +308,7 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) 
 
 ## 📹 範例網站
 
-| [Bax Portfolio](https://bax.sorai.tw) |
+| [OFAUNS Portfolio](https://OFAUNS.sorai.tw) |
 | :--- |
 
 ---
@@ -541,13 +541,13 @@ bun run build
 本專案採用 GPL-3.0 授權，詳情請參閱 [LICENSE](LICENSE) 檔案。
 
 > [!WARNING]
-> 此專案版權許可並不包含此模板含有的占位符或範例圖片，那些圖片的版權唯一持有者為Bax。
+> 此專案版權許可並不包含此模板含有的占位符或範例圖片，那些圖片的版權唯一持有者為OFAUNS。
 
 ---
 
 <div align="center">
 
-**Built with ❤️ by [Bax](https://kita.sorai.tw/bax)**
+**Built with ❤️ by [OFAUNS](https://kita.sorai.tw/OFAUNS)**
 
 </div>
 
