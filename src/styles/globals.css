@@ -104,6 +104,10 @@
   .delay-800 {
     animation-delay: 800ms;
   }
+
+  .flip-180 {
+    transform: rotateY(180deg);
+  }
 }
 
 @keyframes blur-in {

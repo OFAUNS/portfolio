@@ -62,13 +62,19 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
                         <ThemeToggle client:load />
                     </div>
 
-                    <div class="w-24 h-24 md:w-32 md:h-32 overflow-hidden bg-muted relative group cursor-pointer">
-                        {/* Placeholder for Profile Image */}
-                        <img
-                            src={PROFILE.avatar}
-                            alt="Profile"
-                            class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
-                        />
+                    <div class="profile-flip-container w-24 h-24 md:w-32 md:h-32 relative cursor-pointer [perspective:1000px] z-50 group hover:scale-110 transition-transform duration-500">
+                        <div class="profile-flip-inner w-full h-full relative transition-[transform] duration-700 ease-in-out [transform-style:preserve-3d]">
+                            <img
+                                src={PROFILE.avatar}
+                                alt="Profile"
+                                class="object-cover w-full h-full absolute inset-0 bg-muted [backface-visibility:hidden]"
+                            />
+                            <img
+                                src="/melogo.png"
+                                alt="Logo"
+                                class="object-cover w-full h-full absolute inset-0 bg-white [backface-visibility:hidden] flip-180"
+                            />
+                        </div>
                     </div>
 
                     <div class="text-center max-w-lg space-y-4">
@@ -243,12 +249,19 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
                 {/* Header Section */}
                 <header class="mb-20 pt-10 md:pt-20">
                     <div class="flex flex-col md:flex-row gap-8 items-start">
-                        <div class="w-32 h-32 md:w-40 md:h-40 shrink-0 bg-muted overflow-hidden rounded-xl border border-border/50 group cursor-pointer">
-                            <img
-                                src={PROFILE.avatar}
-                                alt="Profile"
-                                class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
-                            />
+                        <div class="profile-flip-container w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-xl border border-border/50 cursor-pointer [perspective:1000px] z-50 group hover:scale-110 transition-transform duration-500">
+                            <div class="profile-flip-inner w-full h-full relative transition-[transform] duration-700 ease-in-out [transform-style:preserve-3d]">
+                                <img
+                                    src={PROFILE.avatar}
+                                    alt="Profile"
+                                    class="object-cover w-full h-full absolute inset-0 rounded-xl bg-muted [backface-visibility:hidden]"
+                                />
+                                <img
+                                    src="/melogo.png"
+                                    alt="Logo"
+                                    class="object-cover w-full h-full absolute inset-0 rounded-xl bg-white [backface-visibility:hidden] flip-180"
+                                />
+                            </div>
                         </div>
 
                         <div class="space-y-5 max-w-3xl pt-2">
@@ -365,12 +378,19 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
                 <aside class="w-full md:w-[40%] md:h-screen md:sticky md:top-0 p-8 md:p-12 lg:p-16 flex flex-col justify-between border-b md:border-b-0 md:border-r border-border/40 z-10 bg-background/50 backdrop-blur-md">
                     <div class="space-y-8">
                         <div class="flex justify-between items-start animate-blur-in delay-100">
-                            <div class="w-20 h-20 overflow-hidden rounded-full border border-border group cursor-pointer">
-                                <img
-                                    src={PROFILE.avatar}
-                                    alt="Profile"
-                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
+                            <div class="profile-flip-container w-20 h-20 rounded-full border border-border cursor-pointer [perspective:1000px] z-50 group hover:scale-110 transition-transform duration-500">
+                                <div class="profile-flip-inner w-full h-full relative transition-[transform] duration-700 ease-in-out [transform-style:preserve-3d]">
+                                    <img
+                                        src={PROFILE.avatar}
+                                        alt="Profile"
+                                        class="w-full h-full object-cover absolute inset-0 rounded-full bg-muted [backface-visibility:hidden]"
+                                    />
+                                    <img
+                                        src="/melogo.png"
+                                        alt="Logo"
+                                        class="w-full h-full object-cover absolute inset-0 rounded-full bg-white [backface-visibility:hidden] flip-180"
+                                    />
+                                </div>
                             </div>
                             <ThemeToggle client:load />
                         </div>
@@ -502,6 +522,17 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
     {/* Shared Scripts */}
     <script>
         document.addEventListener("astro:page-load", () => {
+            // Profile Flip Logic
+            const flipContainers = document.querySelectorAll(".profile-flip-container");
+            flipContainers.forEach(container => {
+                container.addEventListener("click", () => {
+                    const inner = container.querySelector(".profile-flip-inner");
+                    if (inner) {
+                        inner.classList.toggle("flip-180");
+                    }
+                });
+            });
+
             // Logic for Layout 1/2/3/4 Back to Top (Existing)
             const backToTopBtn = document.getElementById("back-to-top");
             if (backToTopBtn) {
