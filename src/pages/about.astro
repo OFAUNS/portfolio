@@ -1,0 +1,264 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
+const PROFILE = {
+    name: "OFANUS",
+    cnName: "陳昱洋",
+    enName: "CHEN, YU-YUNG",
+    role: "Creative Designer & Developer",
+    phone: "0901267387",
+    email: "cheny4314@gmail.com",
+    bio: "Passionate about creating beautiful and functional digital experiences through design, development, and innovative digital solutions.",
+    avatar: "/header.jpg",
+    links: {
+        email: "mailto:cheny4314@gmail.com",
+        phone: "tel:0901267387",
+    },
+};
+
+const EDUCATION = {
+    school: "Yuan Ze University",
+    cnSchool: "元智大學",
+    major: "Information Communication",
+    cnMajor: "資訊傳播學系",
+    startYear: 2023,
+};
+
+const SKILLS = {
+    programming: ["C++", "Java", "JavaScript", "C#", "HTML"],
+    tools: ["Unity", "Phaser", "Touch Designer", "DaVinci", "Blender", "n8n"],
+    softSkills: ["Project Management", "Proposal Skills", "UX Research", "Team Coordination"],
+};
+
+type ExperienceItem = {
+    title: string;
+    cnTitle?: string;
+    date: string;
+    company?: string;
+    event?: string;
+    description: string;
+    details: string[];
+};
+
+const EXPERIENCE: ExperienceItem[] = [
+    {
+        title: "Enterprise Information Session Coordinator",
+        cnTitle: "企業說明會總召",
+        date: "2026/03",
+        company: "Pacific Cable, Chao Mei Microcomputer",
+        description: "Served as event coordinator for enterprise information sessions. Managed vendor partnerships, organized event logistics, and coordinated staff assignments to ensure smooth event execution.",
+        details: ["Coordinated with vendor partners", "Planned and organized event layout", "Managed team assignments and logistics"]
+    },
+    {
+        title: "Paper Presentation",
+        cnTitle: "論文發表",
+        date: "2026/02",
+        event: "TWELF2026 - 21st Taiwan Digital Learning Development Symposium",
+        description: "In-depth research and data analysis on cryptography education. Presented findings to professors and graduate students.",
+        details: ["Conducted deep data analysis on cryptography education", "Wrote comprehensive research paper", "Presented to academic professionals"]
+    },
+    {
+        title: "Escape Room Front Desk & NPC",
+        cnTitle: "密室逃脫前台&NPC",
+        date: "2025/03 - 2025/10",
+        description: "Managed front desk operations and provided immersive NPC experience. Designed escape room scenarios and observed user experience.",
+        details: ["Mastered customer service protocols and presentation", "Designed immersive room scenarios", "Observed and analyzed user experience"]
+    },
+    {
+        title: "Video Marketing",
+        cnTitle: "影片行銷",
+        date: "2025/09 - 2026/01",
+        description: "Produced and directed marketing videos. Conducted on-site research and scriptwriting. Ranked first among project submissions.",
+        details: ["Proficiently operated professional studio equipment and LED walls", "Conducted field research and cultural immersion", "Authored scripts and achieved top project ranking"]
+    },
+    {
+        title: "AI Cryptography Learning Game Development",
+        cnTitle: "三重鷹架Phaser網頁密碼學劇情解謎手機遊戲",
+        date: "2025/07 - 2025/09",
+        description: "Led game development as Project Manager. Built game architecture using Phaser + React.js framework. Integrated AI virtual character to assist student learning through gamified puzzle-solving.",
+        details: ["Managed programming and art direction", "Architected game structure with Phaser and React.js", "Implemented AI-assisted learning mechanics"]
+    }
+];
+---
+
+<Layout title="About OFANUS" description="About page">
+    <main class="container mx-auto px-6 py-12 max-w-4xl animate-blur-in">
+        <div class="absolute right-6 top-6 z-50">
+            <ThemeToggle client:load />
+        </div>
+
+        <a href="/" class="inline-flex items-center gap-2 mb-12 text-muted-foreground hover:text-foreground transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+            Back to Home
+        </a>
+
+        <article class="space-y-12">
+            {/* Header */}
+            <header class="space-y-6">
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="w-32 h-32 md:w-48 md:h-48 shrink-0 rounded-lg overflow-hidden border border-border/50">
+                        <img
+                            src={PROFILE.avatar}
+                            alt={PROFILE.name}
+                            class="w-full h-full object-cover"
+                        />
+                    </div>
+                    
+                    <div class="space-y-4 pt-2">
+                        <div>
+                            <p class="text-sm font-mono text-muted-foreground/60 mb-1">{PROFILE.enName}</p>
+                            <h1 class="text-5xl md:text-6xl font-black uppercase tracking-tighter mb-2">
+                                {PROFILE.name}
+                            </h1>
+                            <h3 class="text-lg text-muted-foreground font-light">{PROFILE.cnName}</h3>
+                        </div>
+                        <h2 class="text-xl md:text-2xl text-muted-foreground font-light">
+                            {PROFILE.role}
+                        </h2>
+                        <p class="text-lg text-muted-foreground/80 leading-relaxed max-w-2xl">
+                            {PROFILE.bio}
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="w-full h-px bg-border/40" />
+
+            {/* Contact Info */}
+            <section class="space-y-4">
+                <h2 class="text-sm font-bold tracking-[0.2em] uppercase text-muted-foreground">Contact</h2>
+                <div class="space-y-2 text-muted-foreground">
+                    <p class="flex items-center gap-3">
+                        <span class="font-mono text-xs text-muted-foreground/60">Phone</span>
+                        <a href={PROFILE.links.phone} class="text-primary hover:underline">{PROFILE.phone}</a>
+                    </p>
+                    <p class="flex items-center gap-3">
+                        <span class="font-mono text-xs text-muted-foreground/60">Email</span> 
+                        <a href={PROFILE.links.email} class="text-primary hover:underline">{PROFILE.email}</a>
+                    </p>
+                </div>
+            </section>
+
+            <div class="w-full h-px bg-border/40" />
+
+            {/* Education */}
+            <section class="space-y-6">
+                <h2 class="text-sm font-bold tracking-[0.2em] uppercase text-muted-foreground">Education</h2>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex items-baseline justify-between mb-2">
+                            <div>
+                                <h3 class="text-lg font-bold">{EDUCATION.school}</h3>
+                                <p class="text-sm font-medium text-muted-foreground">{EDUCATION.cnSchool}</p>
+                            </div>
+                            <span class="text-xs font-mono text-muted-foreground">Since {EDUCATION.startYear}</span>
+                        </div>
+                        <p class="text-muted-foreground">{EDUCATION.major} / {EDUCATION.cnMajor}</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="w-full h-px bg-border/40" />
+
+            {/* Skills */}
+            <section class="space-y-6">
+                <h2 class="text-sm font-bold tracking-[0.2em] uppercase text-muted-foreground">Skills & Expertise</h2>
+                
+                <div class="space-y-6">
+                    {/* Programming */}
+                    <div>
+                        <h3 class="text-sm font-semibold mb-3 text-foreground">Programming Languages</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {SKILLS.programming.map((skill) => (
+                                <span class="px-3 py-1.5 bg-muted/30 rounded-full border border-border/50 text-sm font-medium hover:border-primary/50 transition-colors">
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Tools & Software */}
+                    <div>
+                        <h3 class="text-sm font-semibold mb-3 text-foreground">Tools & Software</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {SKILLS.tools.map((skill) => (
+                                <span class="px-3 py-1.5 bg-muted/30 rounded-full border border-border/50 text-sm font-medium hover:border-primary/50 transition-colors">
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Soft Skills */}
+                    <div>
+                        <h3 class="text-sm font-semibold mb-3 text-foreground">Professional Skills</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {SKILLS.softSkills.map((skill) => (
+                                <span class="px-3 py-1.5 bg-muted/30 rounded-full border border-border/50 text-sm font-medium hover:border-primary/50 transition-colors">
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="w-full h-px bg-border/40" />
+
+            {/* Experience */}
+            <section class="space-y-8">
+                <h2 class="text-sm font-bold tracking-[0.2em] uppercase text-muted-foreground">Experience</h2>
+                
+                <div class="space-y-8">
+                    {EXPERIENCE.map((exp) => (
+                        <div class="space-y-3">
+                            <div class="flex items-baseline justify-between gap-4">
+                                <div>
+                                    <h3 class="text-lg font-bold">{exp.title}</h3>
+                                    {exp.cnTitle && <p class="text-sm text-muted-foreground font-medium">{exp.cnTitle}</p>}
+                                </div>
+                                <span class="text-xs font-mono text-muted-foreground/60 whitespace-nowrap">{exp.date}</span>
+                            </div>
+                            {exp.company && <p class="text-sm font-medium text-primary">{exp.company}</p>}
+                            {exp.event && <p class="text-sm font-medium text-primary">{exp.event}</p>}
+                            <p class="text-muted-foreground leading-relaxed">{exp.description}</p>
+                            {exp.details.length > 0 && (
+                                <ul class="list-disc pl-5 text-sm text-muted-foreground/80 space-y-2">
+                                    {exp.details.map((detail) => (
+                                        <li>{detail}</li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <div class="w-full h-px bg-border/40" />
+
+            {/* Contact Section */}
+            <section class="space-y-6">
+                <h2 class="text-2xl font-bold tracking-tight">Get in Touch</h2>
+                
+                <div class="space-y-4">
+                    <p class="text-muted-foreground">Interested in collaborating or have a project in mind? Feel free to reach out!</p>
+                    
+                    <div class="flex flex-col gap-3">
+                        <a href={PROFILE.links.email} class="inline-flex items-center gap-2 text-primary hover:underline font-medium">
+                            Email <span class="text-xs">cheny4314@gmail.com↗</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </article>
+
+        <footer class="py-8 border-t border-border/40 mt-16">
+            <p class="text-sm text-muted-foreground text-center">
+                &copy; {new Date().getFullYear()} {PROFILE.name}. All rights reserved.
+            </p>
+        </footer>
+    </main>
+</Layout>

@@ -14,14 +14,14 @@ const CURRENT_LAYOUT: number = 3;
 // ---------------------
 
 const PROFILE = {
-    name: "OFANUS",
+    name: "OFAUNS",
     role: "",
-    email: "",
+    email: "cheny4314@gmail.com",
     bio: "",
     avatar: "/header.jpg",
     links: {
         twitter: "x.com/baxartworkz",
-        email: "mailto:bax@sorai.tw",
+        email: "mailto:cheny4314@gmail.com",
     },
 };
 
@@ -73,7 +73,9 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
 
                     <div class="text-center max-w-lg space-y-4">
                         <h1 class="text-2xl font-bold tracking-tight animate-blur-in delay-200">
-                            {PROFILE.name}
+                            <a href="/about" class="hover:text-primary transition-colors">
+                                {PROFILE.name}
+                            </a>
                         </h1>
                         <p class="text-muted-foreground leading-relaxed animate-blur-in delay-300">
                             {PROFILE.bio}
@@ -251,7 +253,9 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
 
                         <div class="space-y-5 max-w-3xl pt-2">
                             <h1 class="text-5xl md:text-7xl font-black tracking-tighter text-foreground font-display uppercase animate-blur-in delay-200">
-                                {PROFILE.name}
+                                <a href="/about" class="hover:text-primary transition-colors">
+                                    {PROFILE.name}
+                                </a>
                             </h1>
 
                             <div class="space-y-1 text-base md:text-lg text-muted-foreground animate-blur-in delay-300">
@@ -372,8 +376,10 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
                         </div>
 
                         <div class="space-y-4">
-                            <h1 class="text-6xl font-black uppercase tracking-tighter leading-none hover:text-primary transition-colors duration-500 cursor-default animate-blur-in delay-200">
-                                {PROFILE.name}
+                            <h1 class="text-6xl font-black uppercase tracking-tighter leading-none animate-blur-in delay-200">
+                                <a href="/about" class="hover:text-primary transition-colors duration-500 inline-block">
+                                    {PROFILE.name}
+                                </a>
                             </h1>
                             <p class="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-sm animate-blur-in delay-300">
                                 {PROFILE.role}
