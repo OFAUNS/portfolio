@@ -57,6 +57,8 @@ const socialImageURL = new URL(image, Astro.url);
             rel="stylesheet"
         />
         <script is:inline>
+            document.documentElement.classList.add("is-loading");
+
             const getThemePreference = () => {
                 if (
                     typeof localStorage !== "undefined" &&
@@ -84,11 +86,477 @@ const socialImageURL = new URL(image, Astro.url);
         </script>
     </head>
     <body
-        class="min-h-screen bg-background font-sans antialiased text-foreground"
+        class="min-h-screen bg-background font-sans antialiased text-foreground overflow-x-hidden"
     >
-        <slot />
+        <div id="ambient-particles" aria-hidden="true"></div>
+        <div id="page-transition" aria-hidden="true">
+            <div class="page-transition__meteor-field">
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+                <span class="transition-meteor"><span class="transition-meteor__tail"></span><span class="transition-meteor__head"></span></span>
+            </div>
+            <div class="page-transition__flash-layer">
+                <span class="transition-flash transition-flash--core"></span>
+                <span class="transition-flash transition-flash--beam"></span>
+                <span class="transition-flash transition-flash--halo"></span>
+            </div>
+            <div class="page-transition__camera-grid">
+                <span class="camera-line camera-line--h1"></span>
+                <span class="camera-line camera-line--h2"></span>
+                <span class="camera-line camera-line--v1"></span>
+                <span class="camera-line camera-line--v2"></span>
+            </div>
+            <div class="page-transition__wipe"></div>
+        </div>
+        <div id="page-loader" aria-live="polite" aria-hidden="true">
+            <div class="page-loader__meteor" role="status" aria-label="Page loading">
+                <span class="loader-meteor loader-meteor--1">
+                    <span class="loader-meteor__tail"></span>
+                    <span class="loader-meteor__head"></span>
+                </span>
+                <span class="loader-meteor loader-meteor--2">
+                    <span class="loader-meteor__tail"></span>
+                    <span class="loader-meteor__head"></span>
+                </span>
+                <span class="loader-meteor loader-meteor--3">
+                    <span class="loader-meteor__tail"></span>
+                    <span class="loader-meteor__head"></span>
+                </span>
+                <span class="loader-frame loader-frame--diamond"></span>
+                <span class="loader-frame loader-frame--ring"></span>
+                <span class="loader-flare loader-flare--a"></span>
+                <span class="loader-flare loader-flare--b"></span>
+            </div>
+            <p class="page-loader__text">Loading New Scene</p>
+        </div>
+        <div id="page-content">
+            <slot />
+        </div>
         <script>
             import "htmx.org";
+        </script>
+        <script is:inline>
+            (() => {
+                const cleanupKey = "__portfolioFxCleanup";
+                const minimumLoaderDuration = 760;
+                const transitionFadeOutDelay = 680;
+                let loaderStartedAt = Date.now();
+                const transitionAnimations = [];
+
+                const trackTransitionAnimation = (animation) => {
+                    if (!animation) return;
+                    transitionAnimations.push(animation);
+                };
+
+                const clearTransitionAnimations = () => {
+                    while (transitionAnimations.length > 0) {
+                        const animation = transitionAnimations.pop();
+                        if (animation) {
+                            animation.cancel();
+                        }
+                    }
+                };
+
+                const parseHslLightness = (token) => {
+                    const matches = token.match(/([0-9.]+)%/g);
+                    if (!matches || matches.length === 0) return 50;
+
+                    const last = matches[matches.length - 1].replace("%", "");
+                    const lightness = Number.parseFloat(last);
+                    return Number.isFinite(lightness) ? lightness : 50;
+                };
+
+                const syncTransitionPalette = () => {
+                    const rootStyle = window.getComputedStyle(document.documentElement);
+                    const primaryToken = rootStyle.getPropertyValue("--primary").trim();
+                    const foregroundToken = rootStyle
+                        .getPropertyValue("--foreground")
+                        .trim();
+                    const backgroundToken = rootStyle
+                        .getPropertyValue("--background")
+                        .trim();
+
+                    const bgLightness = parseHslLightness(backgroundToken);
+                    const glowAlpha = bgLightness < 50 ? 0.7 : 0.5;
+                    const brightness = bgLightness < 50 ? 1.34 : 1.08;
+
+                    const targets = [
+                        document.getElementById("page-transition"),
+                        document.getElementById("page-loader"),
+                    ];
+
+                    targets.forEach((target) => {
+                        if (!target) return;
+
+                        if (primaryToken) {
+                            target.style.setProperty(
+                                "--meteor-tail-color",
+                                `hsl(${primaryToken} / 0.94)`,
+                            );
+                            target.style.setProperty(
+                                "--meteor-glow-color",
+                                `hsl(${primaryToken} / ${glowAlpha})`,
+                            );
+                        }
+
+                        if (foregroundToken) {
+                            target.style.setProperty(
+                                "--meteor-head-color",
+                                `hsl(${foregroundToken} / 0.96)`,
+                            );
+                            target.style.setProperty(
+                                "--meteor-flash-color",
+                                `hsl(${foregroundToken} / 0.9)`,
+                            );
+                        }
+
+                        target.style.setProperty(
+                            "--meteor-brightness",
+                            String(brightness),
+                        );
+                    });
+                };
+
+                const playTransitionSequence = () => {
+                    const transition = document.getElementById("page-transition");
+                    if (!transition) return;
+
+                    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                        return;
+                    }
+
+                    clearTransitionAnimations();
+                    syncTransitionPalette();
+
+                    const meteors = Array.from(
+                        transition.querySelectorAll(".transition-meteor"),
+                    );
+
+                    const laneCount = Math.max(meteors.length, 1);
+
+                    meteors.forEach((meteor, index) => {
+                        const laneRatio = laneCount === 1 ? 0.5 : index / (laneCount - 1);
+                        const top = 8 + laneRatio * 84 + (Math.random() * 6 - 3);
+                        const angle = -26 + Math.random() * 14;
+                        const width = 28 + Math.random() * 36;
+                        const duration = 760 + Math.random() * 360;
+                        const delay = index * 54 + Math.random() * 100;
+
+                        meteor.style.top = `${Math.max(4, Math.min(96, top))}%`;
+                        meteor.style.width = `${width}%`;
+                        meteor.style.setProperty("--meteor-angle", `${angle}deg`);
+
+                        const animation = meteor.animate(
+                            [
+                                {
+                                    opacity: 0,
+                                    transform: `translate3d(-160%, 0, 0) rotate(${angle}deg) scaleX(0.72)`,
+                                },
+                                {
+                                    opacity: 1,
+                                    transform: `translate3d(-42%, 0, 0) rotate(${angle}deg) scaleX(0.9)`,
+                                    offset: 0.2,
+                                },
+                                {
+                                    opacity: 1,
+                                    transform: `translate3d(44%, 0, 0) rotate(${angle}deg) scaleX(1)`,
+                                    offset: 0.76,
+                                },
+                                {
+                                    opacity: 0,
+                                    transform: `translate3d(174%, 0, 0) rotate(${angle}deg) scaleX(1.05)`,
+                                },
+                            ],
+                            {
+                                duration,
+                                delay,
+                                easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                                fill: "forwards",
+                            },
+                        );
+
+                        trackTransitionAnimation(animation);
+                    });
+
+                    const wipe = transition.querySelector(".page-transition__wipe");
+                    if (wipe) {
+                        trackTransitionAnimation(
+                            wipe.animate(
+                                [
+                                    {
+                                        opacity: 0,
+                                        transform: "translateX(-128%) skewX(-18deg)",
+                                    },
+                                    {
+                                        opacity: 0.95,
+                                        transform: "translateX(-12%) skewX(-18deg)",
+                                        offset: 0.34,
+                                    },
+                                    {
+                                        opacity: 0,
+                                        transform: "translateX(132%) skewX(-18deg)",
+                                    },
+                                ],
+                                {
+                                    duration: 960,
+                                    easing: "cubic-bezier(0.18, 0.95, 0.2, 1)",
+                                    fill: "forwards",
+                                },
+                            ),
+                        );
+                    }
+
+                    const flashCore = transition.querySelector(".transition-flash--core");
+                    if (flashCore) {
+                        trackTransitionAnimation(
+                            flashCore.animate(
+                                [
+                                    { opacity: 0, transform: "scale(0.3)" },
+                                    { opacity: 1, transform: "scale(1)", offset: 0.4 },
+                                    { opacity: 0, transform: "scale(1.7)" },
+                                ],
+                                {
+                                    duration: 820,
+                                    easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                                    fill: "forwards",
+                                },
+                            ),
+                        );
+                    }
+
+                    const flashBeam = transition.querySelector(".transition-flash--beam");
+                    if (flashBeam) {
+                        trackTransitionAnimation(
+                            flashBeam.animate(
+                                [
+                                    {
+                                        opacity: 0,
+                                        transform: "rotate(-14deg) scaleX(0.12)",
+                                    },
+                                    {
+                                        opacity: 1,
+                                        transform: "rotate(-14deg) scaleX(1)",
+                                        offset: 0.45,
+                                    },
+                                    {
+                                        opacity: 0,
+                                        transform: "rotate(-14deg) scaleX(1.2)",
+                                    },
+                                ],
+                                {
+                                    duration: 760,
+                                    delay: 40,
+                                    easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                                    fill: "forwards",
+                                },
+                            ),
+                        );
+                    }
+
+                    const cameraLines = Array.from(
+                        transition.querySelectorAll(".camera-line"),
+                    );
+                    cameraLines.forEach((line, index) => {
+                        trackTransitionAnimation(
+                            line.animate(
+                                [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }],
+                                {
+                                    duration: 860,
+                                    delay: index * 36,
+                                    easing: "ease",
+                                    fill: "forwards",
+                                },
+                            ),
+                        );
+                    });
+                };
+
+                const setTransitionVisibility = (isActive) => {
+                    document.documentElement.classList.toggle(
+                        "is-transitioning",
+                        isActive,
+                    );
+                    const transition = document.getElementById("page-transition");
+                    if (transition) {
+                        transition.setAttribute(
+                            "aria-hidden",
+                            isActive ? "false" : "true",
+                        );
+                    }
+
+                    if (isActive) {
+                        playTransitionSequence();
+                    } else {
+                        clearTransitionAnimations();
+                    }
+                };
+
+                const setLoaderVisibility = (isLoading) => {
+                    if (isLoading) {
+                        loaderStartedAt = Date.now();
+                    }
+
+                    document.documentElement.classList.toggle(
+                        "is-loading",
+                        isLoading,
+                    );
+                    const loader = document.getElementById("page-loader");
+                    if (loader) {
+                        loader.setAttribute("aria-hidden", isLoading ? "false" : "true");
+                    }
+                };
+
+                const setupParticles = () => {
+                    const container = document.getElementById("ambient-particles");
+                    if (!container) return () => {};
+
+                    container.innerHTML = "";
+                    const particleCount = window.matchMedia("(max-width: 768px)").matches
+                        ? 14
+                        : 24;
+
+                    for (let index = 0; index < particleCount; index += 1) {
+                        const particle = document.createElement("span");
+                        particle.className = "particle";
+                        particle.style.left = `${Math.random() * 100}%`;
+                        particle.style.width = `${2 + Math.random() * 4}px`;
+                        particle.style.height = particle.style.width;
+                        particle.style.opacity = `${0.12 + Math.random() * 0.35}`;
+                        particle.style.animationDelay = `${Math.random() * 8}s`;
+                        particle.style.animationDuration = `${10 + Math.random() * 12}s`;
+                        container.appendChild(particle);
+                    }
+
+                    return () => {
+                        container.innerHTML = "";
+                    };
+                };
+
+                const setupScrollReveal = () => {
+                    const selectors = [
+                        "main h1",
+                        "main h2",
+                        "main h3",
+                        "main h4",
+                        "main h5",
+                        "main h6",
+                        "main img",
+                        "main .aspect-video",
+                    ].join(", ");
+
+                    const targets = Array.from(document.querySelectorAll(selectors)).filter(
+                        (element) => !element.classList.contains("scroll-reveal-ignore"),
+                    );
+
+                    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                        targets.forEach((element) => element.classList.add("is-revealed"));
+                        return () => {};
+                    }
+
+                    targets.forEach((element, index) => {
+                        element.classList.add("scroll-reveal");
+                        const delay = Math.min((index % 8) * 110, 770);
+                        element.style.setProperty("--reveal-delay", `${delay}ms`);
+                    });
+
+                    const revealElements = () => {
+                        const triggerPoint = window.innerHeight * 0.9;
+                        targets.forEach((element) => {
+                            if (element.classList.contains("is-revealed")) return;
+                            const rect = element.getBoundingClientRect();
+                            if (rect.top <= triggerPoint) {
+                                element.classList.add("is-revealed");
+                            }
+                        });
+                    };
+
+                    let ticking = false;
+                    const onScroll = () => {
+                        if (ticking) return;
+                        ticking = true;
+                        window.requestAnimationFrame(() => {
+                            revealElements();
+                            ticking = false;
+                        });
+                    };
+
+                    revealElements();
+                    window.addEventListener("scroll", onScroll, { passive: true });
+                    window.addEventListener("resize", revealElements);
+
+                    return () => {
+                        window.removeEventListener("scroll", onScroll);
+                        window.removeEventListener("resize", revealElements);
+                    };
+                };
+
+                const finishWhenReady = () => {
+                    const hideLoaderGracefully = () => {
+                        const elapsed = Date.now() - loaderStartedAt;
+                        const remaining = Math.max(minimumLoaderDuration - elapsed, 0);
+
+                        window.setTimeout(() => {
+                            setLoaderVisibility(false);
+                            window.setTimeout(() => {
+                                setTransitionVisibility(false);
+                            }, transitionFadeOutDelay);
+                        }, remaining);
+                    };
+
+                    if (document.readyState === "complete") {
+                        window.requestAnimationFrame(hideLoaderGracefully);
+                        return;
+                    }
+
+                    window.addEventListener(
+                        "load",
+                        () => {
+                            hideLoaderGracefully();
+                        },
+                        { once: true },
+                    );
+                };
+
+                const mountEnhancements = () => {
+                    const previousCleanup = window[cleanupKey];
+                    if (typeof previousCleanup === "function") {
+                        previousCleanup();
+                    }
+
+                    clearTransitionAnimations();
+                    syncTransitionPalette();
+
+                    setLoaderVisibility(true);
+                    setTransitionVisibility(true);
+
+                    const cleanups = [setupScrollReveal(), setupParticles()];
+
+                    window[cleanupKey] = () => {
+                        clearTransitionAnimations();
+                        cleanups.forEach((cleanup) => {
+                            if (typeof cleanup === "function") {
+                                cleanup();
+                            }
+                        });
+                    };
+
+                    finishWhenReady();
+                };
+
+                document.addEventListener("astro:before-preparation", () => {
+                    setTransitionVisibility(true);
+                    setLoaderVisibility(true);
+                });
+                document.addEventListener("astro:page-load", mountEnhancements);
+
+                mountEnhancements();
+            })();
         </script>
     </body>
 </html>
