@@ -172,449 +172,6 @@ const transitionTriangles = [
                 <slot />
             </div>
         </div>
-        <script>
-            import "htmx.org";
-        </script>
-        <script>
-            import barba from "@barba/core";
-            import { gsap } from "gsap";
-
-            const w = window as Window & {
-                __portfolioBarbaStarted?: boolean;
-                __portfolioFxMount?: () => void;
-            };
-
-            const overlay = document.querySelector<HTMLElement>(
-                ".transition-overlay",
-            );
-            const overlayBase = document.querySelector<HTMLElement>(
-                ".transition-overlay__base",
-            );
-            const overlayFrame = document.querySelector<HTMLElement>(
-                ".transition-overlay__frame",
-            );
-            const overlayMark = document.querySelector<HTMLElement>(
-                ".transition-overlay__mark",
-            );
-            const reducedMotionQuery = window.matchMedia(
-                "(prefers-reduced-motion: reduce)",
-            );
-            const getTransitionPieces = () =>
-                Array.from(
-                    document.querySelectorAll<HTMLElement>(
-                        "[data-transition-piece]",
-                    ),
-                );
-            const getTransitionTriangles = () =>
-                Array.from(
-                    document.querySelectorAll<HTMLElement>(
-                        "[data-transition-triangle]",
-                    ),
-                );
-            const getTransitionTargets = () =>
-                [
-                    overlay,
-                    overlayBase,
-                    overlayFrame,
-                    overlayMark,
-                    ...getTransitionPieces(),
-                    ...getTransitionTriangles(),
-                ].filter(Boolean) as HTMLElement[];
-
-            const getTitleTargets = (container: ParentNode = document) =>
-                Array.from(
-                    container.querySelectorAll<HTMLElement>(
-                        "[data-barba-title], .portfolio-hero-panel h1, main h1",
-                    ),
-                ).filter((element) => element.offsetParent !== null);
-
-            const animatePageTitle = (container: ParentNode = document) => {
-                const targets = getTitleTargets(container);
-                if (!targets.length || reducedMotionQuery.matches) return;
-
-                gsap.fromTo(
-                    targets,
-                    { y: 36, opacity: 0 },
-                    {
-                        y: 0,
-                        opacity: 1,
-                        duration: 0.54,
-                        ease: "power2.out",
-                        stagger: 0.06,
-                        clearProps: "transform,opacity",
-                    },
-                );
-            };
-
-            const syncDocumentTitle = (html: string) => {
-                const match = html.match(/<title[^>]*>(.*?)<\/title>/i);
-                if (match?.[1]) {
-                    document.title = match[1];
-                }
-            };
-
-            const setOverlayIdle = () => {
-                const pieces = getTransitionPieces();
-                const triangles = getTransitionTriangles();
-
-                if (overlay) {
-                    gsap.set(overlay, { autoAlpha: 0 });
-                }
-
-                if (overlayBase) {
-                    gsap.set(overlayBase, { autoAlpha: 0 });
-                }
-
-                gsap.set(pieces, {
-                    x: (_index, element: HTMLElement) =>
-                        element.dataset.enterX || 0,
-                    y: (_index, element: HTMLElement) =>
-                        element.dataset.enterY || 0,
-                    rotate: (_index, element: HTMLElement) =>
-                        element.dataset.enterRotate || 0,
-                    scale: 0.18,
-                    opacity: 0,
-                    transformOrigin: "50% 50%",
-                });
-
-                gsap.set(triangles, {
-                    x: (_index, element: HTMLElement) =>
-                        element.dataset.enterX || 0,
-                    y: (_index, element: HTMLElement) =>
-                        element.dataset.enterY || 0,
-                    rotate: (_index, element: HTMLElement) =>
-                        element.dataset.enterRotate || 0,
-                    scale: 0.08,
-                    opacity: 0,
-                    transformOrigin: "50% 50%",
-                });
-
-                if (overlayFrame) {
-                    gsap.set(overlayFrame, {
-                        autoAlpha: 0,
-                        rotate: -6,
-                        scale: 0.68,
-                    });
-                }
-
-                if (overlayMark) {
-                    gsap.set(overlayMark, {
-                        autoAlpha: 0,
-                        y: 12,
-                        scale: 0.92,
-                    });
-                }
-            };
-
-            setOverlayIdle();
-
-            if (!w.__portfolioBarbaStarted && overlay) {
-                w.__portfolioBarbaStarted = true;
-
-                barba.init({
-                    preventRunning: true,
-                    prevent: ({ el, href }) => {
-                        const link = el as HTMLAnchorElement | null;
-                        if (!link || !href) return false;
-
-                        const url = new URL(href, window.location.href);
-                        const isSamePageHash =
-                            url.pathname === window.location.pathname &&
-                            url.search === window.location.search &&
-                            url.hash;
-
-                        return (
-                            link.hasAttribute("download") ||
-                            link.target === "_blank" ||
-                            link.dataset.noTransition === "true" ||
-                            href.startsWith("mailto:") ||
-                            href.startsWith("tel:") ||
-                            url.origin !== window.location.origin ||
-                            Boolean(isSamePageHash)
-                        );
-                    },
-                    transitions: [
-                        {
-                            name: "modular-scale-compose",
-                            once() {
-                                animatePageTitle(document);
-                            },
-                            async leave({ current }) {
-                                if (reducedMotionQuery.matches) return;
-
-                                document.documentElement.dataset.routeTransition =
-                                    "out";
-                                const pieces = getTransitionPieces();
-                                const triangles = getTransitionTriangles();
-                                gsap.killTweensOf([
-                                    ...getTransitionTargets(),
-                                    current.container,
-                                ]);
-                                setOverlayIdle();
-
-                                await new Promise<void>((resolve) => {
-                                    const timeline = gsap.timeline({
-                                        onComplete: resolve,
-                                    });
-                                    const currentContainer = current.container as
-                                        | HTMLElement
-                                        | undefined;
-
-                                    if (currentContainer) {
-                                        timeline.to(
-                                            currentContainer,
-                                            {
-                                                scale: 0.965,
-                                                opacity: 0.58,
-                                                filter: "blur(5px)",
-                                                duration: 0.56,
-                                                ease: "power3.out",
-                                            },
-                                            0,
-                                        );
-                                    }
-
-                                    timeline
-                                        .set(overlay, { autoAlpha: 1 }, 0)
-                                        .to(
-                                            overlayBase,
-                                            {
-                                                autoAlpha: 1,
-                                                duration: 0.3,
-                                                ease: "power2.out",
-                                            },
-                                            0,
-                                        )
-                                        .to(
-                                            triangles,
-                                            {
-                                                x: 0,
-                                                y: 0,
-                                                rotate: 0,
-                                                scale: 1,
-                                                opacity: 0.9,
-                                                duration: 0.5,
-                                                ease: "power4.out",
-                                                stagger: {
-                                                    amount: 0.22,
-                                                    from: "random",
-                                                },
-                                            },
-                                            0,
-                                        )
-                                        .to(
-                                            pieces,
-                                            {
-                                                x: 0,
-                                                y: 0,
-                                                rotate: 0,
-                                                scale: 1,
-                                                opacity: 1,
-                                                duration: 0.62,
-                                                ease: "power4.out",
-                                                stagger: {
-                                                    amount: 0.28,
-                                                    from: "center",
-                                                    grid: [3, 4],
-                                                },
-                                            },
-                                            0.04,
-                                        )
-                                        .to(
-                                            overlayFrame,
-                                            {
-                                                autoAlpha: 1,
-                                                rotate: 0,
-                                                scale: 1,
-                                                duration: 0.48,
-                                                ease: "back.out(1.7)",
-                                            },
-                                            0.28,
-                                        )
-                                        .to(
-                                            overlayMark,
-                                            {
-                                                autoAlpha: 1,
-                                                y: 0,
-                                                scale: 1,
-                                                duration: 0.36,
-                                                ease: "power2.out",
-                                            },
-                                            0.42,
-                                        )
-                                        .to(
-                                            triangles,
-                                            {
-                                                scale: 1.08,
-                                                opacity: 0.68,
-                                                duration: 0.34,
-                                                ease: "sine.inOut",
-                                                stagger: {
-                                                    amount: 0.1,
-                                                    from: "center",
-                                                },
-                                            },
-                                            0.34,
-                                        );
-                                });
-                            },
-                            beforeEnter({ next }) {
-                                window.scrollTo({ top: 0, left: 0 });
-                                syncDocumentTitle(next.html || "");
-                                gsap.set(next.container, {
-                                    scale: 1.035,
-                                    opacity: 0.84,
-                                    filter: "blur(7px)",
-                                });
-                            },
-                            async enter({ next }) {
-                                document.documentElement.dataset.routeTransition =
-                                    "in";
-                                const pieces = getTransitionPieces();
-                                const triangles = getTransitionTriangles();
-                                let mounted = false;
-                                const mountNextPage = () => {
-                                    if (mounted) return;
-                                    mounted = true;
-                                    document.dispatchEvent(
-                                        new CustomEvent("barba:after-enter"),
-                                    );
-                                    animatePageTitle(next.container);
-                                };
-
-                                if (reducedMotionQuery.matches) {
-                                    mountNextPage();
-                                    delete document.documentElement.dataset
-                                        .routeTransition;
-                                    return;
-                                }
-
-                                gsap.killTweensOf([
-                                    ...getTransitionTargets(),
-                                    next.container,
-                                ]);
-
-                                await new Promise<void>((resolve) => {
-                                    const timeline = gsap.timeline({
-                                        onComplete: resolve,
-                                    });
-
-                                    timeline
-                                        .call(mountNextPage, [], 0.08)
-                                        .to(
-                                            next.container,
-                                            {
-                                                scale: 1,
-                                                opacity: 1,
-                                                filter: "blur(0px)",
-                                                duration: 0.72,
-                                                ease: "power3.out",
-                                                clearProps:
-                                                    "transform,opacity,filter",
-                                            },
-                                            0.06,
-                                        )
-                                        .to(
-                                            overlayMark,
-                                            {
-                                                autoAlpha: 0,
-                                                y: -8,
-                                                scale: 1.08,
-                                                duration: 0.24,
-                                                ease: "power2.in",
-                                            },
-                                            0,
-                                        )
-                                        .to(
-                                            overlayFrame,
-                                            {
-                                                autoAlpha: 0,
-                                                rotate: 5,
-                                                scale: 1.26,
-                                                duration: 0.46,
-                                                ease: "power3.inOut",
-                                            },
-                                            0.08,
-                                        )
-                                        .to(
-                                            overlayBase,
-                                            {
-                                                autoAlpha: 0,
-                                                duration: 0.5,
-                                                ease: "power2.inOut",
-                                            },
-                                            0.14,
-                                        )
-                                        .to(
-                                            triangles,
-                                            {
-                                                x: (_index, element: HTMLElement) =>
-                                                    element.dataset.exitX || 0,
-                                                y: (_index, element: HTMLElement) =>
-                                                    element.dataset.exitY || 0,
-                                                rotate: (
-                                                    _index,
-                                                    element: HTMLElement,
-                                                ) =>
-                                                    element.dataset.exitRotate ||
-                                                    0,
-                                                scale: 0.06,
-                                                opacity: 0,
-                                                duration: 0.52,
-                                                ease: "power3.inOut",
-                                                stagger: {
-                                                    amount: 0.2,
-                                                    from: "random",
-                                                },
-                                            },
-                                            0.02,
-                                        )
-                                        .to(
-                                            pieces,
-                                            {
-                                                x: (_index, element: HTMLElement) =>
-                                                    element.dataset.exitX || 0,
-                                                y: (_index, element: HTMLElement) =>
-                                                    element.dataset.exitY || 0,
-                                                rotate: (
-                                                    _index,
-                                                    element: HTMLElement,
-                                                ) =>
-                                                    element.dataset.exitRotate ||
-                                                    0,
-                                                scale: 0.16,
-                                                opacity: 0,
-                                                duration: 0.58,
-                                                ease: "power3.inOut",
-                                                stagger: {
-                                                    amount: 0.22,
-                                                    from: "edges",
-                                                    grid: [3, 4],
-                                                },
-                                            },
-                                            0.1,
-                                        )
-                                        .to(
-                                            overlay,
-                                            {
-                                                autoAlpha: 0,
-                                                duration: 0.14,
-                                                ease: "none",
-                                            },
-                                            0.68,
-                                        );
-                                });
-
-                                mountNextPage();
-                                setOverlayIdle();
-                                delete document.documentElement.dataset
-                                    .routeTransition;
-                            },
-                        },
-                    ],
-                });
-            }
-        </script>
         <script is:inline>
             (() => {
                 const cleanupKey = "__portfolioFxCleanup";
@@ -754,6 +311,9 @@ const transitionTriangles = [
                     const cleanups = [];
                     const portfolioHome = document.querySelector(".portfolio-home");
                     const clickLens = document.querySelector(".portfolio-click-lens");
+                    const canUsePointerEffects =
+                        window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+                        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
                     document.querySelectorAll(".profile-flip-container").forEach((container) => {
                         const onClick = () => {
@@ -795,7 +355,7 @@ const transitionTriangles = [
                         });
                     }
 
-                    if (portfolioHome && clickLens) {
+                    if (portfolioHome && clickLens && canUsePointerEffects) {
                         let lensTimeout = 0;
 
                         const setLensPointer = (event) => {
@@ -848,9 +408,10 @@ const transitionTriangles = [
                         });
                     }
 
-                    document
-                        .querySelectorAll(".portfolio-project, .portfolio-chip")
-                        .forEach((element) => {
+                    if (canUsePointerEffects) {
+                        document
+                            .querySelectorAll(".portfolio-project, .portfolio-chip")
+                            .forEach((element) => {
                             let waterImpactTimeout = 0;
                             let waterHoverTimeout = 0;
                             if (!element.querySelector(".portfolio-water-surface")) {
@@ -929,7 +490,8 @@ const transitionTriangles = [
                                 if (waterHoverTimeout) window.clearTimeout(waterHoverTimeout);
                                 element.classList.remove("portfolio-water-hovering");
                             });
-                        });
+                            });
+                    }
 
                     return () => {
                         cleanups.forEach((cleanup) => cleanup());
@@ -944,7 +506,12 @@ const transitionTriangles = [
                     const reducedMotionQuery = window.matchMedia(
                         "(prefers-reduced-motion: reduce)",
                     );
-                    caseRoot.classList.add("case-motion-ready");
+                    const canUsePointerEffects =
+                        window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+                        !reducedMotionQuery.matches;
+                    if (canUsePointerEffects) {
+                        caseRoot.classList.add("case-motion-ready");
+                    }
 
                     const setCasePointer = (x, y) => {
                         caseRoot.style.setProperty("--case-pointer-x", `${x}%`);
@@ -959,7 +526,7 @@ const transitionTriangles = [
                     caseRoot.style.setProperty("--flow-boost", "0");
                     caseRoot.style.setProperty("--scroll-boost", "0");
 
-                    if (!reducedMotionQuery.matches) {
+                    if (canUsePointerEffects) {
                         let rafId = 0;
                         let pendingPointer = null;
                         let pointerBoostTimeout = 0;
@@ -1100,7 +667,7 @@ const transitionTriangles = [
                     };
 
                     const setupTilt = (element, strength = 7) => {
-                        if (reducedMotionQuery.matches) return;
+                        if (!canUsePointerEffects) return;
 
                         const onMove = (event) => {
                             const rect = element.getBoundingClientRect();
@@ -1168,7 +735,7 @@ const transitionTriangles = [
                     const themeInterfaces = Array.from(
                         document.querySelectorAll("[data-dynamic-interface]"),
                     );
-                    if (themeInterfaces.length && !reducedMotionQuery.matches) {
+                    if (themeInterfaces.length && canUsePointerEffects) {
                         let themeFrameId = 0;
                         let lastLogIndex = -1;
                         const startedAt = performance.now();

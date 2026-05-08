@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import ThemeToggle from "@/components/ThemeToggle.astro";
 
 const PROFILE = {
     name: "OFANUS",
@@ -85,7 +85,7 @@ const EXPERIENCE: ExperienceItem[] = [
 <Layout title="About OFANUS" description="About page">
     <main class="container mx-auto px-6 py-12 max-w-4xl animate-blur-in">
         <div class="absolute right-6 top-6 z-50">
-            <ThemeToggle client:load />
+            <ThemeToggle />
         </div>
 
         <a href="/" class="inline-flex items-center gap-2 mb-12 text-muted-foreground hover:text-foreground transition-colors">
@@ -104,6 +104,8 @@ const EXPERIENCE: ExperienceItem[] = [
                             src={PROFILE.avatar}
                             alt={PROFILE.name}
                             class="w-full h-full object-cover"
+                            decoding="async"
+                            fetchpriority="high"
                         />
                     </div>
                     

@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { getCollection } from "astro:content";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import ThemeToggle from "@/components/ThemeToggle.astro";
 import PortfolioScene from "@/components/PortfolioScene";
 import { getProjectPresentation } from "@/lib/projectPresentation";
 
@@ -93,7 +93,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                 {/* Profile Section */}
                 <header class="flex flex-col items-center justify-center mb-16 space-y-6 relative">
                     <div class="absolute right-0 top-0 md:top-auto">
-                        <ThemeToggle client:load />
+                        <ThemeToggle />
                     </div>
 
                     <div class="profile-flip-container w-24 h-24 md:w-32 md:h-32 relative cursor-pointer [perspective:1000px] z-50 group hover:scale-110 transition-transform duration-500">
@@ -102,11 +102,15 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                 src={PROFILE.avatar}
                                 alt="Profile"
                                 class="object-cover w-full h-full absolute inset-0 bg-muted [backface-visibility:hidden]"
+                                decoding="async"
+                                fetchpriority="high"
                             />
                             <img
                                 src="/melogo.png"
                                 alt="Logo"
                                 class="object-cover w-full h-full absolute inset-0 bg-white [backface-visibility:hidden] flip-180"
+                                loading="lazy"
+                                decoding="async"
                             />
                         </div>
                     </div>
@@ -159,6 +163,8 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                                     src={project.data.thumbnail}
                                                     alt={project.data.title}
                                                     class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                                                    loading="lazy"
+                                                    decoding="async"
                                                 />
                                                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <span class="text-white font-medium tracking-wide">
@@ -277,7 +283,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
         CURRENT_LAYOUT === 2 && (
             <main class="container mx-auto px-6 py-12 max-w-[1800px] animate-blur-in">
                 <div class="absolute right-6 top-6 z-50">
-                    <ThemeToggle client:load />
+                    <ThemeToggle />
                 </div>
 
                 {/* Header Section */}
@@ -289,11 +295,15 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                     src={PROFILE.avatar}
                                     alt="Profile"
                                     class="object-cover w-full h-full absolute inset-0 rounded-xl bg-muted [backface-visibility:hidden]"
+                                    decoding="async"
+                                    fetchpriority="high"
                                 />
                                 <img
                                     src="/melogo.png"
                                     alt="Logo"
                                     class="object-cover w-full h-full absolute inset-0 rounded-xl bg-white [backface-visibility:hidden] flip-180"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             </div>
                         </div>
@@ -342,6 +352,8 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                                     src={project.data.thumbnail}
                                                     alt={project.data.title}
                                                     class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                                    loading="lazy"
+                                                    decoding="async"
                                                 />
                                                 {/* Overlay */}
                                                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
@@ -409,7 +421,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
         CURRENT_LAYOUT === 3 && (
             <div class="portfolio-home relative min-h-screen overflow-hidden bg-background">
                 <PortfolioScene
-                    client:load
+                    client:media="(min-width: 900px)"
                     projectCount={sortedPortfolio.length}
                     categories={genreNames}
                     featuredProjects={featuredSceneProjects}
@@ -429,15 +441,19 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                             src={PROFILE.avatar}
                                             alt="OFAUNS profile"
                                             class="absolute inset-0 h-full w-full bg-muted object-cover [backface-visibility:hidden]"
+                                            decoding="async"
+                                            fetchpriority="high"
                                         />
                                         <img
                                             src="/melogo.png"
                                             alt="OFAUNS mark"
                                             class="flip-180 absolute inset-0 h-full w-full bg-white object-cover [backface-visibility:hidden]"
+                                            loading="lazy"
+                                            decoding="async"
                                         />
                                     </div>
                                 </a>
-                                <ThemeToggle client:load />
+                                <ThemeToggle />
                             </div>
 
                             <div class="mt-10 max-w-xl space-y-4 sm:mt-12 lg:mt-12">
@@ -581,6 +597,8 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                                                     .title
                                                             }
                                                             class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                                            loading="lazy"
+                                                            decoding="async"
                                                         />
                                                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-95" />
                                                         <span class="portfolio-project-mode">

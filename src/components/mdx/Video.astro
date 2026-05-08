@@ -1,15 +1,21 @@
 ---
-import { VideoPlayer as Player } from "@/components/VideoPlayer";
-
 interface Props {
     src: string;
+    title?: string;
+    poster?: string;
 }
 
-const { src } = Astro.props;
+const { src, title = "Project video", poster } = Astro.props;
 ---
 
-<div
-    class="my-8 aspect-video w-full rounded-lg border border-white/10 overflow-hidden shadow-lg"
->
-    <Player client:visible src={src} />
+<div class="my-8 aspect-video w-full overflow-hidden rounded-lg border border-white/10 bg-black shadow-lg">
+    <video
+        class="h-full w-full"
+        src={src}
+        title={title}
+        poster={poster}
+        controls
+        preload="metadata"
+        playsinline
+    ></video>
 </div>

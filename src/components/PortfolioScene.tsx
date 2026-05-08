@@ -122,11 +122,11 @@ export default function PortfolioScene({
         );
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
-            antialias: true,
-            powerPreference: "high-performance",
+            antialias: false,
+            powerPreference: "low-power",
         });
         renderer.setClearColor(0x000000, 0);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2));
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.domElement.className = "portfolio-webgl-canvas";
         mount.appendChild(renderer.domElement);
@@ -181,8 +181,8 @@ export default function PortfolioScene({
 
         const textureLoader = new THREE.TextureLoader();
         const loadedTextures: THREE.Texture[] = [];
-        const projects = featuredProjects.slice(0, 8);
-        const cardGeometry = new THREE.PlaneGeometry(1.95, 1.1, 8, 4);
+        const projects = featuredProjects.slice(0, 6);
+        const cardGeometry = new THREE.PlaneGeometry(1.95, 1.1, 4, 2);
         const cards = projects.map((project, index) => {
             const color = new THREE.Color(project.color);
             const material = new THREE.MeshBasicMaterial({
@@ -229,7 +229,8 @@ export default function PortfolioScene({
         });
 
         const shardGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-        const shards = Array.from({ length: 18 }, (_, index) => {
+        const shardCount = 12;
+        const shards = Array.from({ length: shardCount }, (_, index) => {
             const color = new THREE.Color(PALETTE[index % PALETTE.length]);
             const material = new THREE.MeshBasicMaterial({
                 color,
@@ -240,7 +241,7 @@ export default function PortfolioScene({
                 depthWrite: false,
             });
             const mesh = new THREE.Mesh(shardGeometry, material);
-            const angle = (index / 18) * Math.PI * 2;
+            const angle = (index / shardCount) * Math.PI * 2;
             mesh.position.set(
                 Math.cos(angle) * (2.1 + (index % 4) * 0.58),
                 -2.5 + (index % 6) * 0.92,
@@ -258,7 +259,7 @@ export default function PortfolioScene({
             };
         });
 
-        const particleCount = window.innerWidth < 768 ? 220 : 460;
+        const particleCount = window.innerWidth < 768 ? 120 : 300;
         const positions = new Float32Array(particleCount * 3);
         const colors = new Float32Array(particleCount * 3);
         const particleSeeds = new Float32Array(particleCount);
@@ -290,9 +291,10 @@ export default function PortfolioScene({
         const particles = new THREE.Points(particleGeometry, particleMaterial);
         root.add(particles);
 
-        const ribbonCount = 4;
+        const ribbonCount = 3;
+        const ribbonPointCount = 80;
         const ribbonPoints = Array.from({ length: ribbonCount }, () =>
-            Array.from({ length: 120 }, () => new THREE.Vector3()),
+            Array.from({ length: ribbonPointCount }, () => new THREE.Vector3()),
         );
         const ribbons = ribbonPoints.map((points, index) => {
             const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -405,9 +407,9 @@ export default function PortfolioScene({
                     "position",
                 ) as THREE.BufferAttribute;
                 const array = position.array as Float32Array;
-                for (let point = 0; point < 120; point += 1) {
+                for (let point = 0; point < ribbonPointCount; point += 1) {
                     const offset = point * 3;
-                    const progress = point / 119;
+                    const progress = point / (ribbonPointCount - 1);
                     const sweep = progress * Math.PI * 2;
                     const waveTime = time * (0.7 + index * 0.08) * motionScale;
                     const radius = 1.5 + index * 0.36 + Math.sin(waveTime + sweep) * 0.16;

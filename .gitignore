@@ -3,6 +3,9 @@ dist/
 # generated types
 .astro/
 
+# local dev server logs
+codex-dev-server*.log
+
 # dependencies
 node_modules/
 

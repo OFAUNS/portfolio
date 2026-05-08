@@ -1,9 +1,11 @@
 ---
 interface Props {
     src: string;
+    title?: string;
+    class?: string;
 }
 
-const { src } = Astro.props;
+const { src, title = "YouTube video player", class: className } = Astro.props;
 
 // Helper to extract ID (reusing logic or simplified)
 const getYouTubeId = (url: string) => {
@@ -15,18 +17,72 @@ const getYouTubeId = (url: string) => {
 };
 
 const videoId = getYouTubeId(src);
-const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}`;
+const thumbUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+const wrapperClass =
+    className ||
+    "aspect-video w-full bg-black overflow-hidden shadow-lg my-8 rounded-lg border border-white/10";
 ---
 
 <div
-    class="aspect-video w-full bg-black overflow-hidden shadow-lg my-8 rounded-lg border border-white/10"
+    class={wrapperClass}
+    data-youtube-lite
+    data-embed-url={embedUrl}
+    data-title={title}
 >
-    <iframe
-        width="100%"
-        height="100%"
-        src={embedUrl}
-        title="YouTube video player"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen></iframe>
+    <button
+        type="button"
+        class="relative grid h-full w-full place-items-center overflow-hidden bg-black text-white"
+        aria-label={`Play ${title}`}
+    >
+        <img
+            src={thumbUrl}
+            alt=""
+            class="h-full w-full object-cover opacity-80 transition duration-500 hover:scale-105 hover:opacity-95"
+            loading="lazy"
+            decoding="async"
+        />
+        <span class="absolute grid h-16 w-16 place-items-center rounded-full bg-white/90 text-black shadow-2xl transition duration-300 hover:scale-105">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path d="M8 5v14l11-7z"></path>
+            </svg>
+        </span>
+    </button>
 </div>
+
+<script is:inline>
+    (() => {
+        if (window.__portfolioYouTubeLiteBound) return;
+        window.__portfolioYouTubeLiteBound = true;
+
+        document.addEventListener("click", (event) => {
+            const trigger = event.target.closest("[data-youtube-lite] button");
+            if (!trigger) return;
+
+            const wrapper = trigger.closest("[data-youtube-lite]");
+            const embedUrl = wrapper?.dataset.embedUrl;
+            if (!wrapper || !embedUrl) return;
+
+            const separator = embedUrl.includes("?") ? "&" : "?";
+            const iframe = document.createElement("iframe");
+            iframe.width = "100%";
+            iframe.height = "100%";
+            iframe.src = `${embedUrl}${separator}autoplay=1&rel=0`;
+            iframe.title = wrapper.dataset.title || "YouTube video player";
+            iframe.allow =
+                "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allowFullscreen = true;
+            iframe.loading = "lazy";
+            iframe.style.border = "0";
+
+            wrapper.replaceChildren(iframe);
+        });
+    })();
+</script>
