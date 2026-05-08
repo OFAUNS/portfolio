@@ -6,8 +6,19 @@ export function ThemeToggle({ className }: { className?: string }) {
     const [theme, setTheme] = React.useState<"light" | "dark">("light")
 
     React.useEffect(() => {
-        const isDark = document.documentElement.classList.contains("dark")
-        setTheme(isDark ? "dark" : "light")
+        const syncTheme = () => {
+            const isDark = document.documentElement.classList.contains("dark")
+            setTheme(isDark ? "dark" : "light")
+        }
+
+        syncTheme()
+        window.addEventListener("storage", syncTheme)
+        window.addEventListener("portfolio:theme-change", syncTheme)
+
+        return () => {
+            window.removeEventListener("storage", syncTheme)
+            window.removeEventListener("portfolio:theme-change", syncTheme)
+        }
     }, [])
 
     const toggleTheme = () => {
@@ -21,16 +32,21 @@ export function ThemeToggle({ className }: { className?: string }) {
             document.documentElement.classList.remove("dark")
             localStorage.setItem("theme", "light")
         }
+
+        window.dispatchEvent(new CustomEvent("portfolio:theme-change"))
     }
 
     return (
         <button
+            type="button"
             onClick={toggleTheme}
             className={cn(
                 "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 w-9",
                 className
             )}
-            aria-label="Toggle theme"
+            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+            aria-pressed={theme === "dark"}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
         >
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

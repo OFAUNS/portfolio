@@ -7,8 +7,6 @@ interface Props {
     image?: string;
 }
 
-import { ViewTransitions } from "astro:transitions";
-
 const {
     title,
     description = "Visual designer / Founder of STUDIO SORAI",
@@ -20,6 +18,35 @@ const canonicalURL = new URL(
     Astro.site || "https://yourportfolio.work",
 );
 const socialImageURL = new URL(image, Astro.url);
+const barbaNamespace =
+    Astro.url.pathname === "/"
+        ? "home"
+        : Astro.url.pathname.replace(/^\/|\/$/g, "").replace(/[^a-z0-9]+/gi, "-") ||
+          "page";
+const transitionPieces = [
+    ["-22vw", "-18vh", "-8deg", "18vw", "-22vh", "10deg"],
+    ["-8vw", "-24vh", "6deg", "6vw", "-30vh", "-8deg"],
+    ["8vw", "-22vh", "-5deg", "-8vw", "-28vh", "7deg"],
+    ["24vw", "-14vh", "9deg", "-22vw", "-18vh", "-10deg"],
+    ["-26vw", "-4vh", "7deg", "22vw", "2vh", "-7deg"],
+    ["-10vw", "0vh", "-4deg", "-12vw", "18vh", "8deg"],
+    ["12vw", "2vh", "5deg", "12vw", "20vh", "-8deg"],
+    ["28vw", "-2vh", "-7deg", "-24vw", "6vh", "9deg"],
+    ["-24vw", "18vh", "-9deg", "18vw", "24vh", "8deg"],
+    ["-8vw", "24vh", "6deg", "2vw", "30vh", "-7deg"],
+    ["10vw", "22vh", "-5deg", "-8vw", "28vh", "6deg"],
+    ["24vw", "16vh", "8deg", "-20vw", "20vh", "-9deg"],
+];
+const transitionTriangles = [
+    ["-38vw", "-34vh", "-28deg", "32vw", "-28vh", "26deg", "polygon(50% 0, 100% 100%, 0 100%)"],
+    ["4vw", "-42vh", "18deg", "-20vw", "34vh", "-22deg", "polygon(0 0, 100% 50%, 0 100%)"],
+    ["40vw", "-22vh", "34deg", "-36vw", "22vh", "-18deg", "polygon(100% 0, 100% 100%, 0 50%)"],
+    ["-44vw", "8vh", "20deg", "36vw", "12vh", "-30deg", "polygon(0 0, 100% 0, 50% 100%)"],
+    ["36vw", "20vh", "-22deg", "-30vw", "-24vh", "28deg", "polygon(50% 0, 100% 100%, 0 100%)"],
+    ["-18vw", "42vh", "-34deg", "18vw", "-38vh", "16deg", "polygon(0 50%, 100% 0, 100% 100%)"],
+    ["18vw", "40vh", "24deg", "-28vw", "-30vh", "-26deg", "polygon(0 0, 100% 0, 50% 100%)"],
+    ["44vw", "2vh", "-18deg", "-38vw", "-8vh", "34deg", "polygon(0 0, 100% 50%, 0 100%)"],
+];
 ---
 
 <!doctype html>
@@ -48,7 +75,6 @@ const socialImageURL = new URL(image, Astro.url);
         <meta property="twitter:description" content={description} />
         <meta property="twitter:image" content={socialImageURL} />
 
-        <ViewTransitions />
         <!-- Preload Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -79,19 +105,515 @@ const socialImageURL = new URL(image, Astro.url);
             // Initial setting
             setDarkClass();
 
-            // Re-apply on navigation
-            document.addEventListener("astro:after-swap", setDarkClass);
+            // Re-apply on Barba navigation
+            document.addEventListener("barba:after-enter", setDarkClass);
         </script>
     </head>
     <body
         class="min-h-screen bg-background font-sans antialiased text-foreground overflow-x-hidden"
     >
         <div id="ambient-particles" aria-hidden="true"></div>
-        <div id="page-content">
-            <slot />
+        <div class="portfolio-click-lens" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="transition-overlay" aria-hidden="true">
+            <div class="transition-overlay__base"></div>
+            <div class="transition-overlay__pieces">
+                {
+                    transitionPieces.map(
+                        ([enterX, enterY, enterRotate, exitX, exitY, exitRotate], index) => (
+                            <span
+                                class="transition-overlay__piece"
+                                data-transition-piece
+                                data-enter-x={enterX}
+                                data-enter-y={enterY}
+                                data-enter-rotate={enterRotate}
+                                data-exit-x={exitX}
+                                data-exit-y={exitY}
+                                data-exit-rotate={exitRotate}
+                                style={`--piece-index: ${index};`}
+                            />
+                        ),
+                    )
+                }
+            </div>
+            <div class="transition-overlay__triangles">
+                {
+                    transitionTriangles.map(
+                        ([enterX, enterY, enterRotate, exitX, exitY, exitRotate, shape], index) => (
+                            <span
+                                class="transition-overlay__triangle"
+                                data-transition-triangle
+                                data-enter-x={enterX}
+                                data-enter-y={enterY}
+                                data-enter-rotate={enterRotate}
+                                data-exit-x={exitX}
+                                data-exit-y={exitY}
+                                data-exit-rotate={exitRotate}
+                                style={`--triangle-index: ${index}; --triangle-shape: ${shape};`}
+                            />
+                        ),
+                    )
+                }
+            </div>
+            <div class="transition-overlay__frame"></div>
+            <div class="transition-overlay__mark">
+                <span>OFAUNS</span>
+            </div>
+        </div>
+        <div data-barba="wrapper">
+            <div
+                id="page-content"
+                data-barba="container"
+                data-barba-namespace={barbaNamespace}
+            >
+                <slot />
+            </div>
         </div>
         <script>
             import "htmx.org";
+        </script>
+        <script>
+            import barba from "@barba/core";
+            import { gsap } from "gsap";
+
+            const w = window as Window & {
+                __portfolioBarbaStarted?: boolean;
+                __portfolioFxMount?: () => void;
+            };
+
+            const overlay = document.querySelector<HTMLElement>(
+                ".transition-overlay",
+            );
+            const overlayBase = document.querySelector<HTMLElement>(
+                ".transition-overlay__base",
+            );
+            const overlayFrame = document.querySelector<HTMLElement>(
+                ".transition-overlay__frame",
+            );
+            const overlayMark = document.querySelector<HTMLElement>(
+                ".transition-overlay__mark",
+            );
+            const reducedMotionQuery = window.matchMedia(
+                "(prefers-reduced-motion: reduce)",
+            );
+            const getTransitionPieces = () =>
+                Array.from(
+                    document.querySelectorAll<HTMLElement>(
+                        "[data-transition-piece]",
+                    ),
+                );
+            const getTransitionTriangles = () =>
+                Array.from(
+                    document.querySelectorAll<HTMLElement>(
+                        "[data-transition-triangle]",
+                    ),
+                );
+            const getTransitionTargets = () =>
+                [
+                    overlay,
+                    overlayBase,
+                    overlayFrame,
+                    overlayMark,
+                    ...getTransitionPieces(),
+                    ...getTransitionTriangles(),
+                ].filter(Boolean) as HTMLElement[];
+
+            const getTitleTargets = (container: ParentNode = document) =>
+                Array.from(
+                    container.querySelectorAll<HTMLElement>(
+                        "[data-barba-title], .portfolio-hero-panel h1, main h1",
+                    ),
+                ).filter((element) => element.offsetParent !== null);
+
+            const animatePageTitle = (container: ParentNode = document) => {
+                const targets = getTitleTargets(container);
+                if (!targets.length || reducedMotionQuery.matches) return;
+
+                gsap.fromTo(
+                    targets,
+                    { y: 36, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.54,
+                        ease: "power2.out",
+                        stagger: 0.06,
+                        clearProps: "transform,opacity",
+                    },
+                );
+            };
+
+            const syncDocumentTitle = (html: string) => {
+                const match = html.match(/<title[^>]*>(.*?)<\/title>/i);
+                if (match?.[1]) {
+                    document.title = match[1];
+                }
+            };
+
+            const setOverlayIdle = () => {
+                const pieces = getTransitionPieces();
+                const triangles = getTransitionTriangles();
+
+                if (overlay) {
+                    gsap.set(overlay, { autoAlpha: 0 });
+                }
+
+                if (overlayBase) {
+                    gsap.set(overlayBase, { autoAlpha: 0 });
+                }
+
+                gsap.set(pieces, {
+                    x: (_index, element: HTMLElement) =>
+                        element.dataset.enterX || 0,
+                    y: (_index, element: HTMLElement) =>
+                        element.dataset.enterY || 0,
+                    rotate: (_index, element: HTMLElement) =>
+                        element.dataset.enterRotate || 0,
+                    scale: 0.18,
+                    opacity: 0,
+                    transformOrigin: "50% 50%",
+                });
+
+                gsap.set(triangles, {
+                    x: (_index, element: HTMLElement) =>
+                        element.dataset.enterX || 0,
+                    y: (_index, element: HTMLElement) =>
+                        element.dataset.enterY || 0,
+                    rotate: (_index, element: HTMLElement) =>
+                        element.dataset.enterRotate || 0,
+                    scale: 0.08,
+                    opacity: 0,
+                    transformOrigin: "50% 50%",
+                });
+
+                if (overlayFrame) {
+                    gsap.set(overlayFrame, {
+                        autoAlpha: 0,
+                        rotate: -6,
+                        scale: 0.68,
+                    });
+                }
+
+                if (overlayMark) {
+                    gsap.set(overlayMark, {
+                        autoAlpha: 0,
+                        y: 12,
+                        scale: 0.92,
+                    });
+                }
+            };
+
+            setOverlayIdle();
+
+            if (!w.__portfolioBarbaStarted && overlay) {
+                w.__portfolioBarbaStarted = true;
+
+                barba.init({
+                    preventRunning: true,
+                    prevent: ({ el, href }) => {
+                        const link = el as HTMLAnchorElement | null;
+                        if (!link || !href) return false;
+
+                        const url = new URL(href, window.location.href);
+                        const isSamePageHash =
+                            url.pathname === window.location.pathname &&
+                            url.search === window.location.search &&
+                            url.hash;
+
+                        return (
+                            link.hasAttribute("download") ||
+                            link.target === "_blank" ||
+                            link.dataset.noTransition === "true" ||
+                            href.startsWith("mailto:") ||
+                            href.startsWith("tel:") ||
+                            url.origin !== window.location.origin ||
+                            Boolean(isSamePageHash)
+                        );
+                    },
+                    transitions: [
+                        {
+                            name: "modular-scale-compose",
+                            once() {
+                                animatePageTitle(document);
+                            },
+                            async leave({ current }) {
+                                if (reducedMotionQuery.matches) return;
+
+                                document.documentElement.dataset.routeTransition =
+                                    "out";
+                                const pieces = getTransitionPieces();
+                                const triangles = getTransitionTriangles();
+                                gsap.killTweensOf([
+                                    ...getTransitionTargets(),
+                                    current.container,
+                                ]);
+                                setOverlayIdle();
+
+                                await new Promise<void>((resolve) => {
+                                    const timeline = gsap.timeline({
+                                        onComplete: resolve,
+                                    });
+                                    const currentContainer = current.container as
+                                        | HTMLElement
+                                        | undefined;
+
+                                    if (currentContainer) {
+                                        timeline.to(
+                                            currentContainer,
+                                            {
+                                                scale: 0.965,
+                                                opacity: 0.58,
+                                                filter: "blur(5px)",
+                                                duration: 0.56,
+                                                ease: "power3.out",
+                                            },
+                                            0,
+                                        );
+                                    }
+
+                                    timeline
+                                        .set(overlay, { autoAlpha: 1 }, 0)
+                                        .to(
+                                            overlayBase,
+                                            {
+                                                autoAlpha: 1,
+                                                duration: 0.3,
+                                                ease: "power2.out",
+                                            },
+                                            0,
+                                        )
+                                        .to(
+                                            triangles,
+                                            {
+                                                x: 0,
+                                                y: 0,
+                                                rotate: 0,
+                                                scale: 1,
+                                                opacity: 0.9,
+                                                duration: 0.5,
+                                                ease: "power4.out",
+                                                stagger: {
+                                                    amount: 0.22,
+                                                    from: "random",
+                                                },
+                                            },
+                                            0,
+                                        )
+                                        .to(
+                                            pieces,
+                                            {
+                                                x: 0,
+                                                y: 0,
+                                                rotate: 0,
+                                                scale: 1,
+                                                opacity: 1,
+                                                duration: 0.62,
+                                                ease: "power4.out",
+                                                stagger: {
+                                                    amount: 0.28,
+                                                    from: "center",
+                                                    grid: [3, 4],
+                                                },
+                                            },
+                                            0.04,
+                                        )
+                                        .to(
+                                            overlayFrame,
+                                            {
+                                                autoAlpha: 1,
+                                                rotate: 0,
+                                                scale: 1,
+                                                duration: 0.48,
+                                                ease: "back.out(1.7)",
+                                            },
+                                            0.28,
+                                        )
+                                        .to(
+                                            overlayMark,
+                                            {
+                                                autoAlpha: 1,
+                                                y: 0,
+                                                scale: 1,
+                                                duration: 0.36,
+                                                ease: "power2.out",
+                                            },
+                                            0.42,
+                                        )
+                                        .to(
+                                            triangles,
+                                            {
+                                                scale: 1.08,
+                                                opacity: 0.68,
+                                                duration: 0.34,
+                                                ease: "sine.inOut",
+                                                stagger: {
+                                                    amount: 0.1,
+                                                    from: "center",
+                                                },
+                                            },
+                                            0.34,
+                                        );
+                                });
+                            },
+                            beforeEnter({ next }) {
+                                window.scrollTo({ top: 0, left: 0 });
+                                syncDocumentTitle(next.html || "");
+                                gsap.set(next.container, {
+                                    scale: 1.035,
+                                    opacity: 0.84,
+                                    filter: "blur(7px)",
+                                });
+                            },
+                            async enter({ next }) {
+                                document.documentElement.dataset.routeTransition =
+                                    "in";
+                                const pieces = getTransitionPieces();
+                                const triangles = getTransitionTriangles();
+                                let mounted = false;
+                                const mountNextPage = () => {
+                                    if (mounted) return;
+                                    mounted = true;
+                                    document.dispatchEvent(
+                                        new CustomEvent("barba:after-enter"),
+                                    );
+                                    animatePageTitle(next.container);
+                                };
+
+                                if (reducedMotionQuery.matches) {
+                                    mountNextPage();
+                                    delete document.documentElement.dataset
+                                        .routeTransition;
+                                    return;
+                                }
+
+                                gsap.killTweensOf([
+                                    ...getTransitionTargets(),
+                                    next.container,
+                                ]);
+
+                                await new Promise<void>((resolve) => {
+                                    const timeline = gsap.timeline({
+                                        onComplete: resolve,
+                                    });
+
+                                    timeline
+                                        .call(mountNextPage, [], 0.08)
+                                        .to(
+                                            next.container,
+                                            {
+                                                scale: 1,
+                                                opacity: 1,
+                                                filter: "blur(0px)",
+                                                duration: 0.72,
+                                                ease: "power3.out",
+                                                clearProps:
+                                                    "transform,opacity,filter",
+                                            },
+                                            0.06,
+                                        )
+                                        .to(
+                                            overlayMark,
+                                            {
+                                                autoAlpha: 0,
+                                                y: -8,
+                                                scale: 1.08,
+                                                duration: 0.24,
+                                                ease: "power2.in",
+                                            },
+                                            0,
+                                        )
+                                        .to(
+                                            overlayFrame,
+                                            {
+                                                autoAlpha: 0,
+                                                rotate: 5,
+                                                scale: 1.26,
+                                                duration: 0.46,
+                                                ease: "power3.inOut",
+                                            },
+                                            0.08,
+                                        )
+                                        .to(
+                                            overlayBase,
+                                            {
+                                                autoAlpha: 0,
+                                                duration: 0.5,
+                                                ease: "power2.inOut",
+                                            },
+                                            0.14,
+                                        )
+                                        .to(
+                                            triangles,
+                                            {
+                                                x: (_index, element: HTMLElement) =>
+                                                    element.dataset.exitX || 0,
+                                                y: (_index, element: HTMLElement) =>
+                                                    element.dataset.exitY || 0,
+                                                rotate: (
+                                                    _index,
+                                                    element: HTMLElement,
+                                                ) =>
+                                                    element.dataset.exitRotate ||
+                                                    0,
+                                                scale: 0.06,
+                                                opacity: 0,
+                                                duration: 0.52,
+                                                ease: "power3.inOut",
+                                                stagger: {
+                                                    amount: 0.2,
+                                                    from: "random",
+                                                },
+                                            },
+                                            0.02,
+                                        )
+                                        .to(
+                                            pieces,
+                                            {
+                                                x: (_index, element: HTMLElement) =>
+                                                    element.dataset.exitX || 0,
+                                                y: (_index, element: HTMLElement) =>
+                                                    element.dataset.exitY || 0,
+                                                rotate: (
+                                                    _index,
+                                                    element: HTMLElement,
+                                                ) =>
+                                                    element.dataset.exitRotate ||
+                                                    0,
+                                                scale: 0.16,
+                                                opacity: 0,
+                                                duration: 0.58,
+                                                ease: "power3.inOut",
+                                                stagger: {
+                                                    amount: 0.22,
+                                                    from: "edges",
+                                                    grid: [3, 4],
+                                                },
+                                            },
+                                            0.1,
+                                        )
+                                        .to(
+                                            overlay,
+                                            {
+                                                autoAlpha: 0,
+                                                duration: 0.14,
+                                                ease: "none",
+                                            },
+                                            0.68,
+                                        );
+                                });
+
+                                mountNextPage();
+                                setOverlayIdle();
+                                delete document.documentElement.dataset
+                                    .routeTransition;
+                            },
+                        },
+                    ],
+                });
+            }
         </script>
         <script is:inline>
             (() => {
@@ -102,8 +624,8 @@ const socialImageURL = new URL(image, Astro.url);
 
                     container.innerHTML = "";
                     const particleCount = window.matchMedia("(max-width: 768px)").matches
-                        ? 14
-                        : 24;
+                        ? 4
+                        : 7;
 
                     for (let index = 0; index < particleCount; index += 1) {
                         const particle = document.createElement("span");
@@ -111,7 +633,7 @@ const socialImageURL = new URL(image, Astro.url);
                         particle.style.left = `${Math.random() * 100}%`;
                         particle.style.width = `${2 + Math.random() * 4}px`;
                         particle.style.height = particle.style.width;
-                        particle.style.opacity = `${0.12 + Math.random() * 0.35}`;
+                        particle.style.opacity = `${0.08 + Math.random() * 0.16}`;
                         particle.style.animationDelay = `${Math.random() * 8}s`;
                         particle.style.animationDuration = `${10 + Math.random() * 12}s`;
                         container.appendChild(particle);
@@ -124,18 +646,25 @@ const socialImageURL = new URL(image, Astro.url);
 
                 const setupScrollReveal = () => {
                     const selectors = [
-                        "main h1",
                         "main h2",
                         "main h3",
                         "main h4",
                         "main h5",
                         "main h6",
+                        "main .portfolio-project",
                         "main img",
                         "main .aspect-video",
                     ].join(", ");
 
                     const targets = Array.from(document.querySelectorAll(selectors)).filter(
-                        (element) => !element.classList.contains("scroll-reveal-ignore"),
+                        (element) => {
+                            if (element.classList.contains("scroll-reveal-ignore")) {
+                                return false;
+                            }
+
+                            const project = element.closest(".portfolio-project");
+                            return !project || project === element;
+                        },
                     );
 
                     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -145,38 +674,586 @@ const socialImageURL = new URL(image, Astro.url);
 
                     targets.forEach((element, index) => {
                         element.classList.add("scroll-reveal");
-                        const delay = Math.min((index % 8) * 110, 770);
-                        element.style.setProperty("--reveal-delay", `${delay}ms`);
+                        if (!element.style.getPropertyValue("--reveal-delay")) {
+                            const delay = Math.min((index % 6) * 70, 350);
+                            element.style.setProperty("--reveal-delay", `${delay}ms`);
+                        }
                     });
 
-                    const revealElements = () => {
-                        const triggerPoint = window.innerHeight * 0.9;
+                    let observer = null;
+                    const revealElement = (element) => {
+                        element.classList.add("is-revealed");
+                        if (observer) {
+                            observer.unobserve(element);
+                        }
+                    };
+
+                    const revealVisibleElements = () => {
+                        const triggerPoint = window.innerHeight * 0.98;
                         targets.forEach((element) => {
                             if (element.classList.contains("is-revealed")) return;
+
                             const rect = element.getBoundingClientRect();
-                            if (rect.top <= triggerPoint) {
-                                element.classList.add("is-revealed");
+                            if (rect.top <= triggerPoint && rect.bottom >= -80) {
+                                revealElement(element);
                             }
                         });
                     };
 
                     let ticking = false;
-                    const onScroll = () => {
+                    const scheduleReveal = () => {
                         if (ticking) return;
                         ticking = true;
                         window.requestAnimationFrame(() => {
-                            revealElements();
+                            revealVisibleElements();
                             ticking = false;
                         });
                     };
 
-                    revealElements();
-                    window.addEventListener("scroll", onScroll, { passive: true });
-                    window.addEventListener("resize", revealElements);
+                    if ("IntersectionObserver" in window) {
+                        observer = new IntersectionObserver(
+                            (entries) => {
+                                entries.forEach((entry) => {
+                                    if (entry.isIntersecting || entry.intersectionRatio > 0) {
+                                        revealElement(entry.target);
+                                    }
+                                });
+                            },
+                            {
+                                rootMargin: "0px 0px -4% 0px",
+                                threshold: 0.01,
+                            },
+                        );
+
+                        targets.forEach((element) => observer.observe(element));
+                    }
+
+                    const timers = [
+                        window.setTimeout(revealVisibleElements, 80),
+                        window.setTimeout(revealVisibleElements, 360),
+                        window.setTimeout(revealVisibleElements, 900),
+                    ];
+
+                    window.requestAnimationFrame(revealVisibleElements);
+                    window.addEventListener("scroll", scheduleReveal, { passive: true });
+                    window.addEventListener("resize", scheduleReveal);
+                    window.addEventListener("load", revealVisibleElements);
 
                     return () => {
-                        window.removeEventListener("scroll", onScroll);
-                        window.removeEventListener("resize", revealElements);
+                        if (observer) {
+                            observer.disconnect();
+                        }
+                        timers.forEach((timer) => window.clearTimeout(timer));
+                        window.removeEventListener("scroll", scheduleReveal);
+                        window.removeEventListener("resize", scheduleReveal);
+                        window.removeEventListener("load", revealVisibleElements);
+                    };
+                };
+
+                const setupPageInteractions = () => {
+                    const cleanups = [];
+                    const portfolioHome = document.querySelector(".portfolio-home");
+                    const clickLens = document.querySelector(".portfolio-click-lens");
+
+                    document.querySelectorAll(".profile-flip-container").forEach((container) => {
+                        const onClick = () => {
+                            const inner = container.querySelector(".profile-flip-inner");
+                            if (inner) {
+                                inner.classList.toggle("flip-180");
+                            }
+                        };
+
+                        container.addEventListener("click", onClick);
+                        cleanups.push(() => container.removeEventListener("click", onClick));
+                    });
+
+                    const backToTopBtn = document.getElementById("back-to-top");
+                    if (backToTopBtn) {
+                        const onClick = () => {
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                        };
+                        const toggleVisibility = () => {
+                            const scrolled = window.scrollY > 300;
+                            backToTopBtn.dataset.visible = scrolled.toString();
+                            if (scrolled) {
+                                backToTopBtn.classList.remove(
+                                    "invisible",
+                                    "pointer-events-none",
+                                );
+                            }
+                        };
+
+                        backToTopBtn.addEventListener("click", onClick);
+                        window.addEventListener("scroll", toggleVisibility, {
+                            passive: true,
+                        });
+                        toggleVisibility();
+
+                        cleanups.push(() => {
+                            backToTopBtn.removeEventListener("click", onClick);
+                            window.removeEventListener("scroll", toggleVisibility);
+                        });
+                    }
+
+                    if (portfolioHome && clickLens) {
+                        let lensTimeout = 0;
+
+                        const setLensPointer = (event) => {
+                            const x = `${Math.min(100, Math.max(0, (event.clientX / window.innerWidth) * 100)).toFixed(2)}%`;
+                            const y = `${Math.min(100, Math.max(0, (event.clientY / window.innerHeight) * 100)).toFixed(2)}%`;
+                            clickLens.style.setProperty("--portfolio-pointer-x", x);
+                            clickLens.style.setProperty("--portfolio-pointer-y", y);
+                            portfolioHome.style.setProperty("--portfolio-pointer-x", x);
+                            portfolioHome.style.setProperty("--portfolio-pointer-y", y);
+                        };
+
+                        const onLensPointerMove = (event) => {
+                            setLensPointer(event);
+                            clickLens.classList.add("is-active");
+                        };
+
+                        const onLensPointerLeave = () => {
+                            clickLens.classList.remove("is-active");
+                        };
+
+                        const onLensPointerDown = (event) => {
+                            setLensPointer(event);
+                            clickLens.classList.remove("is-impacting");
+                            void clickLens.offsetWidth;
+                            clickLens.classList.add("is-active", "is-impacting");
+
+                            if (lensTimeout) {
+                                window.clearTimeout(lensTimeout);
+                            }
+
+                            lensTimeout = window.setTimeout(() => {
+                                clickLens.classList.remove("is-impacting");
+                            }, 760);
+                        };
+
+                        window.addEventListener("pointermove", onLensPointerMove, {
+                            passive: true,
+                        });
+                        window.addEventListener("pointerdown", onLensPointerDown, {
+                            passive: true,
+                        });
+                        document.addEventListener("pointerleave", onLensPointerLeave);
+
+                        cleanups.push(() => {
+                            window.removeEventListener("pointermove", onLensPointerMove);
+                            window.removeEventListener("pointerdown", onLensPointerDown);
+                            document.removeEventListener("pointerleave", onLensPointerLeave);
+                            if (lensTimeout) window.clearTimeout(lensTimeout);
+                            clickLens.classList.remove("is-active", "is-impacting");
+                        });
+                    }
+
+                    document
+                        .querySelectorAll(".portfolio-project, .portfolio-chip")
+                        .forEach((element) => {
+                            let waterImpactTimeout = 0;
+                            let waterHoverTimeout = 0;
+                            if (!element.querySelector(".portfolio-water-surface")) {
+                                const surface = document.createElement("span");
+                                surface.className = "portfolio-water-surface";
+                                surface.setAttribute("aria-hidden", "true");
+                                element.appendChild(surface);
+                            }
+
+                            const setWaterPointer = (event) => {
+                                const rect = element.getBoundingClientRect();
+                                element.style.setProperty(
+                                    "--water-x",
+                                    `${Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100)).toFixed(2)}%`,
+                                );
+                                element.style.setProperty(
+                                    "--water-y",
+                                    `${Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100)).toFixed(2)}%`,
+                                );
+                            };
+
+                            const pulseWaterSurface = () => {
+                                element.classList.remove("portfolio-water-hovering");
+                                void element.offsetWidth;
+                                element.classList.add("portfolio-water-hovering");
+
+                                if (waterHoverTimeout) {
+                                    window.clearTimeout(waterHoverTimeout);
+                                }
+
+                                waterHoverTimeout = window.setTimeout(() => {
+                                    element.classList.remove("portfolio-water-hovering");
+                                }, 1150);
+                            };
+
+                            const onWaterEnter = (event) => {
+                                setWaterPointer(event);
+                                pulseWaterSurface();
+                            };
+
+                            const onWaterMove = (event) => {
+                                setWaterPointer(event);
+                            };
+
+                            const onWaterDown = (event) => {
+                                setWaterPointer(event);
+                                element.classList.remove("portfolio-water-impact");
+                                void element.offsetWidth;
+                                element.classList.add("portfolio-water-impact");
+                                pulseWaterSurface();
+
+                                if (waterImpactTimeout) {
+                                    window.clearTimeout(waterImpactTimeout);
+                                }
+
+                                waterImpactTimeout = window.setTimeout(() => {
+                                    element.classList.remove("portfolio-water-impact");
+                                }, 680);
+                            };
+
+                            element.addEventListener("pointerenter", onWaterEnter, {
+                                passive: true,
+                            });
+                            element.addEventListener("pointermove", onWaterMove, {
+                                passive: true,
+                            });
+                            element.addEventListener("pointerdown", onWaterDown, {
+                                passive: true,
+                            });
+
+                            cleanups.push(() => {
+                                element.removeEventListener("pointerenter", onWaterEnter);
+                                element.removeEventListener("pointermove", onWaterMove);
+                                element.removeEventListener("pointerdown", onWaterDown);
+                                if (waterImpactTimeout) window.clearTimeout(waterImpactTimeout);
+                                if (waterHoverTimeout) window.clearTimeout(waterHoverTimeout);
+                                element.classList.remove("portfolio-water-hovering");
+                            });
+                        });
+
+                    return () => {
+                        cleanups.forEach((cleanup) => cleanup());
+                    };
+                };
+
+                const setupCaseInteractions = () => {
+                    const caseRoot = document.querySelector(".work-case");
+                    if (!caseRoot) return () => {};
+
+                    const cleanups = [];
+                    const reducedMotionQuery = window.matchMedia(
+                        "(prefers-reduced-motion: reduce)",
+                    );
+                    caseRoot.classList.add("case-motion-ready");
+
+                    const setCasePointer = (x, y) => {
+                        caseRoot.style.setProperty("--case-pointer-x", `${x}%`);
+                        caseRoot.style.setProperty("--case-pointer-y", `${y}%`);
+                        caseRoot.style.setProperty("--flow-drift-x", `${((x - 50) * 0.18).toFixed(2)}px`);
+                        caseRoot.style.setProperty("--flow-drift-y", `${((y - 50) * 0.14).toFixed(2)}px`);
+                        caseRoot.style.setProperty("--flow-field-x", `${((x - 50) * -0.16).toFixed(2)}px`);
+                        caseRoot.style.setProperty("--flow-field-y", `${((y - 50) * 0.13).toFixed(2)}px`);
+                    };
+
+                    setCasePointer(50, 34);
+                    caseRoot.style.setProperty("--flow-boost", "0");
+                    caseRoot.style.setProperty("--scroll-boost", "0");
+
+                    if (!reducedMotionQuery.matches) {
+                        let rafId = 0;
+                        let pendingPointer = null;
+                        let pointerBoostTimeout = 0;
+                        let pointerImpactTimeout = 0;
+                        let scrollBoostTimeout = 0;
+                        let lastScrollY = window.scrollY;
+
+                        const getViewportPointer = (event) => ({
+                            x: Math.min(100, Math.max(0, (event.clientX / window.innerWidth) * 100)),
+                            y: Math.min(100, Math.max(0, (event.clientY / window.innerHeight) * 100)),
+                        });
+
+                        const setFlowBoost = (value) => {
+                            caseRoot.style.setProperty("--flow-boost", value.toFixed(3));
+                            caseRoot.style.setProperty("--flow-alpha", (0.5 + value * 0.36).toFixed(3));
+                            caseRoot.style.setProperty("--flow-grid-alpha", (0.24 + value * 0.28).toFixed(3));
+                            caseRoot.style.setProperty("--flow-field-alpha", (0.72 + value * 0.34).toFixed(3));
+                            caseRoot.style.setProperty("--flow-spark-alpha", (0.38 + value * 0.62).toFixed(3));
+                            caseRoot.style.setProperty("--flow-readout-alpha", (0.42 + value * 0.4).toFixed(3));
+                            caseRoot.style.setProperty("--flow-saturate", (1 + value * 0.7).toFixed(3));
+                            caseRoot.style.setProperty("--flow-spark-distance", `${(value * 5.4).toFixed(2)}rem`);
+                            caseRoot.style.setProperty("--flow-spark-scale", (0.72 + value * 0.72).toFixed(3));
+                            caseRoot.style.setProperty("--flow-aura-alpha", (0.22 + value * 0.62).toFixed(3));
+                            caseRoot.style.setProperty("--flow-aura-scale", (1 + value * 0.72).toFixed(3));
+                            caseRoot.style.setProperty("--flow-depth-alpha", (0.34 + value * 0.38).toFixed(3));
+                        };
+
+                        const settleFlowBoost = () => {
+                            if (pointerBoostTimeout) {
+                                window.clearTimeout(pointerBoostTimeout);
+                            }
+
+                            pointerBoostTimeout = window.setTimeout(() => {
+                                setFlowBoost(0);
+                            }, 120);
+                        };
+
+                        const onPointerMove = (event) => {
+                            pendingPointer = getViewportPointer(event);
+
+                            if (rafId) return;
+                            rafId = window.requestAnimationFrame(() => {
+                                if (pendingPointer) {
+                                    setCasePointer(pendingPointer.x, pendingPointer.y);
+                                    setFlowBoost(1.05);
+                                    settleFlowBoost();
+                                }
+                                rafId = 0;
+                            });
+                        };
+
+                        const onPointerLeave = () => {
+                            pendingPointer = null;
+                            setCasePointer(50, 34);
+                            caseRoot.classList.remove("case-impacting");
+                            setFlowBoost(0);
+                        };
+
+                        const onPointerDown = (event) => {
+                            const pointer = getViewportPointer(event);
+                            setCasePointer(pointer.x, pointer.y);
+                            caseRoot.classList.add("case-impacting");
+                            setFlowBoost(2.1);
+
+                            if (pointerImpactTimeout) {
+                                window.clearTimeout(pointerImpactTimeout);
+                            }
+
+                            pointerImpactTimeout = window.setTimeout(() => {
+                                caseRoot.classList.remove("case-impacting");
+                                setFlowBoost(0);
+                            }, 260);
+                        };
+
+                        const onScroll = () => {
+                            const delta = Math.min(1, Math.abs(window.scrollY - lastScrollY) / 90);
+                            lastScrollY = window.scrollY;
+                            caseRoot.classList.add("case-is-scrolling");
+                            caseRoot.style.setProperty("--scroll-boost", delta.toFixed(3));
+                            caseRoot.style.setProperty("--flow-alpha", (0.52 + delta * 0.42).toFixed(3));
+                            caseRoot.style.setProperty("--flow-grid-alpha", (0.24 + delta * 0.32).toFixed(3));
+                            caseRoot.style.setProperty("--flow-scale", (1 + delta * 0.055).toFixed(3));
+                            caseRoot.style.setProperty("--flow-readout-y", `${(delta * -1.8).toFixed(2)}rem`);
+                            caseRoot.style.setProperty("--flow-depth-alpha", (0.3 + delta * 0.44).toFixed(3));
+
+                            if (scrollBoostTimeout) {
+                                window.clearTimeout(scrollBoostTimeout);
+                            }
+
+                            scrollBoostTimeout = window.setTimeout(() => {
+                                caseRoot.classList.remove("case-is-scrolling");
+                                caseRoot.style.setProperty("--scroll-boost", "0");
+                                caseRoot.style.setProperty("--flow-alpha", "0.5");
+                                caseRoot.style.setProperty("--flow-grid-alpha", "0.24");
+                                caseRoot.style.setProperty("--flow-scale", "1");
+                                caseRoot.style.setProperty("--flow-readout-y", "0rem");
+                                caseRoot.style.setProperty("--flow-depth-alpha", "0.34");
+                            }, 140);
+                        };
+
+                        caseRoot.addEventListener("pointermove", onPointerMove, {
+                            passive: true,
+                        });
+                        caseRoot.addEventListener("pointerdown", onPointerDown, {
+                            passive: true,
+                        });
+                        caseRoot.addEventListener("pointerleave", onPointerLeave);
+                        window.addEventListener("scroll", onScroll, { passive: true });
+                        cleanups.push(() => {
+                            caseRoot.removeEventListener("pointermove", onPointerMove);
+                            caseRoot.removeEventListener("pointerdown", onPointerDown);
+                            caseRoot.removeEventListener("pointerleave", onPointerLeave);
+                            window.removeEventListener("scroll", onScroll);
+                            if (rafId) window.cancelAnimationFrame(rafId);
+                            if (pointerBoostTimeout) window.clearTimeout(pointerBoostTimeout);
+                            if (pointerImpactTimeout) window.clearTimeout(pointerImpactTimeout);
+                            if (scrollBoostTimeout) window.clearTimeout(scrollBoostTimeout);
+                        });
+                    }
+
+                    const classifyImage = (image) => {
+                        const apply = () => {
+                            const ratio =
+                                image.naturalWidth && image.naturalHeight
+                                    ? image.naturalWidth / image.naturalHeight
+                                    : 1;
+                            const orientation =
+                                ratio < 0.82 ? "portrait" : ratio > 1.7 ? "wide" : "landscape";
+                            image.dataset.orientation = orientation;
+                        };
+
+                        if (image.complete) {
+                            apply();
+                        } else {
+                            image.addEventListener("load", apply, { once: true });
+                            cleanups.push(() => image.removeEventListener("load", apply));
+                        }
+                    };
+
+                    const setupTilt = (element, strength = 7) => {
+                        if (reducedMotionQuery.matches) return;
+
+                        const onMove = (event) => {
+                            const rect = element.getBoundingClientRect();
+                            const localX = (event.clientX - rect.left) / rect.width;
+                            const localY = (event.clientY - rect.top) / rect.height;
+                            const rotateY = (localX - 0.5) * strength;
+                            const rotateX = (0.5 - localY) * strength;
+
+                            element.style.setProperty("--tilt-x", `${rotateX.toFixed(2)}deg`);
+                            element.style.setProperty("--tilt-y", `${rotateY.toFixed(2)}deg`);
+                            element.style.setProperty(
+                                "--local-x",
+                                `${Math.min(100, Math.max(0, localX * 100)).toFixed(2)}%`,
+                            );
+                            element.style.setProperty(
+                                "--local-y",
+                                `${Math.min(100, Math.max(0, localY * 100)).toFixed(2)}%`,
+                            );
+                        };
+
+                        const onLeave = () => {
+                            element.style.setProperty("--tilt-x", "0deg");
+                            element.style.setProperty("--tilt-y", "0deg");
+                            element.style.setProperty("--local-x", "50%");
+                            element.style.setProperty("--local-y", "50%");
+                        };
+
+                        element.addEventListener("pointermove", onMove, { passive: true });
+                        element.addEventListener("pointerleave", onLeave);
+                        onLeave();
+
+                        cleanups.push(() => {
+                            element.removeEventListener("pointermove", onMove);
+                            element.removeEventListener("pointerleave", onLeave);
+                        });
+                    };
+
+                    document.querySelectorAll(".work-case-body img").forEach((image, index) => {
+                        image.classList.add("case-gallery-image");
+                        image.style.setProperty("--gallery-index", `${index % 9}`);
+                        image.style.setProperty("--gallery-delay", `${(index % 9) * -0.62}s`);
+                        classifyImage(image);
+
+                        const parent = image.parentElement;
+                        if (
+                            parent &&
+                            parent.tagName === "P" &&
+                            parent.children.length === 1
+                        ) {
+                            parent.classList.add("case-image-frame");
+                            parent.style.setProperty("--gallery-index", `${index % 9}`);
+                            parent.style.setProperty("--gallery-delay", `${(index % 9) * -0.62}s`);
+                            setupTilt(parent, 4.5);
+                        } else {
+                            setupTilt(image, 3);
+                        }
+                    });
+
+                    document
+                        .querySelectorAll(
+                            ".case-media-frame, .case-theme-interface, .case-focus-card, .case-fact, .case-external-link, .portfolio-project",
+                        )
+                        .forEach((element) => setupTilt(element, 5));
+
+                    const themeInterfaces = Array.from(
+                        document.querySelectorAll("[data-dynamic-interface]"),
+                    );
+                    if (themeInterfaces.length && !reducedMotionQuery.matches) {
+                        let themeFrameId = 0;
+                        let lastLogIndex = -1;
+                        const startedAt = performance.now();
+
+                        const animateThemeInterfaces = () => {
+                            const elapsed = (performance.now() - startedAt) / 1000;
+                            const logIndex = Math.floor(elapsed / 1.35);
+
+                            themeInterfaces.forEach((panel, panelIndex) => {
+                                const offset = elapsed + panelIndex * 0.42;
+                                const progressValue = (offset * 11) % 100;
+                                const progress = progressValue.toFixed(2);
+                                const wave = (50 + Math.sin(offset * 1.6) * 38).toFixed(2);
+                                const pulseValue = 0.45 + Math.sin(offset * 2.2) * 0.28;
+                                const pulse = pulseValue.toFixed(3);
+                                const angle = (progressValue * 3.6).toFixed(2);
+                                const dashOffset = (progressValue * -0.52).toFixed(2);
+                                const sheenAlpha = (pulseValue * 0.34).toFixed(3);
+                                const beamAlpha = (0.24 + pulseValue * 0.22).toFixed(3);
+                                const beamRotateA = ((pulseValue - 0.5) * 8).toFixed(2);
+                                const beamRotateB = ((0.5 - pulseValue) * 10).toFixed(2);
+                                const spinA = (pulseValue * 28).toFixed(2);
+                                const spinB = (pulseValue * -36).toFixed(2);
+                                const spinC = (pulseValue * 18).toFixed(2);
+                                const signalAlpha = (0.46 + pulseValue * 0.36).toFixed(3);
+                                const shiftSoft = ((progressValue - 50) * 0.12).toFixed(2);
+                                const ribbonA = (progressValue * 0.12).toFixed(2);
+                                const ribbonB = ((50 - progressValue) * 0.1).toFixed(2);
+                                const ribbonC = (progressValue * -0.08).toFixed(2);
+                                const ribbonD = ((progressValue - 38) * 0.11).toFixed(2);
+
+                                panel.style.setProperty("--interface-progress", `${progress}%`);
+                                panel.style.setProperty("--interface-wave", `${wave}%`);
+                                panel.style.setProperty("--interface-pulse", pulse);
+                                panel.style.setProperty("--interface-angle", `${angle}deg`);
+                                panel.style.setProperty("--interface-dash-offset", `${dashOffset}px`);
+                                panel.style.setProperty("--interface-sheen-alpha", sheenAlpha);
+                                panel.style.setProperty("--interface-beam-alpha", beamAlpha);
+                                panel.style.setProperty("--interface-beam-rotate-a", `${beamRotateA}deg`);
+                                panel.style.setProperty("--interface-beam-rotate-b", `${beamRotateB}deg`);
+                                panel.style.setProperty("--interface-spin-a", `${spinA}deg`);
+                                panel.style.setProperty("--interface-spin-b", `${spinB}deg`);
+                                panel.style.setProperty("--interface-spin-c", `${spinC}deg`);
+                                panel.style.setProperty("--interface-signal-alpha", signalAlpha);
+                                panel.style.setProperty("--interface-shift-soft", `${shiftSoft}px`);
+                                panel.style.setProperty("--flow-ribbon-a", `${ribbonA}px`);
+                                panel.style.setProperty("--flow-ribbon-b", `${ribbonB}px`);
+                                panel.style.setProperty("--flow-ribbon-c", `${ribbonC}px`);
+                                panel.style.setProperty("--flow-ribbon-d", `${ribbonD}px`);
+
+                                const playhead = panel.querySelector(".edit-playhead span");
+                                if (playhead) {
+                                    const seconds = Math.floor(offset * 4) % 60;
+                                    const frames = Math.floor((offset * 24) % 24);
+                                    playhead.textContent = `00:${String(seconds).padStart(2, "0")}:${String(frames).padStart(2, "0")}`;
+                                }
+
+                                if (logIndex !== lastLogIndex) {
+                                    const logs = (panel.dataset.logStream || "")
+                                        .split("|")
+                                        .map((item) => item.trim())
+                                        .filter(Boolean);
+                                    const terminal = panel.querySelector("[data-dynamic]");
+                                    if (logs.length && terminal) {
+                                        terminal.textContent = logs[logIndex % logs.length];
+                                    }
+                                }
+                            });
+
+                            lastLogIndex = logIndex;
+                            themeFrameId = window.requestAnimationFrame(
+                                animateThemeInterfaces,
+                            );
+                        };
+
+                        animateThemeInterfaces();
+                        cleanups.push(() => {
+                            if (themeFrameId) {
+                                window.cancelAnimationFrame(themeFrameId);
+                            }
+                        });
+                    }
+
+                    return () => {
+                        cleanups.forEach((cleanup) => cleanup());
                     };
                 };
 
@@ -186,7 +1263,12 @@ const socialImageURL = new URL(image, Astro.url);
                         previousCleanup();
                     }
 
-                    const cleanups = [setupScrollReveal(), setupParticles()];
+                    const cleanups = [
+                        setupScrollReveal(),
+                        setupParticles(),
+                        setupPageInteractions(),
+                        setupCaseInteractions(),
+                    ];
 
                     window[cleanupKey] = () => {
                         cleanups.forEach((cleanup) => {
@@ -197,7 +1279,9 @@ const socialImageURL = new URL(image, Astro.url);
                     };
                 };
 
-                document.addEventListener("astro:page-load", mountEnhancements);
+                window.__portfolioFxMount = mountEnhancements;
+                document.addEventListener("barba:after-enter", mountEnhancements);
+                document.addEventListener("DOMContentLoaded", mountEnhancements);
 
                 mountEnhancements();
             })();

@@ -2,6 +2,8 @@
 import Layout from "@/layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import PortfolioScene from "@/components/PortfolioScene";
+import { getProjectPresentation } from "@/lib/projectPresentation";
 
 // --- CONFIGURATION ---
 // 1 = Center Aligned (Original)
@@ -15,15 +17,17 @@ const CURRENT_LAYOUT: number = 3;
 
 const PROFILE = {
     name: "OFAUNS",
-    role: "",
+    role: "Visual Designer / Motion, Web & Interaction",
     email: "cheny4314@gmail.com",
-    bio: "",
+    bio: "Building cinematic visual systems, motion pieces, web interfaces, and interactive design with a sharp eye for atmosphere and detail.",
     avatar: "/header.jpg",
     links: {
-        twitter: "x.com/baxartworkz",
+        twitter: "https://x.com/baxartworkz",
         email: "mailto:cheny4314@gmail.com",
     },
 };
+
+const SCENE_COLORS = ["#5ddcff", "#8fb4ff", "#f2f6ff", "#9ff3d1", "#ffb39a"];
 
 // Fetch all work items (mdx files)
 const portfolioData = await getCollection("work");
@@ -43,8 +47,38 @@ const groupedPortfolio = sortedPortfolio.reduce(
     },
     {} as Record<string, typeof sortedPortfolio>,
 );
+const genreNames = Object.keys(groupedPortfolio).sort((genreA, genreB) => {
+    const aIsFilm = genreA.toLowerCase() === "film";
+    const bIsFilm = genreB.toLowerCase() === "film";
+    if (aIsFilm === bIsFilm) return 0;
+    return aIsFilm ? 1 : -1;
+});
+const orderedGroupedPortfolio = genreNames.map((genre) => [
+    genre,
+    groupedPortfolio[genre],
+] as const);
 // Flatten groupedPortfolio to respect genre ordering for Layout 5
-const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
+const genreSortedPortfolio = orderedGroupedPortfolio.flatMap(([, projects]) => projects);
+const genreMeta = genreNames.reduce(
+    (acc, genre, index) => {
+        acc[genre] = {
+            color: SCENE_COLORS[index % SCENE_COLORS.length],
+            index: index + 1,
+        };
+        return acc;
+    },
+    {} as Record<string, { color: string; index: number }>,
+);
+const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => {
+    const genre = project.data.genre || "Motion";
+
+    return {
+        title: project.data.title,
+        genre,
+        thumbnail: project.data.thumbnail,
+        color: genreMeta[genre]?.color || SCENE_COLORS[0],
+    };
+});
 ---
 
 <Layout title="OFAUNS Portfolio" description={PROFILE.role} image="/og-image.png">
@@ -105,7 +139,7 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
 
                 {/* Grouped Video Grid */}
                 <div class="space-y-16">
-                    {Object.entries(groupedPortfolio).map(
+                    {orderedGroupedPortfolio.map(
                         ([genre, projects]) => (
                             <section class="space-y-6">
                                 <h2 class="text-xl font-semibold tracking-wider uppercase mb-6">
@@ -288,7 +322,7 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
 
                 {/* Works Section */}
                 <div class="space-y-4 relative">
-                    {Object.entries(groupedPortfolio).map(
+                    {orderedGroupedPortfolio.map(
                         ([genre, projects]) => (
                             <section class="mb-24">
                                 <h3 class="text-xl font-bold tracking-tight mb-8 text-foreground/90">
@@ -373,185 +407,248 @@ const genreSortedPortfolio = Object.values(groupedPortfolio).flat();
     }
     {
         CURRENT_LAYOUT === 3 && (
-            <div class="min-h-screen flex flex-col md:flex-row animate-blur-in bg-background">
-                {/* Fixed Sidebar */}
-                <aside class="w-full md:w-[40%] md:h-screen md:sticky md:top-0 p-8 md:p-12 lg:p-16 flex flex-col justify-between border-b md:border-b-0 md:border-r border-border/40 z-10 bg-background/50 backdrop-blur-md">
-                    <div class="space-y-8">
-                        <div class="flex justify-between items-start animate-blur-in delay-100">
-                            <div class="profile-flip-container w-20 h-20 rounded-full border border-border cursor-pointer [perspective:1000px] z-50 group hover:scale-110 transition-transform duration-500">
-                                <div class="profile-flip-inner w-full h-full relative transition-[transform] duration-700 ease-in-out [transform-style:preserve-3d]">
-                                    <img
-                                        src={PROFILE.avatar}
-                                        alt="Profile"
-                                        class="w-full h-full object-cover absolute inset-0 rounded-full bg-muted [backface-visibility:hidden]"
-                                    />
-                                    <img
-                                        src="/melogo.png"
-                                        alt="Logo"
-                                        class="w-full h-full object-cover absolute inset-0 rounded-full bg-white [backface-visibility:hidden] flip-180"
-                                    />
-                                </div>
-                            </div>
-                            <ThemeToggle client:load />
-                        </div>
+            <div class="portfolio-home relative min-h-screen overflow-hidden bg-background">
+                <PortfolioScene
+                    client:load
+                    projectCount={sortedPortfolio.length}
+                    categories={genreNames}
+                    featuredProjects={featuredSceneProjects}
+                />
 
-                        <div class="space-y-4">
-                            <h1 class="text-6xl font-black uppercase tracking-tighter leading-none animate-blur-in delay-200">
-                                <a href="/about" class="hover:text-primary transition-colors duration-500 inline-block">
-                                    {PROFILE.name}
-                                </a>
-                            </h1>
-                            <p class="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-sm animate-blur-in delay-300">
-                                {PROFILE.role}
-                            </p>
-                        </div>
-
-                        <p class="text-muted-foreground/80 max-w-sm text-sm md:text-base animate-blur-in delay-400">
-                            {PROFILE.bio}
-                        </p>
-                    </div>
-
-                    <div class="space-y-8 mt-12 md:mt-0">
-                        {/* Genre Navigation */}
-                        <nav class="flex flex-col gap-2 items-start">
-                            <p class="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                                Jump to
-                            </p>
-                            {Object.keys(groupedPortfolio).map((genre) => (
+                <div class="portfolio-shell relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-[minmax(300px,36vw)_1fr]">
+                    <aside class="portfolio-hero-panel flex min-h-[540px] flex-col justify-between border-b border-border/40 bg-background/82 px-6 py-6 backdrop-blur-md sm:px-8 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r lg:px-10 lg:py-8 xl:px-12">
+                        <div>
+                            <div class="flex items-start justify-between gap-4 animate-blur-in delay-100">
                                 <a
-                                    href={`#${genre}`}
-                                    class="text-lg md:text-xl font-bold hover:translate-x-2 hover:text-primary transition-all duration-300"
+                                    href="/about"
+                                    class="profile-flip-container group relative z-50 h-20 w-20 shrink-0 cursor-pointer border border-border/70 [perspective:1000px] transition-transform duration-500 hover:scale-110"
+                                    aria-label="About OFAUNS"
                                 >
-                                    {genre}
-                                </a>
-                            ))}
-                        </nav>
-
-                        <div class="w-full h-px bg-border/40 my-6" />
-
-                        <nav class="flex flex-col gap-2 items-start">
-                            {/* <a
-                                href={PROFILE.links.twitter}
-                                class="text-lg md:text-xl font-bold hover:translate-x-2 transition-transform duration-300"
-                            >
-                                Twitter ↗
-                            </a> */}
-                            <a
-                                href={PROFILE.links.email}
-                                class="text-lg md:text-xl font-bold hover:translate-x-2 transition-transform duration-300"
-                            >
-                                Email ↗
-                            </a>
-                        </nav>
-
-                        <p class="text-xs text-muted-foreground opacity-50">
-                            &copy; {new Date().getFullYear()} {PROFILE.name}.
-                            All rights reserved.
-                        </p>
-                    </div>
-                </aside>
-
-                {/* Scrollable Content */}
-                <main class="w-full md:w-[60%] p-6 md:p-12 lg:p-16">
-                    <div class="space-y-24">
-                        {Object.entries(groupedPortfolio).map(
-                            ([genre, projects]) => (
-                                <section id={genre} class="scroll-mt-24">
-                                    <div class="flex items-center gap-4 mb-12">
-                                        <h2 class="text-sm font-bold tracking-[0.2em] uppercase text-muted-foreground border-b border-border/50 pb-2 flex-grow">
-                                            {genre}
-                                        </h2>
-                                        <span class="text-xs font-mono text-muted-foreground">
-                                            {projects.length} PROJECTS
-                                        </span>
+                                    <div class="profile-flip-inner relative h-full w-full transition-[transform] duration-700 ease-in-out [transform-style:preserve-3d]">
+                                        <img
+                                            src={PROFILE.avatar}
+                                            alt="OFAUNS profile"
+                                            class="absolute inset-0 h-full w-full bg-muted object-cover [backface-visibility:hidden]"
+                                        />
+                                        <img
+                                            src="/melogo.png"
+                                            alt="OFAUNS mark"
+                                            class="flip-180 absolute inset-0 h-full w-full bg-white object-cover [backface-visibility:hidden]"
+                                        />
                                     </div>
+                                </a>
+                                <ThemeToggle client:load />
+                            </div>
 
-                                    <div class="grid grid-cols-1 gap-12">
-                                        {projects.map((project, index) => (
-                                            <a
-                                                href={`/work/${project.slug}`}
-                                                class={`group block space-y-4 animate-blur-in`}
-                                                style={`animation-delay: ${Math.min((index + 1) * 100 + 300, 1000)}ms`}
-                                            >
-                                                <div class="aspect-video bg-muted overflow-hidden relative">
-                                                    <img
-                                                        src={
-                                                            project.data
-                                                                .thumbnail
+                            <div class="mt-10 max-w-xl space-y-4 sm:mt-12 lg:mt-12">
+                                <h1 class="animate-blur-in delay-200 max-w-none text-5xl font-black uppercase leading-[0.9] tracking-normal text-foreground sm:text-6xl xl:text-7xl">
+                                    <a
+                                        href="/about"
+                                        class="inline-block transition-colors duration-500 hover:text-primary"
+                                    >
+                                        {PROFILE.name}
+                                    </a>
+                                </h1>
+                                <p class="animate-blur-in delay-300 max-w-sm border-l border-border/60 pl-4 text-sm font-semibold uppercase leading-6 tracking-[0.16em] text-muted-foreground sm:text-base">
+                                    {PROFILE.role}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 space-y-4">
+                            <nav class="portfolio-field-board space-y-3" aria-label="Portfolio categories">
+                                <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                                    Fields
+                                </p>
+                                <div class="portfolio-field-list">
+                                    {genreNames.map((genre) => (
+                                        <a
+                                            href={`#${genre}`}
+                                            data-scene-project="true"
+                                            data-scene-title={genre}
+                                            data-scene-genre={genre}
+                                            data-scene-color={
+                                                genreMeta[genre]?.color ||
+                                                SCENE_COLORS[0]
+                                            }
+                                            class="portfolio-chip portfolio-field-sign"
+                                            style={`--scene-accent: ${genreMeta[genre]?.color || SCENE_COLORS[0]}`}
+                                        >
+                                            <span class="portfolio-field-index">
+                                                {String(
+                                                    genreMeta[genre]?.index || 1,
+                                                ).padStart(2, "0")}
+                                            </span>
+                                            <span class="portfolio-field-name">
+                                                {genre}
+                                            </span>
+                                            <span class="portfolio-field-count">
+                                                {groupedPortfolio[genre]?.length || 0}
+                                            </span>
+                                        </a>
+                                    ))}
+                                </div>
+                            </nav>
+
+                            <div class="flex flex-wrap items-center gap-5 border-t border-border/40 pt-4 text-sm text-muted-foreground">
+                                <a
+                                    href={PROFILE.links.email}
+                                    class="font-bold uppercase tracking-[0.18em] text-foreground hover:text-primary"
+                                >
+                                    Email
+                                </a>
+                                <a
+                                    href={PROFILE.links.twitter}
+                                    class="font-bold uppercase tracking-[0.18em] text-foreground hover:text-primary"
+                                >
+                                    X
+                                </a>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <main id="work" class="portfolio-workstream px-5 py-10 sm:px-8 lg:px-12 lg:py-14 xl:px-16">
+                        <section class="mb-14 max-w-3xl space-y-5">
+                            {/* <p class="text-xs font-bold uppercase tracking-[0.28em] text-primary">
+                                Selected Work
+                            </p>
+                            <h2 class="text-3xl font-bold leading-tight tracking-normal text-foreground sm:text-4xl lg:text-5xl">
+                                Motion-led portfolio for visual systems, films,
+                                web interfaces, and interactive design.
+                            </h2> */}
+                        </section>
+
+                        <div class="space-y-20">
+                            {orderedGroupedPortfolio.map(
+                                ([genre, projects], genreIndex) => (
+                                    <section
+                                        id={genre}
+                                        class="scroll-mt-20"
+                                        style={`--scene-accent: ${genreMeta[genre]?.color || SCENE_COLORS[0]}`}
+                                    >
+                                        <div class="mb-5 flex items-end justify-between gap-4 border-b border-border/45 pb-4">
+                                            <div class="space-y-2">
+                                                <p class="font-mono text-xs text-muted-foreground">
+                                                    {String(
+                                                        genreIndex + 1,
+                                                    ).padStart(2, "0")}
+                                                </p>
+                                                <h2 class="text-2xl font-black uppercase leading-none tracking-normal text-foreground sm:text-4xl">
+                                                    {genre}
+                                                </h2>
+                                            </div>
+                                            <span class="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                                                {projects.length} Projects
+                                            </span>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 gap-4">
+                                            {projects.map((project, index) => {
+                                                const projectPresentation =
+                                                    getProjectPresentation(
+                                                        project,
+                                                    );
+
+                                                return (
+                                                <a
+                                                    href={`/work/${project.slug}`}
+                                                    data-scene-project="true"
+                                                    data-scene-title={
+                                                        project.data.title
+                                                    }
+                                                    data-scene-genre={genre}
+                                                    data-scene-color={
+                                                        genreMeta[genre]
+                                                            ?.color ||
+                                                        SCENE_COLORS[0]
+                                                    }
+                                                    class={`portfolio-project portfolio-project--${projectPresentation.layout} group grid gap-5 border-t border-border/35 bg-background/28 p-3 backdrop-blur-sm transition-all duration-500 hover:border-[var(--scene-accent)] hover:bg-background/55 sm:p-4 md:grid-cols-[minmax(0,1.15fr)_minmax(220px,0.85fr)]`}
+                                                    style={`--scene-accent: ${genreMeta[genre]?.color || SCENE_COLORS[0]}; --reveal-delay: ${Math.min((index % 4) * 90, 270)}ms`}
+                                                >
+                                                    <div
+                                                        class="portfolio-project-thumb relative overflow-hidden bg-muted"
+                                                        data-fit={
+                                                            projectPresentation.imageFit
                                                         }
-                                                        alt={project.data.title}
-                                                        class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                                    />
-                                                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500 flex items-center justify-center">
-                                                        <div class="w-16 h-16 rounded-full bg-background/10 backdrop-blur-sm flex items-center justify-center opacity-0 scale-50 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 border border-white/20">
-                                                            <span class="text-white text-2xl">
-                                                                →
+                                                    >
+                                                        <img
+                                                            src={
+                                                                project.data
+                                                                    .thumbnail
+                                                            }
+                                                            alt={
+                                                                project.data
+                                                                    .title
+                                                            }
+                                                            class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                                        />
+                                                        <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-95" />
+                                                        <span class="portfolio-project-mode">
+                                                            {
+                                                                projectPresentation.modeLabel
+                                                            }
+                                                        </span>
+                                                        <div class="absolute bottom-4 left-4 flex items-center gap-3 text-white">
+                                                            <span class="portfolio-project-view-line h-px w-10" />
+                                                            <span class="text-xs font-bold uppercase tracking-[0.2em]">
+                                                                View
                                                             </span>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="flex justify-between items-baseline border-b border-transparent group-hover:border-primary/50 pb-2 transition-colors">
-                                                    <h3 class="text-3xl font-bold uppercase tracking-tight group-hover:text-primary transition-colors">
-                                                        {project.data.title}
-                                                    </h3>
-                                                    <span class="font-mono text-sm text-muted-foreground">
-                                                        {new Date(
-                                                            project.data.date,
-                                                        ).getFullYear()}
-                                                    </span>
-                                                </div>
-                                                <p class="text-muted-foreground line-clamp-2">
-                                                    {project.data.client} /{" "}
-                                                    {project.data.role.join(
-                                                        ", ",
-                                                    )}
-                                                </p>
-                                            </a>
-                                        ))}
-                                    </div>
-                                </section>
-                            ),
-                        )}
-                    </div>
-                </main>
+                                                    <div class="flex min-h-[220px] flex-col justify-between gap-8 p-1 sm:p-2">
+                                                        <div class="space-y-5">
+                                                            <div class="flex items-center justify-between gap-4 font-mono text-xs text-muted-foreground">
+                                                                <span>
+                                                                    {String(
+                                                                        index +
+                                                                            1,
+                                                                    ).padStart(
+                                                                        2,
+                                                                        "0",
+                                                                    )}
+                                                                </span>
+                                                                <span>
+                                                                    {new Date(
+                                                                        project
+                                                                            .data
+                                                                            .date,
+                                                                    ).getFullYear()}
+                                                                </span>
+                                                            </div>
+                                                            <h3 class="text-2xl font-black uppercase leading-tight tracking-normal text-foreground transition-colors duration-300 group-hover:text-[var(--scene-accent)] sm:text-3xl">
+                                                                {
+                                                                    project.data
+                                                                        .title
+                                                                }
+                                                            </h3>
+                                                            <p class="line-clamp-3 text-sm leading-6 text-muted-foreground">
+                                                                {
+                                                                    projectPresentation.homeIntro
+                                                                }
+                                                            </p>
+                                                        </div>
+
+                                                        <div class="flex items-center justify-between border-t border-border/35 pt-4 text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                                                            <span>
+                                                                {project.data.client}
+                                                            </span>
+                                                            <span class="portfolio-project-open">
+                                                                Open
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                );
+                                            })}
+                                        </div>
+                                    </section>
+                                ),
+                            )}
+                        </div>
+                    </main>
+                </div>
             </div>
         )
     }
-
-    {/* Shared Scripts */}
-    <script>
-        document.addEventListener("astro:page-load", () => {
-            // Profile Flip Logic
-            const flipContainers = document.querySelectorAll(".profile-flip-container");
-            flipContainers.forEach(container => {
-                container.addEventListener("click", () => {
-                    const inner = container.querySelector(".profile-flip-inner");
-                    if (inner) {
-                        inner.classList.toggle("flip-180");
-                    }
-                });
-            });
-
-            // Logic for Layout 1/2/3/4 Back to Top (Existing)
-            const backToTopBtn = document.getElementById("back-to-top");
-            if (backToTopBtn) {
-                backToTopBtn.addEventListener("click", () => {
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                });
-                // ... existing toggle logic ...
-                const toggleVisibility = () => {
-                    const scrolled = window.scrollY > 300;
-                    backToTopBtn.dataset.visible = scrolled.toString();
-                    if (scrolled) {
-                        backToTopBtn.classList.remove(
-                            "invisible",
-                            "pointer-events-none",
-                        );
-                    }
-                };
-                window.addEventListener("scroll", toggleVisibility);
-            }
-        });
-    </script>
 </Layout>
