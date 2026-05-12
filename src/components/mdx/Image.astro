@@ -1,19 +1,5 @@
 ---
-interface Props {
-    src?: string;
-    alt?: string;
-    title?: string;
-    class?: string;
-}
-
-const { src, alt = "", title, class: className } = Astro.props;
+import ResponsiveImage from "@/components/ResponsiveImage.astro";
 ---
 
-<img
-    src={src}
-    alt={alt}
-    title={title}
-    class={className}
-    loading="lazy"
-    decoding="async"
-/>
+<ResponsiveImage {...Astro.props} />

@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import ResponsiveImage from "@/components/ResponsiveImage.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 
 const PROFILE = {
@@ -100,12 +101,14 @@ const EXPERIENCE: ExperienceItem[] = [
             <header class="space-y-6">
                 <div class="flex flex-col md:flex-row gap-8 items-start">
                     <div class="w-32 h-32 md:w-48 md:h-48 shrink-0 rounded-lg overflow-hidden border border-border/50">
-                        <img
+                        <ResponsiveImage
                             src={PROFILE.avatar}
                             alt={PROFILE.name}
                             class="w-full h-full object-cover"
                             decoding="async"
                             fetchpriority="high"
+                            loading="eager"
+                            sizes="(max-width: 768px) 8rem, 12rem"
                         />
                     </div>
                     

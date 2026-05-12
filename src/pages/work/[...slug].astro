@@ -1,11 +1,13 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import ResponsiveImage from "@/components/ResponsiveImage.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 import Grid from "@/components/mdx/Grid.astro";
 import MdxImage from "@/components/mdx/Image.astro";
 import YouTube from "@/components/mdx/YouTube.astro";
 import Video from "@/components/mdx/Video.astro";
+import { getLargestVariant } from "@/lib/generated/image-manifest";
 import { getProjectPresentation } from "@/lib/projectPresentation";
 
 export async function getStaticPaths() {
@@ -169,10 +171,6 @@ const themeCopy = {
                     ></span>
                 ))}
             </div>
-            <div class="case-flow-readout">
-                <strong data-dynamic>{themeCopy.eyebrow}</strong>
-                <i></i>
-            </div>
         </div>
 
         <header class="case-nav">
@@ -233,7 +231,7 @@ const themeCopy = {
                                 <video
                                     class="h-full w-full bg-black object-cover"
                                     src={directVideoUrl}
-                                    poster={entry.data.thumbnail}
+                                    poster={getLargestVariant(entry.data.thumbnail)}
                                     controls
                                     preload="metadata"
                                     playsinline
@@ -246,12 +244,14 @@ const themeCopy = {
                                     class="h-full w-full"
                                 />
                             ) : (
-                                <img
+                                <ResponsiveImage
                                     src={entry.data.thumbnail}
                                     alt={entry.data.title}
                                     class="case-hero-image"
                                     decoding="async"
                                     fetchpriority="high"
+                                    loading="eager"
+                                    sizes="(max-width: 900px) 92vw, 44vw"
                                 />
                             )
                         }
@@ -360,7 +360,6 @@ const themeCopy = {
                 {
                     themeVariant === "sensor" && (
                         <div class="theme-sensor-patch">
-                            <div class="sensor-patch-grid" aria-hidden="true"></div>
                             <div class="sensor-viewport">
                                 <span class="sensor-body"></span>
                                 <span class="sensor-trace sensor-trace-a"></span>

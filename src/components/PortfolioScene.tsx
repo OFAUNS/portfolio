@@ -97,8 +97,6 @@ const WATER_FRAGMENT_SHADER = `
 `;
 
 export default function PortfolioScene({
-    projectCount,
-    categories,
     featuredProjects = [],
 }: PortfolioSceneProps) {
     const mountRef = useRef<HTMLDivElement>(null);
@@ -542,19 +540,6 @@ export default function PortfolioScene({
             aria-hidden="true"
         >
             <div ref={mountRef} className="portfolio-webgl-mount" />
-            <div className="portfolio-design-lines" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-                <span />
-            </div>
-            <div className="portfolio-scene-readout">
-                <span className="portfolio-scene-kicker">KINETIC ATLAS</span>
-                <span className="portfolio-scene-label">{focus.label}</span>
-                <span className="portfolio-scene-meta">
-                    {projectCount} works / {categories.length} fields
-                </span>
-            </div>
         </div>
     );
 }

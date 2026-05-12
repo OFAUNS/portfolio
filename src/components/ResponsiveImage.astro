@@ -1,0 +1,55 @@
+---
+import { getImageEntry } from "@/lib/generated/image-manifest";
+
+interface Props {
+    src?: string;
+    alt?: string;
+    class?: string;
+    title?: string;
+    sizes?: string;
+    loading?: "eager" | "lazy";
+    decoding?: "async" | "auto" | "sync";
+    fetchpriority?: "high" | "low" | "auto";
+    width?: number | string;
+    height?: number | string;
+    [key: string]: unknown;
+}
+
+const {
+    src = "",
+    alt = "",
+    class: className,
+    title,
+    sizes,
+    loading = "lazy",
+    decoding = "async",
+    fetchpriority,
+    width,
+    height,
+    ...attrs
+} = Astro.props;
+
+const entry = getImageEntry(src);
+const variants = entry?.variants ?? [];
+const srcSet = variants.map((variant) => `${variant.src} ${variant.width}w`).join(", ");
+const fallbackSrc = variants.at(-1)?.src || src;
+const resolvedWidth = width ?? entry?.width;
+const resolvedHeight = height ?? entry?.height;
+const resolvedSizes =
+    sizes ?? "(max-width: 640px) 92vw, (max-width: 1024px) 86vw, 1200px";
+---
+
+<img
+    {...attrs}
+    src={fallbackSrc}
+    srcset={srcSet || undefined}
+    sizes={srcSet ? resolvedSizes : undefined}
+    width={resolvedWidth}
+    height={resolvedHeight}
+    alt={alt}
+    title={title}
+    class={className}
+    loading={loading}
+    decoding={decoding}
+    fetchpriority={fetchpriority}
+/>
