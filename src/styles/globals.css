@@ -571,6 +571,58 @@ main .portfolio-project.scroll-reveal {
   padding: 0.18em 0.12em 0.22em;
 }
 
+.transition-overlay.is-leaving,
+.transition-overlay.is-entering {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.transition-overlay.is-leaving {
+  animation: route-overlay-cover 520ms ease-out both;
+}
+
+.transition-overlay.is-entering {
+  animation: route-overlay-release 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.transition-overlay__piece,
+.transition-overlay__triangle,
+.transition-overlay__frame,
+.transition-overlay__mark {
+  opacity: 0;
+}
+
+.transition-overlay.is-leaving .transition-overlay__piece {
+  animation: route-piece-cover 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--piece-index) * 18ms);
+}
+
+.transition-overlay.is-entering .transition-overlay__piece {
+  animation: route-piece-release 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--piece-index) * 12ms);
+}
+
+.transition-overlay.is-leaving .transition-overlay__triangle {
+  animation: route-triangle-cover 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--triangle-index) * 24ms);
+}
+
+.transition-overlay.is-entering .transition-overlay__triangle {
+  animation: route-triangle-release 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--triangle-index) * 18ms);
+}
+
+.transition-overlay.is-leaving .transition-overlay__frame,
+.transition-overlay.is-leaving .transition-overlay__mark {
+  animation: route-mark-cover 420ms ease-out 120ms both;
+}
+
+.transition-overlay.is-entering .transition-overlay__frame,
+.transition-overlay.is-entering .transition-overlay__mark {
+  animation: route-mark-release 520ms ease-out both;
+}
+
 /* Interactive portfolio homepage */
 .portfolio-home {
   isolation: isolate;
@@ -1139,6 +1191,21 @@ html[data-route-transition] .portfolio-design-lines span {
   color: var(--muted-foreground);
 }
 
+.portfolio-project-title {
+  display: grid;
+  gap: 0.06em;
+  max-width: min(100%, 19ch);
+  text-wrap: balance;
+  word-break: normal;
+}
+
+.portfolio-project-title span {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
 .portfolio-project-view-line {
   background: color-mix(in oklch, white 58%, transparent);
 }
@@ -1633,21 +1700,24 @@ html[data-route-transition] .portfolio-design-lines span {
 
 .case-title {
   min-width: 0;
-  max-width: 12ch;
+  max-width: min(13ch, 100%);
   color: var(--foreground);
   font-size: clamp(3rem, 8vw, 8.5rem);
   font-weight: 950;
   line-height: 0.9;
   letter-spacing: 0;
   overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
-  word-break: break-word;
+  word-break: normal;
 }
 
 .case-title span {
   display: block;
   min-width: 0;
   overflow-wrap: anywhere;
+  text-wrap: balance;
+  word-break: normal;
 }
 
 .case-summary {
@@ -3278,13 +3348,21 @@ html[data-route-transition] .portfolio-design-lines span {
   }
 
   .case-title {
-    font-size: clamp(2rem, 8.7vw, 2.6rem);
-    line-height: 0.95;
-    word-break: break-all;
+    max-width: 100%;
+    font-size: clamp(2.15rem, 9.2vw, 3rem);
+    line-height: 0.98;
+    word-break: normal;
   }
 
   .case-title span {
-    word-break: break-all;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .portfolio-project-title {
+    max-width: 100%;
+    font-size: clamp(1.35rem, 7vw, 1.9rem);
+    line-height: 1.05;
   }
 
   .case-hero-copy {
@@ -3297,7 +3375,8 @@ html[data-route-transition] .portfolio-design-lines span {
     max-width: 100%;
     line-height: 1.65;
     white-space: normal;
-    word-break: break-all;
+    word-break: normal;
+    overflow-wrap: anywhere;
   }
 
   .case-background-interface {
@@ -3683,6 +3762,106 @@ html[data-route-transition] .portfolio-design-lines span {
   49%,
   100% {
     opacity: 0;
+  }
+}
+
+@keyframes route-overlay-cover {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes route-overlay-release {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes route-piece-cover {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate3d(var(--enter-x), var(--enter-y), 0) rotate(var(--enter-rotate)) scale(0.82);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes route-piece-release {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translate3d(var(--exit-x), var(--exit-y), 0) rotate(var(--exit-rotate)) scale(0.78);
+  }
+}
+
+@keyframes route-triangle-cover {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(calc(-50% + var(--enter-x)), calc(-50% + var(--enter-y))) rotate(var(--enter-rotate)) scale(0.68);
+  }
+
+  100% {
+    opacity: 0.78;
+    filter: blur(0);
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes route-triangle-release {
+  0% {
+    opacity: 0.78;
+    filter: blur(0);
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translate(calc(-50% + var(--exit-x)), calc(-50% + var(--exit-y))) rotate(var(--exit-rotate)) scale(0.72);
+  }
+}
+
+@keyframes route-mark-cover {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes route-mark-release {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(10px);
   }
 }
 

@@ -9,6 +9,7 @@ import YouTube from "@/components/mdx/YouTube.astro";
 import Video from "@/components/mdx/Video.astro";
 import { getLargestVariant } from "@/lib/generated/image-manifest";
 import { getProjectPresentation } from "@/lib/projectPresentation";
+import { getBalancedTitleLines } from "@/lib/titleBreaks";
 
 export async function getStaticPaths() {
     const works = await getCollection("work");
@@ -21,14 +22,14 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 const presentation = getProjectPresentation(entry);
-const baseTitleLines = entry.data.title
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+const baseTitleLines = getBalancedTitleLines(entry.data.title, {
+    maxLines: presentation.layout === "installation" ? 4 : 3,
+    targetLength: presentation.layout === "installation" ? 12 : 18,
+});
 const titleLines =
     presentation.layout === "installation" &&
-    baseTitleLines.length === 1 &&
-    /^touchdesigner\s+/i.test(baseTitleLines[0])
+    /^touchdesigner$/i.test(baseTitleLines[0] || "") &&
+    /元素人形畫布互動設計/.test(baseTitleLines[1] || "")
         ? ["TouchDesigner", "元素人形畫布", "互動設計"]
         : baseTitleLines;
 
