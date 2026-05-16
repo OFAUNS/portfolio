@@ -20,10 +20,10 @@ type SceneFocus = {
     label: string;
 };
 
-const DEFAULT_COLOR = "#d8e6ff";
+const DEFAULT_COLOR = "#76f7ff";
 const RESTING_LABEL = "LIVE INDEX";
-const PALETTE = ["#d8e6ff", "#9aaec9", "#ffffff", "#283a55", "#111a2b"];
-const BASE_TINT = new THREE.Color("#d8e6ff");
+const PALETTE = ["#76f7ff", "#d8ff38", "#ffffff", "#ff5a24", "#27302d"];
+const BASE_TINT = new THREE.Color("#e6fdff");
 const WATER_VERTEX_SHADER = `
     varying vec2 vUv;
 
@@ -82,16 +82,24 @@ const WATER_FRAGMENT_SHADER = `
         float rings = pow(max(0.0, sin(distanceToPointer * 43.0 - uTime * 6.0)), 3.0);
         rings *= exp(-distanceToPointer * 2.05) * pulse;
         float caustic = pow(0.5 + 0.5 * sin((q.x + q.y) * 5.0 + uTime * 1.2 + ripple * 2.0), 3.0);
+        float velocity = lineMask(q.x * 0.58 - q.y * 0.18 + uTime * 0.18, 7.2, 0.012);
+        velocity *= smoothstep(-1.2, 0.6, p.x) * (0.45 + pulse * 0.35);
+        float trackEdge = lineMask(q.x * 0.42 + q.y * 0.55 - uTime * 0.08, 2.1, 0.018);
+        trackEdge *= 0.5 + pulse * 0.18;
 
         float vignette = 1.0 - smoothstep(0.28, 1.85, length(p * vec2(0.76, 1.0)));
-        float intensity = thin * 0.22 + thick * 0.38 + rings * 0.58 + caustic * 0.11;
+        float intensity = thin * 0.22 + thick * 0.38 + rings * 0.58 + caustic * 0.11 + velocity * 0.42 + trackEdge * 0.2;
 
         vec3 lightLine = vec3(0.06, 0.18, 0.34);
         vec3 darkLine = vec3(0.78, 0.9, 1.0);
+        vec3 signalLine = vec3(1.0, 0.35, 0.12);
+        vec3 limeLine = vec3(0.76, 1.0, 0.22);
         vec3 lineColor = mix(lightLine, darkLine, uThemeDark);
-        lineColor = mix(lineColor, uAccent, 0.16 + pulse * 0.24);
+        lineColor = mix(lineColor, uAccent, 0.22 + pulse * 0.28);
+        lineColor = mix(lineColor, signalLine, velocity * 0.26);
+        lineColor = mix(lineColor, limeLine, trackEdge * 0.18);
 
-        float alpha = clamp(intensity * vignette * (0.52 + uThemeDark * 0.34), 0.0, 0.72);
+        float alpha = clamp(intensity * vignette * (0.66 + uThemeDark * 0.24), 0.0, 0.86);
         gl_FragColor = vec4(lineColor, alpha);
     }
 `;
@@ -147,7 +155,7 @@ export default function PortfolioScene({
         let interactionPulse = 0;
         let themeMix = document.documentElement.classList.contains("dark") ? 1 : 0;
         let lastFrameTime = 0;
-        const targetFrameDuration = window.innerWidth < 1280 ? 42 : 34;
+        const targetFrameDuration = window.innerWidth < 1280 ? 38 : 30;
 
         const ambient = new THREE.AmbientLight(0xffffff, 0.9);
         const keyLight = new THREE.PointLight(0xd8e6ff, 2.9, 18);
@@ -181,8 +189,8 @@ export default function PortfolioScene({
 
         const textureLoader = new THREE.TextureLoader();
         const loadedTextures: THREE.Texture[] = [];
-        const projects = featuredProjects.slice(0, 4);
-        const cardGeometry = new THREE.PlaneGeometry(1.95, 1.1, 4, 2);
+        const projects = featuredProjects.slice(0, 0);
+        const cardGeometry = new THREE.PlaneGeometry(2.24, 1.26, 4, 2);
         const cards = projects.map((project, index) => {
             const color = new THREE.Color(project.color);
             const material = new THREE.MeshBasicMaterial({
@@ -194,9 +202,9 @@ export default function PortfolioScene({
             });
             const mesh = new THREE.Mesh(cardGeometry, material);
             const angle = (index / Math.max(projects.length, 1)) * Math.PI * 2;
-            const radius = 3.25 + (index % 2) * 0.7;
+            const radius = 3.6 + (index % 2) * 0.86;
             mesh.position.set(
-                Math.cos(angle) * radius + 1.05,
+                Math.cos(angle) * radius + 1.35,
                 Math.sin(angle * 1.45) * 0.82,
                 Math.sin(angle) * 1.85 - 0.35,
             );
@@ -212,7 +220,7 @@ export default function PortfolioScene({
                 loadedTextures.push(texture);
                 material.map = texture;
                 material.color.copy(BASE_TINT);
-                material.opacity = 0.2;
+                material.opacity = 0.24;
                 material.needsUpdate = true;
             });
 
@@ -229,7 +237,7 @@ export default function PortfolioScene({
         });
 
         const shardGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-        const shardCount = 8;
+        const shardCount = 0;
         const shards = Array.from({ length: shardCount }, (_, index) => {
             const color = new THREE.Color(PALETTE[index % PALETTE.length]);
             const material = new THREE.MeshBasicMaterial({
@@ -259,7 +267,7 @@ export default function PortfolioScene({
             };
         });
 
-        const particleCount = window.innerWidth < 768 ? 72 : 160;
+        const particleCount = 0;
         const positions = new Float32Array(particleCount * 3);
         const colors = new Float32Array(particleCount * 3);
         const particleSeeds = new Float32Array(particleCount);
@@ -291,7 +299,7 @@ export default function PortfolioScene({
         const particles = new THREE.Points(particleGeometry, particleMaterial);
         root.add(particles);
 
-        const ribbonCount = 2;
+        const ribbonCount = 0;
         const ribbonPointCount = 52;
         const ribbonPoints = Array.from({ length: ribbonCount }, () =>
             Array.from({ length: ribbonPointCount }, () => new THREE.Vector3()),
@@ -317,11 +325,11 @@ export default function PortfolioScene({
             renderer.setSize(safeWidth, safeHeight, false);
             camera.aspect = safeWidth / safeHeight;
             camera.updateProjectionMatrix();
-            root.position.x = safeWidth >= 1024 ? 1.05 : 0;
-            root.position.y = safeWidth >= 1024 ? 0.05 : -0.24;
-            root.scale.setScalar(safeWidth >= 1024 ? 1 : 0.84);
-            waveMesh.position.x = safeWidth >= 1024 ? 0.86 : 0;
-            waveMesh.scale.setScalar(safeWidth >= 1024 ? 1 : 0.84);
+            root.position.x = safeWidth >= 1024 ? 1.6 : 0.12;
+            root.position.y = safeWidth >= 1024 ? 0.08 : -0.24;
+            root.scale.setScalar(safeWidth >= 1024 ? 1.08 : 0.86);
+            waveMesh.position.x = safeWidth >= 1024 ? 1.18 : 0;
+            waveMesh.scale.setScalar(safeWidth >= 1024 ? 1.1 : 0.86);
             waveUniforms.uAspect.value = safeWidth / safeHeight;
         };
 
@@ -398,7 +406,7 @@ export default function PortfolioScene({
                 const orbit = card.angle + time * 0.12 * motionScale;
                 const depthPulse = Math.sin(time * 0.72 + card.seed) * 0.28;
                 card.mesh.position.x =
-                    Math.cos(orbit) * card.radius + 1.05 + pointer.x * 0.28;
+                    Math.cos(orbit) * card.radius + 1.35 + pointer.x * 0.32;
                 card.mesh.position.y =
                     Math.sin(orbit * 1.45 + card.seed) * 0.76 + pointer.y * 0.18;
                 card.mesh.position.z = Math.sin(orbit) * 1.85 - 0.45 + depthPulse;
@@ -412,7 +420,7 @@ export default function PortfolioScene({
                 );
                 card.material.color.copy(cardTint);
                 card.material.opacity =
-                    0.16 + focusPower * 0.14 + (routeActive ? 0.12 : 0);
+                    0.2 + focusPower * 0.16 + (routeActive ? 0.12 : 0);
             });
 
             shards.forEach((shard, index) => {
@@ -486,7 +494,7 @@ export default function PortfolioScene({
             camera.position.x += (pointer.x * 0.32 - camera.position.x) * 0.035;
             camera.position.y +=
                 (0.35 + pointer.y * 0.18 - camera.position.y) * 0.035;
-            camera.lookAt(0.8, 0, -0.8);
+            camera.lookAt(1.15, 0, -0.8);
 
             renderer.render(scene, camera);
         };

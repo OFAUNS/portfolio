@@ -438,141 +438,158 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                     featuredProjects={featuredSceneProjects}
                 />
 
-                <div class="portfolio-shell relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-[minmax(300px,36vw)_1fr]">
-                    <aside class="portfolio-hero-panel flex min-h-[540px] flex-col justify-between border-b border-border/40 bg-background/82 px-6 py-6 backdrop-blur-md sm:px-8 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r lg:px-10 lg:py-8 xl:px-12">
-                        <div>
-                            <div class="flex items-start justify-between gap-4 animate-blur-in delay-100">
-                                <a
-                                    href="/about"
-                                    class="profile-flip-container group relative z-50 h-20 w-20 shrink-0 cursor-pointer border border-border/70 [perspective:1000px] transition-transform duration-500 hover:scale-110"
-                                    aria-label="About OFAUNS"
-                                >
-                                    <div class="profile-flip-inner relative h-full w-full transition-[transform] duration-700 ease-in-out [transform-style:preserve-3d]">
-                                        <ResponsiveImage
-                                            src={PROFILE.avatar}
-                                            alt="OFAUNS profile"
-                                            class="absolute inset-0 h-full w-full bg-muted object-cover [backface-visibility:hidden]"
-                                            decoding="async"
-                                            fetchpriority="high"
-                                            loading="eager"
-                                            sizes="5rem"
-                                        />
-                                        <ResponsiveImage
-                                            src="/melogo.png"
-                                            alt="OFAUNS mark"
-                                            class="flip-180 absolute inset-0 h-full w-full bg-white object-cover [backface-visibility:hidden]"
-                                            loading="lazy"
-                                            decoding="async"
-                                            sizes="5rem"
-                                        />
-                                    </div>
-                                </a>
-                                <ThemeToggle />
-                            </div>
-
-                            <div class="mt-10 max-w-xl space-y-4 sm:mt-12 lg:mt-12">
-                                <h1 class="animate-blur-in delay-200 max-w-none text-5xl font-black uppercase leading-[0.9] tracking-normal text-foreground sm:text-6xl xl:text-7xl">
-                                    <a
-                                        href="/about"
-                                        class="inline-block transition-colors duration-500 hover:text-primary"
-                                    >
-                                        {PROFILE.name}
-                                    </a>
-                                </h1>
-                                <p class="animate-blur-in delay-300 max-w-sm border-l border-border/60 pl-4 text-sm font-semibold uppercase leading-6 tracking-[0.16em] text-muted-foreground sm:text-base">
-                                    {PROFILE.role}
-                                </p>
+                <div class="portfolio-shell portfolio-shell--cinematic relative z-10 min-h-screen">
+                    <header class="portfolio-topbar animate-blur-in delay-100">
+                        <div class="portfolio-topbar-brand">
+                            <a
+                                href="/about"
+                                class="profile-flip-container group relative z-50 h-16 w-16 shrink-0 cursor-pointer border border-border/70 [perspective:1000px] transition-transform duration-500 hover:scale-110"
+                                aria-label="About OFAUNS"
+                            >
+                                <div class="profile-flip-inner relative h-full w-full transition-[transform] duration-700 ease-in-out [transform-style:preserve-3d]">
+                                    <ResponsiveImage
+                                        src={PROFILE.avatar}
+                                        alt="OFAUNS profile"
+                                        class="absolute inset-0 h-full w-full bg-muted object-cover [backface-visibility:hidden]"
+                                        decoding="async"
+                                        fetchpriority="high"
+                                        loading="eager"
+                                        sizes="4rem"
+                                    />
+                                    <ResponsiveImage
+                                        src="/melogo.png"
+                                        alt="OFAUNS mark"
+                                        class="flip-180 absolute inset-0 h-full w-full bg-white object-cover [backface-visibility:hidden]"
+                                        loading="lazy"
+                                        decoding="async"
+                                        sizes="4rem"
+                                    />
+                                </div>
+                            </a>
+                            <div class="portfolio-topbar-title">
+                                <span>OFAUNS</span>
+                                <span>Visual Systems</span>
                             </div>
                         </div>
 
-                        <div class="mt-8 space-y-4">
-                            <nav class="portfolio-field-board space-y-3" aria-label="Portfolio categories">
-                                <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                                    Fields
-                                </p>
-                                <div class="portfolio-field-list">
-                                    {genreNames.map((genre) => (
-                                        <a
-                                            href={`#${genre}`}
-                                            data-scene-project="true"
-                                            data-scene-title={genre}
-                                            data-scene-genre={genre}
-                                            data-scene-color={
-                                                genreMeta[genre]?.color ||
-                                                SCENE_COLORS[0]
-                                            }
-                                            class="portfolio-chip portfolio-field-sign"
-                                            style={`--scene-accent: ${genreMeta[genre]?.color || SCENE_COLORS[0]}`}
-                                        >
-                                            <span class="portfolio-field-index">
-                                                {String(
-                                                    genreMeta[genre]?.index || 1,
-                                                ).padStart(2, "0")}
-                                            </span>
-                                            <span class="portfolio-field-name">
-                                                {genre}
-                                            </span>
-                                            <span class="portfolio-field-count">
-                                                {groupedPortfolio[genre]?.length || 0}
-                                            </span>
-                                        </a>
-                                    ))}
-                                </div>
-                            </nav>
+                        <nav class="portfolio-topbar-links" aria-label="Primary">
+                            <a href="#work">Work</a>
+                            <a href={PROFILE.links.email}>Contact</a>
+                        </nav>
 
-                            <div class="flex flex-wrap items-center gap-5 border-t border-border/40 pt-4 text-sm text-muted-foreground">
+                        <ThemeToggle />
+                    </header>
+
+                    <section class="portfolio-race-hero" aria-labelledby="home-title">
+                        <div class="portfolio-hero-copy">
+                            <p class="portfolio-hero-kicker animate-blur-in delay-200">
+                                Motion / Web / Interaction
+                            </p>
+                            <h1
+                                id="home-title"
+                                class="portfolio-home-title animate-blur-in delay-300"
+                            >
+                                <a href="/about">
+                                    {PROFILE.name}
+                                </a>
+                            </h1>
+                            <p class="portfolio-hero-role animate-blur-in delay-400">
+                                {PROFILE.role}
+                            </p>
+                            <p class="portfolio-hero-bio animate-blur-in delay-500">
+                                {PROFILE.bio}
+                            </p>
+                            <div class="portfolio-hero-actions animate-blur-in delay-600">
+                                <a class="portfolio-action portfolio-chip" href="#work">
+                                    Explore Work
+                                </a>
                                 <a
+                                    class="portfolio-action portfolio-action--ghost portfolio-chip"
                                     href={PROFILE.links.email}
-                                    class="font-bold uppercase tracking-[0.18em] text-foreground hover:text-primary"
                                 >
                                     Email
                                 </a>
-                                <a
-                                    href={PROFILE.links.twitter}
-                                    class="font-bold uppercase tracking-[0.18em] text-foreground hover:text-primary"
-                                >
-                                    X
-                                </a>
                             </div>
                         </div>
-                    </aside>
 
-                    <main id="work" class="portfolio-workstream px-5 py-10 sm:px-8 lg:px-12 lg:py-14 xl:px-16">
-                        <section class="mb-14 max-w-3xl space-y-5">
-                            {/* <p class="text-xs font-bold uppercase tracking-[0.28em] text-primary">
-                                Selected Work
-                            </p>
-                            <h2 class="text-3xl font-bold leading-tight tracking-normal text-foreground sm:text-4xl lg:text-5xl">
-                                Motion-led portfolio for visual systems, films,
-                                web interfaces, and interactive design.
-                            </h2> */}
-                        </section>
+                        <div class="portfolio-hero-figure animate-blur-in delay-400">
+                            <div class="portfolio-figure-track" aria-hidden="true">
+                                <span>Visual Designer</span>
+                                <span>Motion</span>
+                                <span>Web</span>
+                                <span>Interaction</span>
+                            </div>
+                            <div class="portfolio-figure-frame">
+                                <ResponsiveImage
+                                    src={PROFILE.avatar}
+                                    alt="OFAUNS portrait"
+                                    class="h-full w-full object-cover"
+                                    decoding="async"
+                                    fetchpriority="high"
+                                    loading="eager"
+                                    sizes="(max-width: 1024px) 92vw, 34vw"
+                                />
+                                <div class="portfolio-figure-overlay">
+                                    <span>OFAUNS</span>
+                                    <span>{new Date().getFullYear()}</span>
+                                </div>
+                            </div>
+                            <div class="portfolio-figure-plate">
+                                <span>{PROFILE.email}</span>
+                                <span>{String(sortedPortfolio.length).padStart(2, "0")} Works / {String(genreNames.length).padStart(2, "0")} Fields</span>
+                            </div>
+                        </div>
 
-                        <div class="space-y-20">
+                        <div class="portfolio-water-caption" aria-hidden="true">
+                            <span>Liquid Index</span>
+                            <span>Speed Layer</span>
+                            <span>{new Date().getFullYear()}</span>
+                        </div>
+
+                        <div class="portfolio-hero-marquee" aria-hidden="true">
+                            <span>Motion</span>
+                            <span>Web</span>
+                            <span>Interaction</span>
+                            <span>Film</span>
+                            <span>Visual</span>
+                        </div>
+
+                        <a
+                            href="#work"
+                            class="portfolio-scroll-cue"
+                            aria-label="Scroll to selected work"
+                        >
+                            <span>Selected Work</span>
+                            <i></i>
+                        </a>
+                    </section>
+
+                    <main id="work" class="portfolio-workstream">
+                        <div class="portfolio-sections">
                             {orderedGroupedPortfolio.map(
                                 ([genre, projects], genreIndex) => (
                                     <section
                                         id={genre}
-                                        class="scroll-mt-20"
+                                        class="portfolio-genre-section scroll-mt-20"
                                         style={`--scene-accent: ${genreMeta[genre]?.color || SCENE_COLORS[0]}`}
                                     >
-                                        <div class="mb-5 flex items-end justify-between gap-4 border-b border-border/45 pb-4">
-                                            <div class="space-y-2">
-                                                <p class="font-mono text-xs text-muted-foreground">
+                                        <div class="portfolio-genre-head">
+                                            <div>
+                                                <p>
                                                     {String(
                                                         genreIndex + 1,
                                                     ).padStart(2, "0")}
                                                 </p>
-                                                <h2 class="text-2xl font-black uppercase leading-none tracking-normal text-foreground sm:text-4xl">
+                                                <h2>
                                                     {genre}
                                                 </h2>
                                             </div>
-                                            <span class="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                                            <span>
                                                 {projects.length} Projects
                                             </span>
                                         </div>
 
-                                        <div class="grid grid-cols-1 gap-4">
+                                        <div class="portfolio-project-grid">
                                             {projects.map((project, index) => {
                                                 const projectPresentation =
                                                     getProjectPresentation(
@@ -580,58 +597,57 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                                     );
 
                                                 return (
-                                                <a
-                                                    href={`/work/${project.slug}`}
-                                                    data-scene-project="true"
-                                                    data-scene-title={
-                                                        project.data.title
-                                                    }
-                                                    data-scene-genre={genre}
-                                                    data-scene-color={
-                                                        genreMeta[genre]
-                                                            ?.color ||
-                                                        SCENE_COLORS[0]
-                                                    }
-                                                    class={`portfolio-project portfolio-project--${projectPresentation.layout} group grid gap-5 border-t border-border/35 bg-background/28 p-3 backdrop-blur-sm transition-all duration-500 hover:border-[var(--scene-accent)] hover:bg-background/55 sm:p-4 md:grid-cols-[minmax(0,1.15fr)_minmax(220px,0.85fr)]`}
-                                                    style={`--scene-accent: ${genreMeta[genre]?.color || SCENE_COLORS[0]}; --reveal-delay: ${Math.min((index % 4) * 90, 270)}ms`}
-                                                >
-                                                    <div
-                                                        class="portfolio-project-thumb relative overflow-hidden bg-muted"
-                                                        data-fit={
-                                                            projectPresentation.imageFit
+                                                    <a
+                                                        href={`/work/${project.slug}`}
+                                                        data-scene-project="true"
+                                                        data-scene-title={
+                                                            project.data.title
                                                         }
+                                                        data-scene-genre={genre}
+                                                        data-scene-color={
+                                                            genreMeta[genre]
+                                                                ?.color ||
+                                                            SCENE_COLORS[0]
+                                                        }
+                                                        class={`portfolio-project portfolio-project--${projectPresentation.layout} group`}
+                                                        style={`--scene-accent: ${genreMeta[genre]?.color || SCENE_COLORS[0]}; --reveal-delay: ${Math.min((index % 4) * 90, 270)}ms`}
                                                     >
-                                                        <ResponsiveImage
-                                                            src={
-                                                                project.data
-                                                                    .thumbnail
+                                                        <div
+                                                            class="portfolio-project-thumb relative overflow-hidden bg-muted"
+                                                            data-fit={
+                                                                projectPresentation.imageFit
                                                             }
-                                                            alt={
-                                                                project.data
-                                                                    .title
-                                                            }
-                                                            class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                                            loading="lazy"
-                                                            decoding="async"
-                                                            sizes="(max-width: 768px) 92vw, (max-width: 1024px) 78vw, 38vw"
-                                                        />
-                                                        <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-95" />
-                                                        <span class="portfolio-project-mode">
-                                                            {
-                                                                projectPresentation.modeLabel
-                                                            }
-                                                        </span>
-                                                        <div class="absolute bottom-4 left-4 flex items-center gap-3 text-white">
-                                                            <span class="portfolio-project-view-line h-px w-10" />
-                                                            <span class="text-xs font-bold uppercase tracking-[0.2em]">
-                                                                View
+                                                        >
+                                                            <ResponsiveImage
+                                                                src={
+                                                                    project.data
+                                                                        .thumbnail
+                                                                }
+                                                                alt={
+                                                                    project.data
+                                                                        .title
+                                                                }
+                                                                class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                                                loading="lazy"
+                                                                decoding="async"
+                                                                sizes="(max-width: 768px) 92vw, (max-width: 1280px) 44vw, 32vw"
+                                                            />
+                                                            <div class="portfolio-project-shade" />
+                                                            <span class="portfolio-project-mode">
+                                                                {
+                                                                    projectPresentation.modeLabel
+                                                                }
                                                             </span>
+                                                            <div class="portfolio-project-view">
+                                                                <span class="portfolio-project-view-line" />
+                                                                <span>
+                                                                    View
+                                                                </span>
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="flex min-h-[220px] flex-col justify-between gap-8 p-1 sm:p-2">
-                                                        <div class="space-y-5">
-                                                            <div class="flex items-center justify-between gap-4 font-mono text-xs text-muted-foreground">
+                                                        <div class="portfolio-project-body">
+                                                            <div class="portfolio-project-meta">
                                                                 <span>
                                                                     {String(
                                                                         index +
@@ -649,7 +665,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                                                     ).getFullYear()}
                                                                 </span>
                                                             </div>
-                                                            <h3 class="portfolio-project-title text-2xl font-black uppercase leading-tight tracking-normal text-foreground transition-colors duration-300 group-hover:text-[var(--scene-accent)] sm:text-3xl">
+                                                            <h3 class="portfolio-project-title">
                                                                 {getBalancedTitleLines(
                                                                     project.data
                                                                         .title,
@@ -665,23 +681,22 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                                                     ),
                                                                 )}
                                                             </h3>
-                                                            <p class="line-clamp-3 text-sm leading-6 text-muted-foreground">
+                                                            <p class="portfolio-project-intro">
                                                                 {
                                                                     projectPresentation.homeIntro
                                                                 }
                                                             </p>
-                                                        </div>
 
-                                                        <div class="flex items-center justify-between border-t border-border/35 pt-4 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                                                            <span>
-                                                                {project.data.client}
-                                                            </span>
-                                                            <span class="portfolio-project-open">
-                                                                Open
-                                                            </span>
+                                                            <div class="portfolio-project-footer">
+                                                                <span>
+                                                                    {project.data.client}
+                                                                </span>
+                                                                <span class="portfolio-project-open">
+                                                                    Open
+                                                                </span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </a>
+                                                    </a>
                                                 );
                                             })}
                                         </div>
