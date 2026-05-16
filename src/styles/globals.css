@@ -31,16 +31,7 @@
 body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
-    transition: background-color 0.5s ease, color 0.5s ease;
-  }
-
-  /* Ensure commonly transitioned properties are covered for all elements */
-  *,
-  *::before,
-  *::after {
-    transition-property: background-color, border-color, color, text-decoration-color, fill, stroke;
-    transition-duration: 0.5s;
-    transition-timing-function: ease;
+    transition: background-color 180ms ease, color 180ms ease;
   }
 
   img,
@@ -57,9 +48,8 @@ body {
   input[type="button"],
   input[type="submit"] {
     transition-property: transform, box-shadow, color, background-color, border-color;
-    transition-duration: 320ms;
+    transition-duration: 180ms;
     transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -81,6 +71,7 @@ body {
   input[type="submit"]:focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 3px;
+    transition-duration: 80ms;
   }
 }
 
@@ -340,11 +331,13 @@ main .portfolio-project.scroll-reveal {
   visibility: hidden;
   transform: translateZ(0);
   perspective: 1200px;
-  will-change: opacity, visibility;
+  contain: paint;
+  will-change: opacity;
   --transition-accent: var(--route-transition-accent, #d8e6ff);
 }
 
 .transition-overlay__base,
+.transition-overlay__water,
 .transition-overlay__pieces,
 .transition-overlay__triangles,
 .transition-overlay__frame,
@@ -356,8 +349,43 @@ main .portfolio-project.scroll-reveal {
 .transition-overlay__base {
   inset: 0;
   background:
-    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--transition-accent) 18%, transparent), transparent 32%),
-    linear-gradient(130deg, color-mix(in oklch, #061225 88%, var(--transition-accent) 12%) 0%, #020609 62%, #000 100%);
+    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, white 18%, transparent), transparent 16%),
+    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, var(--transition-accent) 34%, transparent), transparent 44%),
+    linear-gradient(130deg, color-mix(in oklch, #061225 90%, var(--transition-accent) 10%) 0%, #020609 62%, #000 100%);
+  opacity: 0;
+  transform: scale(1.04);
+  transform-origin: var(--route-x, 50%) var(--route-y, 50%);
+  contain: paint;
+  will-change: opacity, transform;
+}
+
+.transition-overlay__water {
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  contain: paint;
+}
+
+.transition-overlay__water span {
+  position: absolute;
+  left: var(--route-x, 50%);
+  top: var(--route-y, 50%);
+  width: max(34vmax, 24rem);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in oklch, white 28%, transparent);
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle, transparent 0 44%, color-mix(in oklch, white 20%, transparent) 45% 45.8%, transparent 47% 100%),
+    radial-gradient(circle, color-mix(in oklch, var(--transition-accent) 22%, transparent), transparent 58%);
+  box-shadow:
+    0 0 48px color-mix(in oklch, var(--transition-accent) 16%, transparent),
+    inset 0 0 44px color-mix(in oklch, white 8%, transparent);
+  opacity: 0;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%) scale(0.12);
+  backface-visibility: hidden;
+  contain: paint;
+  will-change: opacity, transform, filter;
 }
 
 .transition-overlay__base::before,
@@ -369,9 +397,9 @@ main .portfolio-project.scroll-reveal {
 
 .transition-overlay__base::before {
   background:
-    repeating-linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 0 1px, transparent 1px 56px),
-    repeating-linear-gradient(0deg, color-mix(in oklch, white 5%, transparent) 0 1px, transparent 1px 56px);
-  opacity: 0.5;
+    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, white 12%, transparent), transparent 28%),
+    radial-gradient(circle at calc(var(--route-x, 50%) + 16%) calc(var(--route-y, 50%) - 12%), color-mix(in oklch, var(--transition-accent) 14%, transparent), transparent 34%);
+  opacity: 0.48;
 }
 
 .transition-overlay__base::after {
@@ -579,11 +607,11 @@ main .portfolio-project.scroll-reveal {
 }
 
 .transition-overlay.is-leaving {
-  animation: route-overlay-cover 520ms ease-out both;
+  animation: route-overlay-cover 420ms ease-out both;
 }
 
 .transition-overlay.is-entering {
-  animation: route-overlay-release 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: route-overlay-release 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .transition-overlay__piece,
@@ -593,24 +621,22 @@ main .portfolio-project.scroll-reveal {
   opacity: 0;
 }
 
-.transition-overlay.is-leaving .transition-overlay__piece {
-  animation: route-piece-cover 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(var(--piece-index) * 18ms);
+.transition-overlay.is-leaving .transition-overlay__base {
+  animation: route-water-backdrop-cover 420ms ease-out both;
 }
 
-.transition-overlay.is-entering .transition-overlay__piece {
-  animation: route-piece-release 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--piece-index) * 12ms);
+.transition-overlay.is-entering .transition-overlay__base {
+  animation: route-water-backdrop-release 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.transition-overlay.is-leaving .transition-overlay__triangle {
-  animation: route-triangle-cover 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(var(--triangle-index) * 24ms);
+.transition-overlay.is-leaving .transition-overlay__water span {
+  animation: route-water-ripple-cover 560ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
+  animation-delay: calc(var(--ripple-index) * 54ms);
 }
 
-.transition-overlay.is-entering .transition-overlay__triangle {
-  animation: route-triangle-release 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--triangle-index) * 18ms);
+.transition-overlay.is-entering .transition-overlay__water span {
+  animation: route-water-ripple-release 660ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--ripple-index) * 38ms);
 }
 
 .transition-overlay.is-leaving .transition-overlay__frame,
@@ -1058,7 +1084,9 @@ html[data-route-transition] .portfolio-design-lines span {
   filter: blur(0.8px) saturate(1.25);
   transform: scale(0.82);
   transform-origin: var(--water-x, 50%) var(--water-y, 50%);
+  contain: paint;
   transition: opacity 180ms ease;
+  will-change: opacity, transform, filter;
 }
 
 .portfolio-water-hovering .portfolio-water-surface {
@@ -1151,16 +1179,12 @@ html[data-route-transition] .portfolio-design-lines span {
 }
 
 .portfolio-chip:hover::before,
-.portfolio-chip:focus-visible::before,
-.portfolio-project:hover::before,
-.portfolio-project:focus-visible::before {
+.portfolio-project:hover::before {
   transform: scaleX(1);
 }
 
 .portfolio-chip:hover::after,
-.portfolio-chip:focus-visible::after,
-.portfolio-project:hover::after,
-.portfolio-project:focus-visible::after {
+.portfolio-project:hover::after {
   opacity: 0.88;
   transform: translate(-50%, -50%) scale(1);
   animation: portfolio-water-hover 1.45s ease-out infinite;
@@ -1177,14 +1201,32 @@ html[data-route-transition] .portfolio-design-lines span {
   transform-style: preserve-3d;
 }
 
-.portfolio-project:hover,
-.portfolio-project:focus-visible {
+.portfolio-project:hover {
   background:
     radial-gradient(circle at var(--water-x, 50%) var(--water-y, 50%), color-mix(in oklch, white 14%, transparent), color-mix(in oklch, var(--scene-accent) 8%, transparent) 18%, transparent 36%),
     color-mix(in oklch, var(--background) 55%, transparent);
   box-shadow:
     inset 0 0 46px color-mix(in oklch, var(--scene-accent) 10%, transparent),
     0 22px 52px color-mix(in oklch, var(--scene-accent) 17%, transparent);
+}
+
+.portfolio-chip:focus-visible::before,
+.portfolio-project:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.portfolio-chip:focus-visible::after,
+.portfolio-project:focus-visible::after {
+  animation: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.18);
+}
+
+.portfolio-project:focus-visible {
+  border-color: color-mix(in oklch, var(--scene-accent) 72%, var(--border));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--scene-accent) 26%, transparent),
+    0 0 0 2px color-mix(in oklch, var(--scene-accent) 34%, transparent);
 }
 
 .portfolio-project-open {
@@ -3001,7 +3043,8 @@ html[data-route-transition] .portfolio-design-lines span {
   margin: 0 !important;
 }
 
-.case-image-frame {
+.case-image-frame,
+.work-case-body > p:has(> img:only-child) {
   position: relative;
   display: block;
   overflow: hidden;
@@ -3013,7 +3056,8 @@ html[data-route-transition] .portfolio-design-lines span {
   transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), border-color 360ms ease, box-shadow 360ms ease;
 }
 
-.case-image-frame::after {
+.case-image-frame::after,
+.work-case-body > p:has(> img:only-child)::after {
   content: "";
   position: absolute;
   inset: -30%;
@@ -3028,13 +3072,17 @@ html[data-route-transition] .portfolio-design-lines span {
 }
 
 .case-image-frame:hover,
-.case-image-frame:focus-within {
+.case-image-frame:focus-within,
+.work-case-body > p:has(> img:only-child):hover,
+.work-case-body > p:has(> img:only-child):focus-within {
   border-color: color-mix(in oklch, var(--case-accent) 58%, var(--border));
   box-shadow: 0 26px 68px color-mix(in oklch, var(--case-accent) 14%, transparent);
 }
 
 .case-image-frame:hover::after,
-.case-image-frame:focus-within::after {
+.case-image-frame:focus-within::after,
+.work-case-body > p:has(> img:only-child):hover::after,
+.work-case-body > p:has(> img:only-child):focus-within::after {
   opacity: 0.64;
   transform: translateX(12%);
 }
@@ -3069,7 +3117,8 @@ html[data-route-transition] .portfolio-design-lines span {
   object-position: center;
 }
 
-.work-case-body > .case-image-frame img {
+.work-case-body > .case-image-frame img,
+.work-case-body > p:has(> img:only-child) > img {
   aspect-ratio: 16 / 9;
   border: 0;
   min-height: clamp(16rem, 52vw, 40rem);
@@ -3077,7 +3126,10 @@ html[data-route-transition] .portfolio-design-lines span {
 
 .case-layout-installation .work-case-body > .case-image-frame img,
 .case-layout-cinema .work-case-body > .case-image-frame img,
-.case-layout-film .work-case-body > .case-image-frame img {
+.case-layout-film .work-case-body > .case-image-frame img,
+.case-layout-installation .work-case-body > p:has(> img:only-child) > img,
+.case-layout-cinema .work-case-body > p:has(> img:only-child) > img,
+.case-layout-film .work-case-body > p:has(> img:only-child) > img {
   max-height: min(82vh, 48rem);
 }
 
@@ -3091,7 +3143,9 @@ html[data-route-transition] .portfolio-design-lines span {
 
 .case-image-frame:has(img[data-orientation="portrait"]) img,
 .case-image-frame:has(img[src*="logo" i]) img,
-.case-image-frame:has(img[src*="SIGN" i]) img {
+.case-image-frame:has(img[src*="SIGN" i]) img,
+.work-case-body > p:has(> img[src*="logo" i]:only-child) > img,
+.work-case-body > p:has(> img[src*="SIGN" i]:only-child) > img {
   aspect-ratio: auto;
   max-height: min(78vh, 46rem);
   object-fit: contain;
@@ -3785,6 +3839,66 @@ html[data-route-transition] .portfolio-design-lines span {
   }
 }
 
+@keyframes route-water-backdrop-cover {
+  0% {
+    opacity: 0;
+    filter: blur(12px) saturate(1.25);
+    transform: scale(1.06);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0) saturate(1.05);
+    transform: scale(1);
+  }
+}
+
+@keyframes route-water-backdrop-release {
+  0% {
+    opacity: 1;
+    filter: blur(0) saturate(1.05);
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(14px) saturate(1.35);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes route-water-ripple-cover {
+  0% {
+    opacity: 0;
+    filter: blur(0.4rem) saturate(1.5);
+    transform: translate(-50%, -50%) scale(0.1);
+  }
+
+  48% {
+    opacity: 0.78;
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(0.08rem) saturate(1.1);
+    transform: translate(-50%, -50%) scale(2.55);
+  }
+}
+
+@keyframes route-water-ripple-release {
+  0% {
+    opacity: 0.62;
+    filter: blur(0.08rem) saturate(1.2);
+    transform: translate(-50%, -50%) scale(2.2);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(0.7rem) saturate(1.55);
+    transform: translate(-50%, -50%) scale(0.22);
+  }
+}
+
 @keyframes route-piece-cover {
   0% {
     opacity: 0;
@@ -3973,6 +4087,43 @@ html[data-route-transition] .portfolio-flow-field span {
   background:
     radial-gradient(circle at var(--interface-wave) 50%, color-mix(in oklch, var(--case-accent-2) 28%, transparent), transparent 42%),
     color-mix(in oklch, white 5%, transparent);
+}
+
+.case-gallery-image.scroll-reveal.is-revealed {
+  animation: none;
+}
+
+html[data-fx-calm="true"] #ambient-particles .particle,
+html[data-fx-calm="true"] .portfolio-click-lens,
+html[data-fx-calm="true"] .portfolio-click-lens::before,
+html[data-fx-calm="true"] .portfolio-click-lens::after,
+html[data-fx-calm="true"] .portfolio-click-lens span,
+html[data-fx-calm="true"] .portfolio-water-surface,
+html[data-fx-calm="true"] .portfolio-chip::after,
+html[data-fx-calm="true"] .portfolio-project::after,
+html[data-fx-calm="true"] .case-flow-ribbon,
+html[data-fx-calm="true"] .case-pointer-aura span,
+html[data-fx-calm="true"] .case-flow-depth span,
+html[data-fx-calm="true"] .case-flow-orbits span,
+html[data-fx-calm="true"] .case-background-interface::before,
+html[data-fx-calm="true"] .theme-status-light,
+html[data-fx-calm="true"] .theme-terminal-stream::after {
+  animation: none !important;
+  transition-duration: 0ms !important;
+}
+
+html[data-input-mode="keyboard"] a,
+html[data-input-mode="keyboard"] button,
+html[data-input-mode="keyboard"] [role="button"],
+html[data-input-mode="keyboard"] input[type="button"],
+html[data-input-mode="keyboard"] input[type="submit"] {
+  transition-duration: 80ms !important;
+}
+
+html[data-input-mode="keyboard"] .portfolio-chip:focus-visible::after,
+html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
+  animation: none !important;
+  opacity: 0 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

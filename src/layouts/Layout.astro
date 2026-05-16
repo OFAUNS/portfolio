@@ -23,37 +23,14 @@ const barbaNamespace =
         ? "home"
         : Astro.url.pathname.replace(/^\/|\/$/g, "").replace(/[^a-z0-9]+/gi, "-") ||
           "page";
-const transitionPieces = [
-    ["-22vw", "-18vh", "-8deg", "18vw", "-22vh", "10deg"],
-    ["-8vw", "-24vh", "6deg", "6vw", "-30vh", "-8deg"],
-    ["8vw", "-22vh", "-5deg", "-8vw", "-28vh", "7deg"],
-    ["24vw", "-14vh", "9deg", "-22vw", "-18vh", "-10deg"],
-    ["-26vw", "-4vh", "7deg", "22vw", "2vh", "-7deg"],
-    ["-10vw", "0vh", "-4deg", "-12vw", "18vh", "8deg"],
-    ["12vw", "2vh", "5deg", "12vw", "20vh", "-8deg"],
-    ["28vw", "-2vh", "-7deg", "-24vw", "6vh", "9deg"],
-    ["-24vw", "18vh", "-9deg", "18vw", "24vh", "8deg"],
-    ["-8vw", "24vh", "6deg", "2vw", "30vh", "-7deg"],
-    ["10vw", "22vh", "-5deg", "-8vw", "28vh", "6deg"],
-    ["24vw", "16vh", "8deg", "-20vw", "20vh", "-9deg"],
-];
-const transitionTriangles = [
-    ["-38vw", "-34vh", "-28deg", "32vw", "-28vh", "26deg", "polygon(50% 0, 100% 100%, 0 100%)"],
-    ["4vw", "-42vh", "18deg", "-20vw", "34vh", "-22deg", "polygon(0 0, 100% 50%, 0 100%)"],
-    ["40vw", "-22vh", "34deg", "-36vw", "22vh", "-18deg", "polygon(100% 0, 100% 100%, 0 50%)"],
-    ["-44vw", "8vh", "20deg", "36vw", "12vh", "-30deg", "polygon(0 0, 100% 0, 50% 100%)"],
-    ["36vw", "20vh", "-22deg", "-30vw", "-24vh", "28deg", "polygon(50% 0, 100% 100%, 0 100%)"],
-    ["-18vw", "42vh", "-34deg", "18vw", "-38vh", "16deg", "polygon(0 50%, 100% 0, 100% 100%)"],
-    ["18vw", "40vh", "24deg", "-28vw", "-30vh", "-26deg", "polygon(0 0, 100% 0, 50% 100%)"],
-    ["44vw", "2vh", "-18deg", "-38vw", "-8vh", "34deg", "polygon(0 0, 100% 50%, 0 100%)"],
-];
+const transitionRipples = [0, 1, 2, 3];
 ---
 
 <!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/jpeg" href="/favico.jpg" />
         <meta name="generator" content={Astro.generator} />
         <title>{title}</title>
@@ -79,7 +56,7 @@ const transitionTriangles = [
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=optional"
             rel="stylesheet"
         />
         <script is:inline>
@@ -104,9 +81,6 @@ const transitionTriangles = [
 
             // Initial setting
             setDarkClass();
-
-            // Re-apply on Barba navigation
-            document.addEventListener("barba:after-enter", setDarkClass);
         </script>
     </head>
     <body
@@ -120,45 +94,13 @@ const transitionTriangles = [
         </div>
         <div class="transition-overlay" aria-hidden="true">
             <div class="transition-overlay__base"></div>
-            <div class="transition-overlay__pieces">
+            <div class="transition-overlay__water">
                 {
-                    transitionPieces.map(
-                        ([enterX, enterY, enterRotate, exitX, exitY, exitRotate], index) => (
-                            <span
-                                class="transition-overlay__piece"
-                                data-transition-piece
-                                data-enter-x={enterX}
-                                data-enter-y={enterY}
-                                data-enter-rotate={enterRotate}
-                                data-exit-x={exitX}
-                                data-exit-y={exitY}
-                                data-exit-rotate={exitRotate}
-                                style={`--piece-index: ${index}; --enter-x: ${enterX}; --enter-y: ${enterY}; --enter-rotate: ${enterRotate}; --exit-x: ${exitX}; --exit-y: ${exitY}; --exit-rotate: ${exitRotate};`}
-                            />
-                        ),
-                    )
+                    transitionRipples.map((index) => (
+                        <span style={`--ripple-index: ${index};`}></span>
+                    ))
                 }
             </div>
-            <div class="transition-overlay__triangles">
-                {
-                    transitionTriangles.map(
-                        ([enterX, enterY, enterRotate, exitX, exitY, exitRotate, shape], index) => (
-                            <span
-                                class="transition-overlay__triangle"
-                                data-transition-triangle
-                                data-enter-x={enterX}
-                                data-enter-y={enterY}
-                                data-enter-rotate={enterRotate}
-                                data-exit-x={exitX}
-                                data-exit-y={exitY}
-                                data-exit-rotate={exitRotate}
-                                style={`--triangle-index: ${index}; --triangle-shape: ${shape}; --enter-x: ${enterX}; --enter-y: ${enterY}; --enter-rotate: ${enterRotate}; --exit-x: ${exitX}; --exit-y: ${exitY}; --exit-rotate: ${exitRotate};`}
-                            />
-                        ),
-                    )
-                }
-            </div>
-            <div class="transition-overlay__frame"></div>
             <div class="transition-overlay__mark">
                 <span>OFAUNS</span>
             </div>
@@ -175,6 +117,63 @@ const transitionTriangles = [
         <script is:inline>
             (() => {
                 const cleanupKey = "__portfolioFxCleanup";
+                const suppressMotion = (duration = 1100) => {
+                    const root = document.documentElement;
+                    const until = performance.now() + duration;
+                    window.__portfolioFxSuppressUntil = until;
+                    root.dataset.fxCalm = "true";
+
+                    if (window.__portfolioFxCalmTimer) {
+                        window.clearTimeout(window.__portfolioFxCalmTimer);
+                    }
+
+                    window.__portfolioFxCalmTimer = window.setTimeout(() => {
+                        if (performance.now() >= window.__portfolioFxSuppressUntil) {
+                            delete root.dataset.fxCalm;
+                        }
+                    }, duration + 60);
+                };
+
+                const isMotionSuppressed = () =>
+                    performance.now() < (window.__portfolioFxSuppressUntil || 0) ||
+                    document.documentElement.dataset.fxCalm === "true";
+
+                const setupInputMode = () => {
+                    const root = document.documentElement;
+
+                    const onKeyDown = (event) => {
+                        if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+                        root.dataset.inputMode = "keyboard";
+                        suppressMotion(
+                            ["Tab", "ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)
+                                ? 1400
+                                : 900,
+                        );
+                    };
+
+                    const onPointerDown = () => {
+                        root.dataset.inputMode = "pointer";
+                        delete root.dataset.fxCalm;
+                        window.__portfolioFxSuppressUntil = 0;
+
+                        if (window.__portfolioFxCalmTimer) {
+                            window.clearTimeout(window.__portfolioFxCalmTimer);
+                            window.__portfolioFxCalmTimer = 0;
+                        }
+                    };
+
+                    document.addEventListener("keydown", onKeyDown, true);
+                    window.addEventListener("pointerdown", onPointerDown, {
+                        passive: true,
+                    });
+
+                    return () => {
+                        document.removeEventListener("keydown", onKeyDown, true);
+                        window.removeEventListener("pointerdown", onPointerDown);
+                    };
+                };
+
                 const setupParticles = () => {
                     const container = document.getElementById("ambient-particles");
                     if (!container) return () => {};
@@ -230,7 +229,16 @@ const transitionTriangles = [
                     }
 
                     targets.forEach((element, index) => {
+                        const rect = element.getBoundingClientRect();
+                        const initiallyVisible =
+                            rect.top <= window.innerHeight * 0.96 && rect.bottom >= -80;
+
                         element.classList.add("scroll-reveal");
+                        if (initiallyVisible) {
+                            element.classList.add("is-revealed");
+                            return;
+                        }
+
                         if (!element.style.getPropertyValue("--reveal-delay")) {
                             const delay = Math.min((index % 6) * 70, 350);
                             element.style.setProperty("--reveal-delay", `${delay}ms`);
@@ -267,6 +275,8 @@ const transitionTriangles = [
                         });
                     };
 
+                    const cleanupFallbackListeners = [];
+
                     if ("IntersectionObserver" in window) {
                         observer = new IntersectionObserver(
                             (entries) => {
@@ -282,28 +292,36 @@ const transitionTriangles = [
                             },
                         );
 
-                        targets.forEach((element) => observer.observe(element));
+                        targets.forEach((element) => {
+                            if (!element.classList.contains("is-revealed")) {
+                                observer.observe(element);
+                            }
+                        });
+                    } else {
+                        const timers = [
+                            window.setTimeout(revealVisibleElements, 80),
+                            window.setTimeout(revealVisibleElements, 360),
+                            window.setTimeout(revealVisibleElements, 900),
+                        ];
+
+                        window.requestAnimationFrame(revealVisibleElements);
+                        window.addEventListener("scroll", scheduleReveal, { passive: true });
+                        window.addEventListener("resize", scheduleReveal);
+                        window.addEventListener("load", revealVisibleElements);
+
+                        cleanupFallbackListeners.push(() => {
+                            timers.forEach((timer) => window.clearTimeout(timer));
+                            window.removeEventListener("scroll", scheduleReveal);
+                            window.removeEventListener("resize", scheduleReveal);
+                            window.removeEventListener("load", revealVisibleElements);
+                        });
                     }
-
-                    const timers = [
-                        window.setTimeout(revealVisibleElements, 80),
-                        window.setTimeout(revealVisibleElements, 360),
-                        window.setTimeout(revealVisibleElements, 900),
-                    ];
-
-                    window.requestAnimationFrame(revealVisibleElements);
-                    window.addEventListener("scroll", scheduleReveal, { passive: true });
-                    window.addEventListener("resize", scheduleReveal);
-                    window.addEventListener("load", revealVisibleElements);
 
                     return () => {
                         if (observer) {
                             observer.disconnect();
                         }
-                        timers.forEach((timer) => window.clearTimeout(timer));
-                        window.removeEventListener("scroll", scheduleReveal);
-                        window.removeEventListener("resize", scheduleReveal);
-                        window.removeEventListener("load", revealVisibleElements);
+                        cleanupFallbackListeners.forEach((cleanup) => cleanup());
                     };
                 };
 
@@ -329,6 +347,7 @@ const transitionTriangles = [
 
                     const backToTopBtn = document.getElementById("back-to-top");
                     if (backToTopBtn) {
+                        let backToTopFrame = 0;
                         const onClick = () => {
                             window.scrollTo({ top: 0, behavior: "smooth" });
                         };
@@ -342,16 +361,27 @@ const transitionTriangles = [
                                 );
                             }
                         };
+                        const scheduleToggleVisibility = () => {
+                            if (backToTopFrame) return;
+
+                            backToTopFrame = window.requestAnimationFrame(() => {
+                                backToTopFrame = 0;
+                                toggleVisibility();
+                            });
+                        };
 
                         backToTopBtn.addEventListener("click", onClick);
-                        window.addEventListener("scroll", toggleVisibility, {
+                        window.addEventListener("scroll", scheduleToggleVisibility, {
                             passive: true,
                         });
                         toggleVisibility();
 
                         cleanups.push(() => {
                             backToTopBtn.removeEventListener("click", onClick);
-                            window.removeEventListener("scroll", toggleVisibility);
+                            window.removeEventListener("scroll", scheduleToggleVisibility);
+                            if (backToTopFrame) {
+                                window.cancelAnimationFrame(backToTopFrame);
+                            }
                         });
                     }
 
@@ -367,15 +397,6 @@ const transitionTriangles = [
                             portfolioHome.style.setProperty("--portfolio-pointer-y", y);
                         };
 
-                        const onLensPointerMove = (event) => {
-                            setLensPointer(event);
-                            clickLens.classList.add("is-active");
-                        };
-
-                        const onLensPointerLeave = () => {
-                            clickLens.classList.remove("is-active");
-                        };
-
                         const onLensPointerDown = (event) => {
                             setLensPointer(event);
                             clickLens.classList.remove("is-impacting");
@@ -387,110 +408,139 @@ const transitionTriangles = [
                             }
 
                             lensTimeout = window.setTimeout(() => {
-                                clickLens.classList.remove("is-impacting");
+                                clickLens.classList.remove("is-active", "is-impacting");
                             }, 760);
                         };
 
-                        window.addEventListener("pointermove", onLensPointerMove, {
-                            passive: true,
-                        });
                         window.addEventListener("pointerdown", onLensPointerDown, {
                             passive: true,
                         });
-                        document.addEventListener("pointerleave", onLensPointerLeave);
 
                         cleanups.push(() => {
-                            window.removeEventListener("pointermove", onLensPointerMove);
                             window.removeEventListener("pointerdown", onLensPointerDown);
-                            document.removeEventListener("pointerleave", onLensPointerLeave);
                             if (lensTimeout) window.clearTimeout(lensTimeout);
                             clickLens.classList.remove("is-active", "is-impacting");
                         });
                     }
 
                     if (canUsePointerEffects) {
-                        document
-                            .querySelectorAll(".portfolio-project, .portfolio-chip")
-                            .forEach((element) => {
-                            let waterImpactTimeout = 0;
-                            let waterHoverTimeout = 0;
-                            if (!element.querySelector(".portfolio-water-surface")) {
-                                const surface = document.createElement("span");
-                                surface.className = "portfolio-water-surface";
-                                surface.setAttribute("aria-hidden", "true");
-                                element.appendChild(surface);
+                        const waterStates = new Map();
+                        const getWaterTarget = (event) => {
+                            const target = event.target;
+                            if (!(target instanceof Element)) return null;
+                            return target.closest(".portfolio-project, .portfolio-chip");
+                        };
+
+                        const getWaterState = (element) => {
+                            let state = waterStates.get(element);
+                            if (state) return state;
+
+                            state = {
+                                impactTimer: 0,
+                                hoverTimer: 0,
+                                surface: element.querySelector(".portfolio-water-surface"),
+                            };
+                            waterStates.set(element, state);
+                            return state;
+                        };
+
+                        const ensureWaterSurface = (element, state) => {
+                            if (state.surface) return;
+
+                            const surface = document.createElement("span");
+                            surface.className = "portfolio-water-surface";
+                            surface.setAttribute("aria-hidden", "true");
+                            element.appendChild(surface);
+                            state.surface = surface;
+                        };
+
+                        const setWaterPointer = (element, event) => {
+                            const rect = element.getBoundingClientRect();
+                            element.style.setProperty(
+                                "--water-x",
+                                `${Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100)).toFixed(2)}%`,
+                            );
+                            element.style.setProperty(
+                                "--water-y",
+                                `${Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100)).toFixed(2)}%`,
+                            );
+                        };
+
+                        const pulseWaterSurface = (element, state) => {
+                            ensureWaterSurface(element, state);
+                            element.classList.remove("portfolio-water-hovering");
+                            void element.offsetWidth;
+                            element.classList.add("portfolio-water-hovering");
+
+                            if (state.hoverTimer) {
+                                window.clearTimeout(state.hoverTimer);
                             }
 
-                            const setWaterPointer = (event) => {
-                                const rect = element.getBoundingClientRect();
-                                element.style.setProperty(
-                                    "--water-x",
-                                    `${Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100)).toFixed(2)}%`,
-                                );
-                                element.style.setProperty(
-                                    "--water-y",
-                                    `${Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100)).toFixed(2)}%`,
-                                );
-                            };
-
-                            const pulseWaterSurface = () => {
+                            state.hoverTimer = window.setTimeout(() => {
                                 element.classList.remove("portfolio-water-hovering");
-                                void element.offsetWidth;
-                                element.classList.add("portfolio-water-hovering");
+                            }, 1150);
+                        };
 
-                                if (waterHoverTimeout) {
-                                    window.clearTimeout(waterHoverTimeout);
-                                }
+                        const onWaterOver = (event) => {
+                            const element = getWaterTarget(event);
+                            if (!element || isMotionSuppressed()) return;
+                            if (
+                                event.relatedTarget instanceof Node &&
+                                element.contains(event.relatedTarget)
+                            ) {
+                                return;
+                            }
 
-                                waterHoverTimeout = window.setTimeout(() => {
-                                    element.classList.remove("portfolio-water-hovering");
-                                }, 1150);
-                            };
+                            const state = getWaterState(element);
+                            setWaterPointer(element, event);
+                            pulseWaterSurface(element, state);
+                        };
 
-                            const onWaterEnter = (event) => {
-                                setWaterPointer(event);
-                                pulseWaterSurface();
-                            };
+                        const onWaterDown = (event) => {
+                            const element = getWaterTarget(event);
+                            if (!element || isMotionSuppressed()) return;
 
-                            const onWaterMove = (event) => {
-                                setWaterPointer(event);
-                            };
+                            const state = getWaterState(element);
+                            setWaterPointer(element, event);
+                            element.classList.remove("portfolio-water-impact");
+                            void element.offsetWidth;
+                            element.classList.add("portfolio-water-impact");
+                            pulseWaterSurface(element, state);
 
-                            const onWaterDown = (event) => {
-                                setWaterPointer(event);
+                            if (state.impactTimer) {
+                                window.clearTimeout(state.impactTimer);
+                            }
+
+                            state.impactTimer = window.setTimeout(() => {
                                 element.classList.remove("portfolio-water-impact");
-                                void element.offsetWidth;
-                                element.classList.add("portfolio-water-impact");
-                                pulseWaterSurface();
+                            }, 680);
+                        };
 
-                                if (waterImpactTimeout) {
-                                    window.clearTimeout(waterImpactTimeout);
+                        document.addEventListener("pointerover", onWaterOver, {
+                            passive: true,
+                        });
+                        document.addEventListener("pointerdown", onWaterDown, {
+                            passive: true,
+                        });
+
+                        cleanups.push(() => {
+                            document.removeEventListener("pointerover", onWaterOver);
+                            document.removeEventListener("pointerdown", onWaterDown);
+                            waterStates.forEach((state, element) => {
+                                if (state.impactTimer) window.clearTimeout(state.impactTimer);
+                                if (state.hoverTimer) window.clearTimeout(state.hoverTimer);
+                                element.classList.remove(
+                                    "portfolio-water-hovering",
+                                    "portfolio-water-impact",
+                                );
+                                element.style.removeProperty("--water-x");
+                                element.style.removeProperty("--water-y");
+                                if (state.surface) {
+                                    state.surface.remove();
                                 }
-
-                                waterImpactTimeout = window.setTimeout(() => {
-                                    element.classList.remove("portfolio-water-impact");
-                                }, 680);
-                            };
-
-                            element.addEventListener("pointerenter", onWaterEnter, {
-                                passive: true,
                             });
-                            element.addEventListener("pointermove", onWaterMove, {
-                                passive: true,
-                            });
-                            element.addEventListener("pointerdown", onWaterDown, {
-                                passive: true,
-                            });
-
-                            cleanups.push(() => {
-                                element.removeEventListener("pointerenter", onWaterEnter);
-                                element.removeEventListener("pointermove", onWaterMove);
-                                element.removeEventListener("pointerdown", onWaterDown);
-                                if (waterImpactTimeout) window.clearTimeout(waterImpactTimeout);
-                                if (waterHoverTimeout) window.clearTimeout(waterHoverTimeout);
-                                element.classList.remove("portfolio-water-hovering");
-                            });
-                            });
+                            waterStates.clear();
+                        });
                     }
 
                     return () => {
@@ -565,6 +615,7 @@ const transitionTriangles = [
                         };
 
                         const onPointerMove = (event) => {
+                            if (isMotionSuppressed()) return;
                             pendingPointer = getViewportPointer(event);
 
                             if (rafId) return;
@@ -586,6 +637,7 @@ const transitionTriangles = [
                         };
 
                         const onPointerDown = (event) => {
+                            if (isMotionSuppressed()) return;
                             const pointer = getViewportPointer(event);
                             setCasePointer(pointer.x, pointer.y);
                             caseRoot.classList.add("case-impacting");
@@ -602,6 +654,8 @@ const transitionTriangles = [
                         };
 
                         const onScroll = () => {
+                            if (isMotionSuppressed()) return;
+
                             const delta = Math.min(1, Math.abs(window.scrollY - lastScrollY) / 90);
                             lastScrollY = window.scrollY;
                             caseRoot.classList.add("case-is-scrolling");
@@ -647,25 +701,6 @@ const transitionTriangles = [
                         });
                     }
 
-                    const classifyImage = (image) => {
-                        const apply = () => {
-                            const ratio =
-                                image.naturalWidth && image.naturalHeight
-                                    ? image.naturalWidth / image.naturalHeight
-                                    : 1;
-                            const orientation =
-                                ratio < 0.82 ? "portrait" : ratio > 1.7 ? "wide" : "landscape";
-                            image.dataset.orientation = orientation;
-                        };
-
-                        if (image.complete) {
-                            apply();
-                        } else {
-                            image.addEventListener("load", apply, { once: true });
-                            cleanups.push(() => image.removeEventListener("load", apply));
-                        }
-                    };
-
                     const setupTilt = (element, strength = 7) => {
                         if (!canUsePointerEffects) return;
 
@@ -709,7 +744,6 @@ const transitionTriangles = [
                         image.classList.add("case-gallery-image");
                         image.style.setProperty("--gallery-index", `${index % 9}`);
                         image.style.setProperty("--gallery-delay", `${(index % 9) * -0.62}s`);
-                        classifyImage(image);
 
                         const parent = image.parentElement;
                         if (
@@ -738,10 +772,27 @@ const transitionTriangles = [
                     if (themeInterfaces.length && canUsePointerEffects) {
                         let themeFrameId = 0;
                         let lastLogIndex = -1;
+                        let lastThemeTick = 0;
+                        const themeTickInterval = window.matchMedia("(max-width: 768px)").matches
+                            ? 140
+                            : 80;
                         const startedAt = performance.now();
 
-                        const animateThemeInterfaces = () => {
-                            const elapsed = (performance.now() - startedAt) / 1000;
+                        const animateThemeInterfaces = (now = performance.now()) => {
+                            themeFrameId = window.requestAnimationFrame(
+                                animateThemeInterfaces,
+                            );
+
+                            if (
+                                document.hidden ||
+                                isMotionSuppressed() ||
+                                now - lastThemeTick < themeTickInterval
+                            ) {
+                                return;
+                            }
+
+                            lastThemeTick = now;
+                            const elapsed = (now - startedAt) / 1000;
                             const logIndex = Math.floor(elapsed / 1.35);
 
                             themeInterfaces.forEach((panel, panelIndex) => {
@@ -806,9 +857,6 @@ const transitionTriangles = [
                             });
 
                             lastLogIndex = logIndex;
-                            themeFrameId = window.requestAnimationFrame(
-                                animateThemeInterfaces,
-                            );
                         };
 
                         animateThemeInterfaces();
@@ -829,32 +877,63 @@ const transitionTriangles = [
                     const reducedMotion = window.matchMedia(
                         "(prefers-reduced-motion: reduce)",
                     ).matches;
-                    if (!overlay || reducedMotion) return;
+                    if (!overlay || reducedMotion) return () => {};
 
                     const storageKey = "__portfolioRouteTransition";
                     const root = document.documentElement;
                     let isTransitioning = false;
                     let transitionTimer = 0;
+                    let hasPlayedIncoming = false;
+
+                    const setTransitionOrigin = (x = "50%", y = "50%") => {
+                        overlay.style.setProperty("--route-x", x);
+                        overlay.style.setProperty("--route-y", y);
+                    };
+
+                    const cancelOverlayAnimations = () => {
+                        if (typeof overlay.getAnimations !== "function") return;
+
+                        overlay.getAnimations({ subtree: true }).forEach((animation) => {
+                            animation.cancel();
+                        });
+                    };
 
                     const clearTransition = () => {
+                        if (transitionTimer) {
+                            window.clearTimeout(transitionTimer);
+                            transitionTimer = 0;
+                        }
+
+                        cancelOverlayAnimations();
                         overlay.classList.remove("is-entering", "is-leaving");
+                        overlay.style.removeProperty("--route-x");
+                        overlay.style.removeProperty("--route-y");
                         delete root.dataset.routeTransition;
                         isTransitioning = false;
                     };
 
+                    const restartTransitionClass = (className) => {
+                        cancelOverlayAnimations();
+                        overlay.classList.remove("is-entering", "is-leaving");
+                        void overlay.offsetWidth;
+                        overlay.classList.add(className);
+                    };
+
                     const playIncomingTransition = () => {
+                        if (hasPlayedIncoming) return;
                         if (window.sessionStorage.getItem(storageKey) !== "1") return;
 
+                        hasPlayedIncoming = true;
                         window.sessionStorage.removeItem(storageKey);
+                        setTransitionOrigin();
                         root.dataset.routeTransition = "true";
-                        overlay.classList.remove("is-leaving");
-                        overlay.classList.add("is-entering");
+                        restartTransitionClass("is-entering");
 
                         if (transitionTimer) {
                             window.clearTimeout(transitionTimer);
                         }
 
-                        transitionTimer = window.setTimeout(clearTransition, 880);
+                        transitionTimer = window.setTimeout(clearTransition, 720);
                     };
 
                     const getTransitionUrl = (link, event) => {
@@ -903,14 +982,21 @@ const transitionTriangles = [
                         const url = getTransitionUrl(link, event);
                         if (!url) return;
 
+                        if (event.detail === 0) {
+                            return;
+                        }
+
                         event.preventDefault();
                         if (isTransitioning) return;
 
                         isTransitioning = true;
                         window.sessionStorage.setItem(storageKey, "1");
+                        setTransitionOrigin(
+                            `${Math.min(100, Math.max(0, (event.clientX / window.innerWidth) * 100)).toFixed(2)}%`,
+                            `${Math.min(100, Math.max(0, (event.clientY / window.innerHeight) * 100)).toFixed(2)}%`,
+                        );
                         root.dataset.routeTransition = "true";
-                        overlay.classList.remove("is-entering");
-                        overlay.classList.add("is-leaving");
+                        restartTransitionClass("is-leaving");
 
                         if (transitionTimer) {
                             window.clearTimeout(transitionTimer);
@@ -918,16 +1004,29 @@ const transitionTriangles = [
 
                         transitionTimer = window.setTimeout(() => {
                             window.location.href = url.href;
-                        }, 580);
+                        }, 420);
+                    };
+
+                    const onPageShow = (event) => {
+                        if (event.persisted) {
+                            clearTransition();
+                            return;
+                        }
+
+                        playIncomingTransition();
                     };
 
                     document.addEventListener("click", onClick);
-                    window.addEventListener("pageshow", (event) => {
-                        if (event.persisted) {
-                            clearTransition();
-                        }
-                    });
+                    window.addEventListener("pageshow", onPageShow);
+                    window.addEventListener("pagehide", clearTransition);
                     playIncomingTransition();
+
+                    return () => {
+                        document.removeEventListener("click", onClick);
+                        window.removeEventListener("pageshow", onPageShow);
+                        window.removeEventListener("pagehide", clearTransition);
+                        clearTransition();
+                    };
                 };
 
                 const mountEnhancements = () => {
@@ -937,6 +1036,7 @@ const transitionTriangles = [
                     }
 
                     const cleanups = [
+                        setupInputMode(),
                         setupScrollReveal(),
                         setupParticles(),
                         setupPageInteractions(),
@@ -953,14 +1053,12 @@ const transitionTriangles = [
                 };
 
                 window.__portfolioFxMount = mountEnhancements;
-                document.addEventListener("barba:after-enter", mountEnhancements);
-                document.addEventListener("DOMContentLoaded", mountEnhancements);
 
                 mountEnhancements();
-                if (!window.__portfolioRouteTransitionsReady) {
-                    window.__portfolioRouteTransitionsReady = true;
-                    setupRouteTransitions();
+                if (typeof window.__portfolioRouteTransitionsCleanup === "function") {
+                    window.__portfolioRouteTransitionsCleanup();
                 }
+                window.__portfolioRouteTransitionsCleanup = setupRouteTransitions();
             })();
         </script>
     </body>
@@ -968,7 +1066,7 @@ const transitionTriangles = [
 
 <style is:global>
     :root {
-        --font-sans: "Space Grotesk", sans-serif;
+        --font-sans: "Space Grotesk", "Noto Sans TC", sans-serif;
     }
     body {
         font-family: var(--font-sans);

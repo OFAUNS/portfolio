@@ -124,7 +124,7 @@ export default function PortfolioScene({
             powerPreference: "low-power",
         });
         renderer.setClearColor(0x000000, 0);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.domElement.className = "portfolio-webgl-canvas";
         mount.appendChild(renderer.domElement);
@@ -146,6 +146,8 @@ export default function PortfolioScene({
         let focusPower = 0;
         let interactionPulse = 0;
         let themeMix = document.documentElement.classList.contains("dark") ? 1 : 0;
+        let lastFrameTime = 0;
+        const targetFrameDuration = window.innerWidth < 1280 ? 42 : 34;
 
         const ambient = new THREE.AmbientLight(0xffffff, 0.9);
         const keyLight = new THREE.PointLight(0xd8e6ff, 2.9, 18);
@@ -179,7 +181,7 @@ export default function PortfolioScene({
 
         const textureLoader = new THREE.TextureLoader();
         const loadedTextures: THREE.Texture[] = [];
-        const projects = featuredProjects.slice(0, 6);
+        const projects = featuredProjects.slice(0, 4);
         const cardGeometry = new THREE.PlaneGeometry(1.95, 1.1, 4, 2);
         const cards = projects.map((project, index) => {
             const color = new THREE.Color(project.color);
@@ -206,7 +208,7 @@ export default function PortfolioScene({
 
             textureLoader.load(project.thumbnail, (texture) => {
                 texture.colorSpace = THREE.SRGBColorSpace;
-                texture.anisotropy = 4;
+                texture.anisotropy = 1;
                 loadedTextures.push(texture);
                 material.map = texture;
                 material.color.copy(BASE_TINT);
@@ -227,7 +229,7 @@ export default function PortfolioScene({
         });
 
         const shardGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-        const shardCount = 12;
+        const shardCount = 8;
         const shards = Array.from({ length: shardCount }, (_, index) => {
             const color = new THREE.Color(PALETTE[index % PALETTE.length]);
             const material = new THREE.MeshBasicMaterial({
@@ -257,7 +259,7 @@ export default function PortfolioScene({
             };
         });
 
-        const particleCount = window.innerWidth < 768 ? 120 : 300;
+        const particleCount = window.innerWidth < 768 ? 72 : 160;
         const positions = new Float32Array(particleCount * 3);
         const colors = new Float32Array(particleCount * 3);
         const particleSeeds = new Float32Array(particleCount);
@@ -289,8 +291,8 @@ export default function PortfolioScene({
         const particles = new THREE.Points(particleGeometry, particleMaterial);
         root.add(particles);
 
-        const ribbonCount = 3;
-        const ribbonPointCount = 80;
+        const ribbonCount = 2;
+        const ribbonPointCount = 52;
         const ribbonPoints = Array.from({ length: ribbonCount }, () =>
             Array.from({ length: ribbonPointCount }, () => new THREE.Vector3()),
         );
@@ -323,7 +325,19 @@ export default function PortfolioScene({
             waveUniforms.uAspect.value = safeWidth / safeHeight;
         };
 
+        const isSceneCalm = () => {
+            const customWindow = window as Window & {
+                __portfolioFxSuppressUntil?: number;
+            };
+            return (
+                performance.now() < (customWindow.__portfolioFxSuppressUntil ?? 0) ||
+                document.documentElement.dataset.fxCalm === "true"
+            );
+        };
+
         const onPointerMove = (event: PointerEvent) => {
+            if (isSceneCalm()) return;
+
             pointerTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
             pointerTarget.y = -(event.clientY / window.innerHeight) * 2 + 1;
             interactionPulse = Math.min(interactionPulse + 0.45, 1.45);
@@ -335,13 +349,28 @@ export default function PortfolioScene({
         };
 
         const animate = () => {
-            const time = (performance.now() - startTime) / 1000;
-            const reduced = reducedMotionQuery.matches;
+            frameId = window.requestAnimationFrame(animate);
+            const now = performance.now();
             const routeActive = Boolean(
                 document.documentElement.dataset.routeTransition,
             );
-            const motionScale = reduced ? 0.12 : routeActive ? 2.15 : 1;
-            const targetFocus = focusRef.current.active ? 1 : 0;
+            const calmActive = isSceneCalm();
+            const frameDuration =
+                calmActive
+                    ? 180
+                    : routeActive || interactionPulse > 0.08 || focusPower > 0.08
+                    ? 28
+                    : targetFrameDuration;
+
+            if (document.hidden || now - lastFrameTime < frameDuration) {
+                return;
+            }
+
+            lastFrameTime = now;
+            const time = (now - startTime) / 1000;
+            const reduced = reducedMotionQuery.matches;
+            const motionScale = reduced || calmActive ? 0.08 : routeActive ? 0.9 : 0.72;
+            const targetFocus = calmActive ? 0 : focusRef.current.active ? 1 : 0;
             focusPower += (targetFocus - focusPower) * 0.07;
             interactionPulse += (0 - interactionPulse) * (reduced ? 0.18 : 0.035);
             themeMix +=
@@ -460,7 +489,6 @@ export default function PortfolioScene({
             camera.lookAt(0.8, 0, -0.8);
 
             renderer.render(scene, camera);
-            frameId = window.requestAnimationFrame(animate);
         };
 
         window.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -517,17 +545,13 @@ export default function PortfolioScene({
 
         focusTargets.forEach((target) => {
             target.addEventListener("mouseenter", onFocusEnter);
-            target.addEventListener("focus", onFocusEnter);
             target.addEventListener("mouseleave", onFocusLeave);
-            target.addEventListener("blur", onFocusLeave);
         });
 
         return () => {
             focusTargets.forEach((target) => {
                 target.removeEventListener("mouseenter", onFocusEnter);
-                target.removeEventListener("focus", onFocusEnter);
                 target.removeEventListener("mouseleave", onFocusLeave);
-                target.removeEventListener("blur", onFocusLeave);
             });
         };
     }, []);

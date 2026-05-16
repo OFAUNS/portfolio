@@ -432,7 +432,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
         CURRENT_LAYOUT === 3 && (
             <div class="portfolio-home relative min-h-screen overflow-hidden bg-background">
                 <PortfolioScene
-                    client:media="(min-width: 900px)"
+                    client:media="(min-width: 1100px) and (prefers-reduced-motion: no-preference)"
                     projectCount={sortedPortfolio.length}
                     categories={genreNames}
                     featuredProjects={featuredSceneProjects}
