@@ -510,6 +510,35 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                     Email
                                 </a>
                             </div>
+                            <nav
+                                class="portfolio-category-rails animate-blur-in delay-700"
+                                aria-label="Jump to portfolio category"
+                            >
+                                {genreNames.map((genre, index) => (
+                                    <a
+                                        href={`#${genre}`}
+                                        data-scene-project="true"
+                                        data-scene-title={genre}
+                                        data-scene-genre={genre}
+                                        data-scene-color={
+                                            genreMeta[genre]?.color ||
+                                            SCENE_COLORS[0]
+                                        }
+                                        class="portfolio-category-rail portfolio-chip"
+                                        style={`--scene-accent: ${genreMeta[genre]?.color || SCENE_COLORS[0]}; --rail-index: ${index};`}
+                                    >
+                                        <span>
+                                            {String(index + 1).padStart(2, "0")}
+                                        </span>
+                                        <strong>
+                                            {genre}
+                                        </strong>
+                                        <i>
+                                            {groupedPortfolio[genre]?.length || 0}
+                                        </i>
+                                    </a>
+                                ))}
+                            </nav>
                         </div>
 
                         <div class="portfolio-hero-figure animate-blur-in delay-400">
@@ -519,7 +548,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                 <span>Web</span>
                                 <span>Interaction</span>
                             </div>
-                            <div class="portfolio-figure-frame">
+                            <div class="portfolio-figure-frame" data-scroll-zoom="true">
                                 <ResponsiveImage
                                     src={PROFILE.avatar}
                                     alt="OFAUNS portrait"
@@ -546,12 +575,31 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                             <span>{new Date().getFullYear()}</span>
                         </div>
 
-                        <div class="portfolio-hero-marquee" aria-hidden="true">
-                            <span>Motion</span>
-                            <span>Web</span>
-                            <span>Interaction</span>
-                            <span>Film</span>
-                            <span>Visual</span>
+                        <div class="portfolio-speed-marquees" aria-hidden="true">
+                            <div class="portfolio-hero-marquee portfolio-hero-marquee--wide">
+                                <span>Motion</span>
+                                <span>Web</span>
+                                <span>Interaction</span>
+                                <span>Film</span>
+                                <span>Visual</span>
+                                <span>Motion</span>
+                                <span>Web</span>
+                            </div>
+                            <div class="portfolio-hero-marquee portfolio-hero-marquee--signal">
+                                <span>OFAUNS</span>
+                                <span>Liquid</span>
+                                <span>Design</span>
+                                <span>Motion</span>
+                                <span>Portfolio</span>
+                                <span>OFAUNS</span>
+                            </div>
+                            <div class="portfolio-hero-marquee portfolio-hero-marquee--track">
+                                <span>Visual Designer</span>
+                                <span>Motion System</span>
+                                <span>Interface</span>
+                                <span>Atmosphere</span>
+                                <span>Visual Designer</span>
+                            </div>
                         </div>
 
                         <a
@@ -589,6 +637,14 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                             </span>
                                         </div>
 
+                                        <div class="portfolio-genre-marquee" aria-hidden="true">
+                                            <span>{genre}</span>
+                                            <span>{genre}</span>
+                                            <span>{genre}</span>
+                                            <span>{genre}</span>
+                                            <span>{genre}</span>
+                                        </div>
+
                                         <div class="portfolio-project-grid">
                                             {projects.map((project, index) => {
                                                 const projectPresentation =
@@ -614,6 +670,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                                     >
                                                         <div
                                                             class="portfolio-project-thumb relative overflow-hidden bg-muted"
+                                                            data-scroll-zoom="true"
                                                             data-fit={
                                                                 projectPresentation.imageFit
                                                             }

@@ -24,6 +24,7 @@ const barbaNamespace =
         : Astro.url.pathname.replace(/^\/|\/$/g, "").replace(/[^a-z0-9]+/gi, "-") ||
           "page";
 const transitionRipples = [0, 1, 2, 3];
+const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
 ---
 
 <!doctype html>
@@ -94,6 +95,22 @@ const transitionRipples = [0, 1, 2, 3];
         </div>
         <div class="transition-overlay" aria-hidden="true">
             <div class="transition-overlay__base"></div>
+            <div class="transition-overlay__tunnel">
+                {
+                    transitionSpeedLines.map((index) => (
+                        <span style={`--line-index: ${index};`}></span>
+                    ))
+                }
+            </div>
+            <div class="transition-overlay__runway">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="transition-overlay__speedcopy">
+                <span>OFAUNS / MOTION / WEB / INTERACTION</span>
+                <span>OFAUNS / MOTION / WEB / INTERACTION</span>
+            </div>
             <div class="transition-overlay__water">
                 {
                     transitionRipples.map((index) => (
@@ -332,6 +349,138 @@ const transitionRipples = [0, 1, 2, 3];
                     const canUsePointerEffects =
                         window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
                         !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+                    if (portfolioHome) {
+                        let lastScrollY = window.scrollY;
+                        let lastScrollTime = performance.now();
+                        let scrollFrame = 0;
+                        let settleTimer = 0;
+                        let smoothedBoost = 0;
+
+                        const getPositionBoost = (scrollY) => {
+                            const maxScroll = Math.max(
+                                document.documentElement.scrollHeight - window.innerHeight,
+                                1,
+                            );
+                            const progressBoost = (scrollY / maxScroll) * 0.42;
+                            const earlyBoost = Math.min(scrollY / Math.max(window.innerHeight, 1), 1) * 0.08;
+
+                            return Math.min(0.46, progressBoost + earlyBoost);
+                        };
+
+                        const setMarqueeBoost = (boost) => {
+                            portfolioHome.style.setProperty("--scroll-boost", boost.toFixed(3));
+                            portfolioHome.style.setProperty(
+                                "--marquee-duration-a",
+                                `${(24 - boost * 15).toFixed(2)}s`,
+                            );
+                            portfolioHome.style.setProperty(
+                                "--marquee-duration-b",
+                                `${(18 - boost * 11).toFixed(2)}s`,
+                            );
+                            portfolioHome.style.setProperty(
+                                "--marquee-duration-c",
+                                `${(30 - boost * 19).toFixed(2)}s`,
+                            );
+                        };
+
+                        const updateScrollVelocity = () => {
+                            scrollFrame = 0;
+                            const now = performance.now();
+                            const currentY = window.scrollY;
+                            const delta = Math.abs(currentY - lastScrollY);
+                            const elapsed = Math.max(now - lastScrollTime, 16);
+                            const velocity = Math.min(delta / elapsed, 3.2);
+                            const targetBoost = Math.min(1, velocity / 2.4);
+                            const positionBoost = getPositionBoost(currentY);
+
+                            smoothedBoost += (targetBoost - smoothedBoost) * 0.48;
+                            setMarqueeBoost(Math.max(smoothedBoost, positionBoost));
+                            lastScrollY = currentY;
+                            lastScrollTime = now;
+
+                            if (settleTimer) {
+                                window.clearTimeout(settleTimer);
+                            }
+
+                            settleTimer = window.setTimeout(() => {
+                                smoothedBoost = getPositionBoost(window.scrollY);
+                                setMarqueeBoost(smoothedBoost);
+                            }, 1200);
+                        };
+
+                        const onMarqueeScroll = () => {
+                            if (scrollFrame) return;
+                            scrollFrame = window.requestAnimationFrame(updateScrollVelocity);
+                        };
+
+                        setMarqueeBoost(getPositionBoost(window.scrollY));
+                        window.addEventListener("scroll", onMarqueeScroll, { passive: true });
+                        cleanups.push(() => {
+                            window.removeEventListener("scroll", onMarqueeScroll);
+                            if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+                            if (settleTimer) window.clearTimeout(settleTimer);
+                            portfolioHome.style.removeProperty("--scroll-boost");
+                            portfolioHome.style.removeProperty("--marquee-duration-a");
+                            portfolioHome.style.removeProperty("--marquee-duration-b");
+                            portfolioHome.style.removeProperty("--marquee-duration-c");
+                        });
+                    }
+
+                    const zoomTargets = Array.from(
+                        document.querySelectorAll("[data-scroll-zoom]"),
+                    );
+
+                    if (
+                        zoomTargets.length &&
+                        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                    ) {
+                        let zoomFrame = 0;
+
+                        const updateScrollZoom = () => {
+                            zoomFrame = 0;
+                            const viewportCenter = window.innerHeight * 0.52;
+
+                            zoomTargets.forEach((element) => {
+                                const rect = element.getBoundingClientRect();
+                                const elementCenter = rect.top + rect.height / 2;
+                                const distance = Math.abs(elementCenter - viewportCenter);
+                                const range = Math.max(window.innerHeight * 0.78, 1);
+                                const power = Math.max(0, 1 - distance / range);
+                                const shift = (viewportCenter - elementCenter) * 0.018;
+
+                                element.style.setProperty(
+                                    "--scroll-image-scale",
+                                    power.toFixed(3),
+                                );
+                                element.style.setProperty(
+                                    "--scroll-image-shift",
+                                    `${Math.max(-16, Math.min(16, shift)).toFixed(2)}px`,
+                                );
+                            });
+                        };
+
+                        const scheduleScrollZoom = () => {
+                            if (zoomFrame) return;
+                            zoomFrame = window.requestAnimationFrame(updateScrollZoom);
+                        };
+
+                        updateScrollZoom();
+                        window.addEventListener("scroll", scheduleScrollZoom, {
+                            passive: true,
+                        });
+                        window.addEventListener("resize", scheduleScrollZoom);
+
+                        cleanups.push(() => {
+                            window.removeEventListener("scroll", scheduleScrollZoom);
+                            window.removeEventListener("resize", scheduleScrollZoom);
+                            if (zoomFrame) window.cancelAnimationFrame(zoomFrame);
+                            zoomTargets.forEach((element) => {
+                                element.style.removeProperty("--scroll-image-scale");
+                                element.style.removeProperty("--scroll-image-shift");
+                            });
+                        });
+                    }
 
                     document.querySelectorAll(".profile-flip-container").forEach((container) => {
                         const onClick = () => {
@@ -933,7 +1082,7 @@ const transitionRipples = [0, 1, 2, 3];
                             window.clearTimeout(transitionTimer);
                         }
 
-                        transitionTimer = window.setTimeout(clearTransition, 720);
+                        transitionTimer = window.setTimeout(clearTransition, 860);
                     };
 
                     const getTransitionUrl = (link, event) => {
@@ -1004,7 +1153,7 @@ const transitionRipples = [0, 1, 2, 3];
 
                         transitionTimer = window.setTimeout(() => {
                             window.location.href = url.href;
-                        }, 420);
+                        }, 540);
                     };
 
                     const onPageShow = (event) => {
