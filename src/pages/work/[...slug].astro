@@ -200,17 +200,20 @@ const themeCopy = {
         <main class="case-shell animate-blur-in">
             <section class="case-hero">
                 <div class="case-hero-copy">
-                    <p class="case-kicker">{presentation.kicker}</p>
-                    <h1 class="case-title" data-barba-title>
+                    <p class="case-kicker portfolio-text-wipe delay-100">{presentation.kicker}</p>
+                    <h1
+                        class="case-title portfolio-text-wipe portfolio-text-wipe--title delay-200"
+                        data-barba-title
+                    >
                         {
                             titleLines.map((line) => (
                                 <span>{line}</span>
                             ))
                         }
                     </h1>
-                    <p class="case-summary">{presentation.summary}</p>
+                    <p class="case-summary portfolio-text-wipe delay-300">{presentation.summary}</p>
 
-                    <div class="case-quick-meta" aria-label="Project summary">
+                    <div class="case-quick-meta animate-blur-in delay-400" aria-label="Project summary">
                         <span>{presentation.modeLabel}</span>
                         <span>{entry.data.genre}</span>
                         <span>{displayYear}</span>

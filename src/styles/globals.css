@@ -703,6 +703,10 @@ main .portfolio-project.scroll-reveal {
   --portfolio-depth: #dfe9f7;
   --portfolio-wave-thin: color-mix(in oklch, #12345f 16%, transparent);
   --portfolio-wave-thick: color-mix(in oklch, #12345f 26%, transparent);
+  --portfolio-pointer-x: 50%;
+  --portfolio-pointer-y: 50%;
+  --portfolio-ripple-strength: 0;
+  --portfolio-ripple-scale: 0.94;
   background:
     linear-gradient(180deg, color-mix(in oklch, var(--background) 92%, white 8%) 0%, var(--background) 72%),
     repeating-linear-gradient(0deg, color-mix(in oklch, #12345f 4%, transparent) 0 1px, transparent 1px 7px);
@@ -1774,17 +1778,23 @@ html[data-route-transition] .portfolio-design-lines span {
 }
 
 .case-title {
+  display: grid;
+  gap: 0.06em;
   min-width: 0;
-  max-width: min(13ch, 100%);
+  max-width: min(19ch, 100%);
   color: var(--foreground);
   font-size: clamp(3rem, 8vw, 8.5rem);
   font-weight: 950;
-  line-height: 0.9;
+  line-height: 0.98;
   letter-spacing: 0;
   overflow-wrap: anywhere;
   text-wrap: balance;
   text-transform: uppercase;
   word-break: normal;
+}
+
+.case-title.portfolio-text-wipe {
+  width: min(19ch, 100%);
 }
 
 .case-title span {
@@ -1802,6 +1812,10 @@ html[data-route-transition] .portfolio-design-lines span {
   font-size: clamp(1rem, 1.6vw, 1.28rem);
   line-height: 1.8;
   overflow-wrap: anywhere;
+}
+
+.case-summary.portfolio-text-wipe {
+  width: min(100%, 44rem);
 }
 
 .case-quick-meta {
@@ -1875,6 +1889,11 @@ html[data-route-transition] .portfolio-design-lines span {
   transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translate3d(0, -0.25rem, 0) scale(1.012);
 }
 
+.case-media-frame[data-fit="contain"] {
+  background: transparent;
+  box-shadow: 0 24px 68px color-mix(in oklch, var(--case-accent) 10%, transparent);
+}
+
 .case-media-topline {
   display: flex;
   justify-content: space-between;
@@ -1904,6 +1923,16 @@ html[data-route-transition] .portfolio-design-lines span {
     repeating-linear-gradient(90deg, color-mix(in oklch, white 7%, transparent) 0 1px, transparent 1px 24px),
     #05070d;
   transform: translateZ(36px);
+}
+
+.case-media-frame[data-fit="contain"] .case-media-surface {
+  border-color: color-mix(in oklch, var(--case-accent) 18%, transparent);
+  background: transparent;
+  box-shadow: none;
+}
+
+.case-media-frame[data-fit="contain"] .case-media-surface::after {
+  display: none;
 }
 
 .case-media-surface::after {
@@ -1966,6 +1995,7 @@ html[data-route-transition] .portfolio-design-lines span {
 .case-media-frame[data-fit="contain"] .case-media-surface img {
   object-fit: contain;
   padding: clamp(0.85rem, 2vw, 1.5rem);
+  background: transparent;
 }
 
 .case-media-phone {
@@ -3082,11 +3112,20 @@ html[data-route-transition] .portfolio-design-lines span {
   display: block;
   overflow: hidden;
   border: 1px solid color-mix(in oklch, var(--foreground) 13%, transparent);
-  background:
-    linear-gradient(135deg, color-mix(in oklch, var(--case-accent) 8%, transparent), transparent 42%),
-    color-mix(in oklch, var(--background) 68%, #05070d 32%);
+  background: transparent;
   transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
   transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), border-color 360ms ease, box-shadow 360ms ease;
+}
+
+.case-image-frame:has(img[src$=".png" i]),
+.work-case-body > p:has(> img[src$=".png" i]:only-child) {
+  background: transparent;
+  box-shadow: none;
+}
+
+.case-image-frame:has(img[src$=".png" i])::after,
+.work-case-body > p:has(> img[src$=".png" i]:only-child)::after {
+  display: none;
 }
 
 .case-image-frame::after,
@@ -3124,9 +3163,7 @@ html[data-route-transition] .portfolio-design-lines span {
   display: block;
   width: 100%;
   border: 1px solid color-mix(in oklch, var(--foreground) 13%, transparent);
-  background:
-    linear-gradient(135deg, color-mix(in oklch, var(--case-accent) 8%, transparent), transparent 42%),
-    color-mix(in oklch, var(--background) 68%, #05070d 32%);
+  background: transparent;
   object-fit: cover;
   object-position: center center;
   transition:
@@ -3211,6 +3248,7 @@ html[data-route-transition] .portfolio-design-lines span {
 }
 
 .case-layout-product .work-case-body img {
+  background: transparent;
   object-fit: contain;
   padding: clamp(0.8rem, 2vw, 1.4rem);
 }
@@ -3295,6 +3333,10 @@ html[data-route-transition] .portfolio-design-lines span {
   font-size: clamp(3rem, 4.6vw, 5.8rem);
 }
 
+.case-layout-installation .case-title.portfolio-text-wipe {
+  width: min(14ch, 100%);
+}
+
 .case-layout-system .case-title {
   max-width: 13ch;
 }
@@ -3325,6 +3367,7 @@ html[data-route-transition] .portfolio-design-lines span {
 
   .case-hero {
     min-height: auto;
+    gap: clamp(1rem, 4vw, 2rem);
   }
 
   .case-focus-grid {
@@ -3337,6 +3380,31 @@ html[data-route-transition] .portfolio-design-lines span {
 
   .case-title {
     max-width: 100%;
+  }
+
+  .case-title.portfolio-text-wipe,
+  .case-layout-installation .case-title.portfolio-text-wipe {
+    width: 100%;
+  }
+
+  .case-media-frame {
+    justify-self: stretch;
+    width: 100%;
+    transform: none !important;
+  }
+
+  .case-media-phone {
+    justify-self: center;
+    width: min(100%, 28rem);
+  }
+
+  .case-media-frame:hover,
+  .case-media-frame:focus-within {
+    transform: none;
+  }
+
+  .case-media-surface {
+    transform: none;
   }
 
   .theme-interface-head,
@@ -3436,8 +3504,8 @@ html[data-route-transition] .portfolio-design-lines span {
 
   .case-title {
     max-width: 100%;
-    font-size: clamp(2.15rem, 9.2vw, 3rem);
-    line-height: 0.98;
+    font-size: clamp(2rem, 8.8vw, 2.86rem);
+    line-height: 1.05;
     word-break: normal;
   }
 
@@ -3458,7 +3526,7 @@ html[data-route-transition] .portfolio-design-lines span {
   }
 
   .case-summary {
-    width: min(100%, 22rem);
+    width: 100%;
     max-width: 100%;
     line-height: 1.65;
     white-space: normal;
@@ -3483,6 +3551,52 @@ html[data-route-transition] .portfolio-design-lines span {
   .case-media-topline {
     align-items: start;
     flex-direction: column;
+  }
+
+  .case-media-frame {
+    padding: 0.5rem;
+    box-shadow: 0 18px 44px color-mix(in oklch, var(--case-accent) 10%, transparent);
+  }
+
+  .case-media-frame[data-fit="contain"] {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .case-media-phone {
+    width: min(100%, 23rem);
+  }
+
+  .case-media-surface {
+    max-height: 72vh;
+  }
+
+  .case-media-frame[data-fit="contain"] .case-media-surface {
+    max-height: 62vh;
+    background: transparent;
+  }
+
+  .case-media-phone .case-media-surface {
+    justify-self: center;
+    width: min(100%, 18.25rem);
+    max-height: none;
+  }
+
+  .case-media-frame[data-fit="contain"] .case-hero-image,
+  .case-media-frame[data-fit="contain"] .case-media-surface img {
+    padding: 0.25rem;
+  }
+
+  .case-media-surface img,
+  .case-media-surface video,
+  .case-media-surface iframe {
+    transform: none !important;
+  }
+
+  .case-image-frame,
+  .work-case-body > p:has(> img:only-child),
+  .work-case-body img {
+    transform: none !important;
   }
 
   .theme-projection-stage,
@@ -4128,91 +4242,264 @@ html[data-route-transition] .portfolio-flow-field span {
 
 /* Cinematic water homepage refresh */
 .portfolio-home {
-  --background: oklch(0.075 0.012 250);
-  --foreground: oklch(0.96 0.01 240);
-  --muted: oklch(0.18 0.016 248);
-  --muted-foreground: oklch(0.76 0.026 220);
-  --card: oklch(0.12 0.014 248);
-  --card-foreground: oklch(0.96 0.01 240);
-  --popover: oklch(0.12 0.014 248);
-  --popover-foreground: oklch(0.96 0.01 240);
-  --primary: oklch(0.82 0.12 205);
-  --primary-foreground: oklch(0.06 0.012 250);
-  --secondary: oklch(0.22 0.02 248);
-  --secondary-foreground: oklch(0.92 0.014 230);
-  --border: oklch(0.92 0.012 240 / 18%);
-  --ring: oklch(0.82 0.12 205);
-  --portfolio-cyan: #76f7ff;
-  --portfolio-signal: #ff5a24;
-  --portfolio-lime: #d8ff38;
-  --portfolio-panel-mix: #101312;
-  --portfolio-depth: #050606;
+  --background: oklch(0.94 0.024 178);
+  --foreground: oklch(0.09 0.018 180);
+  --muted: oklch(0.84 0.035 176);
+  --muted-foreground: oklch(0.24 0.03 184);
+  --card: oklch(0.97 0.015 178);
+  --card-foreground: oklch(0.13 0.018 180);
+  --popover: oklch(0.97 0.015 178);
+  --popover-foreground: oklch(0.13 0.018 180);
+  --primary: oklch(0.62 0.12 200);
+  --primary-foreground: oklch(0.98 0.012 180);
+  --secondary: oklch(0.82 0.036 182);
+  --secondary-foreground: oklch(0.14 0.02 180);
+  --border: oklch(0.12 0.02 180 / 24%);
+  --ring: oklch(0.58 0.17 205);
+  --portfolio-cyan: #00c8f0;
+  --portfolio-signal: #ff3f1f;
+  --portfolio-lime: #c8ff00;
+  --portfolio-ink: #070908;
+  --portfolio-paper: #f7fff7;
+  --portfolio-panel-mix: #f8fff8;
+  --portfolio-depth: #c4d7d1;
   --portfolio-wave-thin: color-mix(in oklch, var(--portfolio-cyan) 14%, transparent);
   --portfolio-wave-thick: color-mix(in oklch, var(--portfolio-cyan) 28%, transparent);
-  --marquee-duration-a: 24s;
-  --marquee-duration-b: 18s;
-  --marquee-duration-c: 30s;
+  --marquee-duration-a: 12s;
+  --marquee-duration-b: 9s;
+  --marquee-duration-c: 15s;
   --scroll-boost: 0;
+  --portfolio-pointer-x: 50%;
+  --portfolio-pointer-y: 50%;
+  --portfolio-ripple-strength: 0;
+  --portfolio-ripple-scale: 0.94;
   color: var(--foreground);
+  overflow-x: clip;
+  overflow-y: visible;
   background:
-    radial-gradient(circle at 72% 18%, color-mix(in oklch, var(--portfolio-cyan) 12%, transparent), transparent 34%),
-    radial-gradient(circle at 18% 88%, color-mix(in oklch, var(--portfolio-signal) 10%, transparent), transparent 38%),
-    linear-gradient(160deg, #050606 0%, #101312 46%, #020303 100%);
+    radial-gradient(circle at 74% 18%, color-mix(in oklch, var(--portfolio-cyan) 34%, transparent), transparent 36%),
+    radial-gradient(circle at 12% 86%, color-mix(in oklch, var(--portfolio-lime) 28%, transparent), transparent 38%),
+    radial-gradient(circle at 82% 82%, color-mix(in oklch, var(--portfolio-signal) 14%, transparent), transparent 34%),
+    linear-gradient(150deg, #fbfff7 0%, #dce9e1 50%, #ffffff 100%);
 }
 
 .dark .portfolio-home {
-  --background: oklch(0.065 0.012 250);
-  --foreground: oklch(0.97 0.01 240);
-  --muted: oklch(0.16 0.016 248);
-  --muted-foreground: oklch(0.74 0.026 220);
-  --card: oklch(0.1 0.014 248);
-  --card-foreground: oklch(0.97 0.01 240);
-  --primary: oklch(0.86 0.12 205);
-  --secondary: oklch(0.2 0.02 248);
-  --border: oklch(0.95 0.012 240 / 18%);
+  --background: oklch(0.92 0.024 178);
+  --foreground: oklch(0.08 0.018 180);
+  --muted: oklch(0.82 0.032 178);
+  --muted-foreground: oklch(0.22 0.03 184);
+  --card: oklch(0.95 0.015 178);
+  --card-foreground: oklch(0.12 0.018 180);
+  --primary: oklch(0.58 0.13 202);
+  --secondary: oklch(0.78 0.036 182);
+  --border: oklch(0.1 0.02 180 / 26%);
   background:
-    radial-gradient(circle at 72% 18%, color-mix(in oklch, var(--portfolio-cyan) 12%, transparent), transparent 34%),
-    radial-gradient(circle at 18% 88%, color-mix(in oklch, var(--portfolio-signal) 10%, transparent), transparent 38%),
-    linear-gradient(160deg, #050606 0%, #101312 46%, #020303 100%);
+    radial-gradient(circle at 74% 18%, color-mix(in oklch, var(--portfolio-cyan) 28%, transparent), transparent 34%),
+    radial-gradient(circle at 12% 86%, color-mix(in oklch, var(--portfolio-lime) 22%, transparent), transparent 36%),
+    radial-gradient(circle at 82% 82%, color-mix(in oklch, var(--portfolio-signal) 16%, transparent), transparent 34%),
+    linear-gradient(150deg, #f9fff5 0%, #d5e6dd 50%, #ffffff 100%);
 }
 
 .portfolio-home::before {
   inset: -14vh -12vw;
   z-index: 0;
   background:
-    linear-gradient(118deg, transparent 0 44%, color-mix(in oklch, var(--portfolio-signal) 12%, transparent) 44.2% 44.7%, transparent 45% 100%),
-    linear-gradient(72deg, transparent 0 62%, color-mix(in oklch, var(--portfolio-lime) 8%, transparent) 62.2% 62.6%, transparent 63% 100%),
-    radial-gradient(ellipse at 58% 42%, color-mix(in oklch, white 8%, transparent), transparent 52%),
-    linear-gradient(100deg, color-mix(in oklch, #000 88%, transparent) 0%, transparent 58%);
-  background-size: 100% 100%;
+    radial-gradient(circle at var(--portfolio-pointer-x) var(--portfolio-pointer-y), color-mix(in oklch, var(--portfolio-cyan) 52%, transparent) 0%, color-mix(in oklch, #77eeff 28%, transparent) 18%, transparent 48%),
+    radial-gradient(circle at calc(var(--portfolio-pointer-x) + 8%) calc(var(--portfolio-pointer-y) + 6%), color-mix(in oklch, white 64%, transparent) 0%, color-mix(in oklch, #d9ffff 24%, transparent) 18%, transparent 34%),
+    radial-gradient(ellipse at 36% 36%, color-mix(in oklch, #5eeaff 36%, transparent) 0%, transparent 44%),
+    radial-gradient(ellipse at 76% 58%, color-mix(in oklch, #bff8ff 30%, transparent) 0%, transparent 48%),
+    radial-gradient(ellipse at 18% 82%, color-mix(in oklch, #b8ff70 22%, transparent) 0%, transparent 44%),
+    radial-gradient(circle at 74% 18%, color-mix(in oklch, var(--portfolio-cyan) 28%, transparent), transparent 36%),
+    radial-gradient(circle at 12% 86%, color-mix(in oklch, var(--portfolio-lime) 20%, transparent), transparent 38%),
+    radial-gradient(circle at 82% 82%, color-mix(in oklch, var(--portfolio-signal) 11%, transparent), transparent 34%),
+    linear-gradient(150deg, color-mix(in oklch, white 44%, transparent) 0%, transparent 62%);
+  background-size: 100% 100%, 100% 100%, 124% 118%, 136% 126%, 120% 116%, 112% 108%, 120% 112%, 128% 116%, 100% 100%;
   mask-image: linear-gradient(90deg, transparent 0%, black 14%, black 88%, transparent 100%);
-  opacity: 0.46;
-  transform: translate3d(0, 0, 0);
-  animation: portfolio-track-drift 16s linear infinite alternate;
+  opacity: calc(0.64 + var(--portfolio-ripple-strength) * 0.24);
+  filter: blur(calc(0.26rem + var(--portfolio-ripple-strength) * 0.42rem)) saturate(1.24);
+  mix-blend-mode: normal;
+  transform: translate3d(0, 0, 0) scale(calc(1 + var(--portfolio-ripple-strength) * 0.006));
+  transition:
+    opacity 260ms ease,
+    filter 260ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: portfolio-track-drift 12s ease-in-out infinite alternate;
+}
+
+.portfolio-home::after {
+  content: "";
+  position: fixed;
+  left: var(--portfolio-pointer-x);
+  top: var(--portfolio-pointer-y);
+  z-index: 1;
+  display: block !important;
+  width: clamp(20rem, 42vw, 48rem);
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, transparent 0 29%, color-mix(in oklch, #020606 26%, transparent) 35%, transparent 43%),
+    radial-gradient(circle, transparent 0 46%, color-mix(in oklch, #020606 20%, transparent) 51%, transparent 62%),
+    radial-gradient(circle, color-mix(in oklch, white 34%, transparent) 0%, color-mix(in oklch, var(--portfolio-cyan) 42%, transparent) 18%, color-mix(in oklch, #72f2ff 28%, transparent) 34%, color-mix(in oklch, #b8ff70 12%, transparent) 50%, transparent 74%),
+    radial-gradient(circle, transparent 0 34%, color-mix(in oklch, #9ef6ff 20%, transparent) 46%, transparent 66%);
+  box-shadow:
+    0 0 5.4rem color-mix(in oklch, var(--portfolio-cyan) 34%, transparent),
+    0 0 9rem color-mix(in oklch, #b8ff70 12%, transparent);
+  filter: blur(0.8rem);
+  opacity: calc(0.2 + var(--portfolio-ripple-strength) * 0.78);
+  mix-blend-mode: normal;
+  transform: translate3d(-50%, -50%, 0) scale(var(--portfolio-ripple-scale));
+  transition:
+    left 120ms linear,
+    top 120ms linear,
+    opacity 580ms ease,
+    transform 960ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 580ms ease;
+  animation: portfolio-idle-ripple-breathe 5.4s ease-in-out infinite;
+}
+
+.portfolio-home.is-rippling::after {
+  filter: blur(1.18rem) saturate(1.16);
+}
+
+.portfolio-auto-ripple {
+  position: fixed;
+  left: var(--auto-ripple-x, 50%);
+  top: var(--auto-ripple-y, 50%);
+  z-index: 1;
+  display: block;
+  width: var(--auto-ripple-size, 28rem);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, transparent 0 26%, color-mix(in oklch, #020606 24%, transparent) 32%, transparent 39%),
+    radial-gradient(circle, transparent 0 45%, color-mix(in oklch, #020606 18%, transparent) 51%, transparent 61%),
+    radial-gradient(circle, color-mix(in oklch, white 20%, transparent) 0%, color-mix(in oklch, var(--portfolio-cyan) 30%, transparent) 20%, color-mix(in oklch, #72f2ff 22%, transparent) 38%, color-mix(in oklch, #b8ff70 10%, transparent) 54%, transparent 74%);
+  box-shadow:
+    0 0 3.5rem color-mix(in oklch, var(--portfolio-cyan) 22%, transparent),
+    0 0 6rem color-mix(in oklch, #b8ff70 8%, transparent);
+  filter: blur(0.62rem);
+  mix-blend-mode: normal;
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0) scale(0.18) rotate(var(--auto-ripple-rotate, 0deg));
+  animation: portfolio-auto-ripple-spread var(--auto-ripple-duration, 3.2s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.dark .portfolio-auto-ripple {
+  background:
+    radial-gradient(circle, transparent 0 25%, color-mix(in oklch, #000 36%, transparent) 32%, transparent 40%),
+    radial-gradient(circle, transparent 0 44%, color-mix(in oklch, #000 30%, transparent) 51%, transparent 62%),
+    radial-gradient(circle, color-mix(in oklch, white 13%, transparent) 0%, color-mix(in oklch, var(--portfolio-cyan) 36%, transparent) 20%, color-mix(in oklch, #72f2ff 28%, transparent) 38%, color-mix(in oklch, #b8ff70 9%, transparent) 54%, transparent 74%);
+  box-shadow:
+    0 0 4.5rem color-mix(in oklch, var(--portfolio-cyan) 28%, transparent),
+    0 0 7rem color-mix(in oklch, #b8ff70 8%, transparent);
+}
+
+html[data-fx-calm="true"] .portfolio-auto-ripple {
+  display: none !important;
+}
+
+.portfolio-theme-toggle {
+  position: fixed;
+  top: clamp(0.85rem, 2vw, 1.4rem);
+  right: clamp(0.85rem, 2vw, 1.4rem);
+  z-index: 40;
+}
+
+.portfolio-theme-toggle [data-theme-toggle] {
+  border: 1px solid color-mix(in oklch, var(--portfolio-ink) 18%, transparent);
+  background: color-mix(in oklch, var(--portfolio-paper) 66%, transparent);
+  color: var(--portfolio-ink);
+  box-shadow:
+    0 1rem 2.6rem color-mix(in oklch, var(--portfolio-cyan) 16%, transparent),
+    inset 0 0 0 1px color-mix(in oklch, white 34%, transparent);
+  backdrop-filter: blur(16px) saturate(1.12);
+}
+
+.dark .portfolio-home {
+  --background: oklch(0.145 0.028 204);
+  --foreground: oklch(0.94 0.018 190);
+  --muted: oklch(0.22 0.026 204);
+  --muted-foreground: oklch(0.74 0.034 190);
+  --card: oklch(0.17 0.028 204);
+  --card-foreground: oklch(0.96 0.014 190);
+  --primary: oklch(0.78 0.13 195);
+  --secondary: oklch(0.24 0.034 202);
+  --border: oklch(0.94 0.012 190 / 18%);
+  --portfolio-cyan: #58e8ff;
+  --portfolio-signal: #ff5c3a;
+  --portfolio-lime: #d8ff48;
+  --portfolio-ink: #f7fffb;
+  --portfolio-paper: #071416;
+  --portfolio-panel-mix: #061d21;
+  --portfolio-depth: #02242d;
+  background:
+    radial-gradient(circle at 72% 18%, color-mix(in oklch, var(--portfolio-cyan) 24%, transparent), transparent 36%),
+    radial-gradient(circle at 14% 86%, color-mix(in oklch, var(--portfolio-lime) 14%, transparent), transparent 40%),
+    radial-gradient(circle at 82% 82%, color-mix(in oklch, var(--portfolio-signal) 12%, transparent), transparent 38%),
+    linear-gradient(150deg, #020a0d 0%, #061b20 54%, #010506 100%);
+}
+
+.dark .portfolio-home::before {
+  background:
+    radial-gradient(circle at var(--portfolio-pointer-x) var(--portfolio-pointer-y), color-mix(in oklch, var(--portfolio-cyan) 56%, transparent) 0%, color-mix(in oklch, #77eeff 34%, transparent) 18%, transparent 50%),
+    radial-gradient(circle at calc(var(--portfolio-pointer-x) + 8%) calc(var(--portfolio-pointer-y) + 6%), color-mix(in oklch, #d9ffff 34%, transparent) 0%, transparent 34%),
+    radial-gradient(ellipse at 36% 36%, color-mix(in oklch, #5eeaff 34%, transparent) 0%, transparent 46%),
+    radial-gradient(ellipse at 76% 58%, color-mix(in oklch, #bff8ff 20%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse at 18% 82%, color-mix(in oklch, #b8ff70 14%, transparent) 0%, transparent 46%),
+    radial-gradient(circle at 74% 18%, color-mix(in oklch, var(--portfolio-cyan) 24%, transparent), transparent 38%),
+    radial-gradient(circle at 12% 86%, color-mix(in oklch, var(--portfolio-lime) 12%, transparent), transparent 40%),
+    radial-gradient(circle at 82% 82%, color-mix(in oklch, var(--portfolio-signal) 9%, transparent), transparent 36%),
+    linear-gradient(150deg, color-mix(in oklch, #0e3038 58%, transparent) 0%, transparent 64%);
+  opacity: calc(0.58 + var(--portfolio-ripple-strength) * 0.28);
+  filter: blur(calc(0.22rem + var(--portfolio-ripple-strength) * 0.46rem)) saturate(1.22);
+}
+
+.dark .portfolio-home::after {
+  background:
+    radial-gradient(circle, transparent 0 28%, color-mix(in oklch, #000 38%, transparent) 35%, transparent 44%),
+    radial-gradient(circle, transparent 0 45%, color-mix(in oklch, #000 30%, transparent) 51%, transparent 63%),
+    radial-gradient(circle, color-mix(in oklch, white 20%, transparent) 0%, color-mix(in oklch, var(--portfolio-cyan) 48%, transparent) 18%, color-mix(in oklch, #72f2ff 34%, transparent) 34%, color-mix(in oklch, #b8ff70 12%, transparent) 52%, transparent 74%),
+    radial-gradient(circle, transparent 0 34%, color-mix(in oklch, #9ef6ff 24%, transparent) 46%, transparent 66%);
+  box-shadow:
+    0 0 6.2rem color-mix(in oklch, var(--portfolio-cyan) 34%, transparent),
+    0 0 10rem color-mix(in oklch, #b8ff70 10%, transparent);
+}
+
+.dark .portfolio-theme-toggle [data-theme-toggle] {
+  border-color: color-mix(in oklch, var(--portfolio-cyan) 28%, transparent);
+  background: color-mix(in oklch, #041214 72%, transparent);
+  color: var(--foreground);
+  box-shadow:
+    0 1rem 3rem color-mix(in oklch, var(--portfolio-cyan) 20%, transparent),
+    inset 0 0 0 1px color-mix(in oklch, white 10%, transparent);
 }
 
 .portfolio-scene-layer::after {
   background:
-    linear-gradient(90deg, color-mix(in oklch, #020303 92%, transparent) 0%, color-mix(in oklch, #020303 62%, transparent) 22%, transparent 52%),
-    linear-gradient(180deg, transparent 0%, color-mix(in oklch, #020303 28%, transparent) 58%, color-mix(in oklch, #020303 86%, transparent) 100%),
-    linear-gradient(112deg, transparent 0 42%, color-mix(in oklch, var(--portfolio-signal) 10%, transparent) 42.2% 43.2%, transparent 44% 100%);
+    linear-gradient(90deg, color-mix(in oklch, var(--portfolio-paper) 86%, transparent) 0%, color-mix(in oklch, var(--portfolio-paper) 48%, transparent) 22%, transparent 58%),
+    linear-gradient(180deg, transparent 0%, color-mix(in oklch, var(--portfolio-paper) 38%, transparent) 64%, color-mix(in oklch, var(--portfolio-paper) 72%, transparent) 100%),
+    linear-gradient(112deg, transparent 0 42%, color-mix(in oklch, var(--portfolio-signal) 12%, transparent) 42.2% 43.2%, transparent 44% 100%);
 }
 
 .portfolio-design-field {
   background:
-    radial-gradient(circle at 64% 46%, color-mix(in oklch, var(--portfolio-cyan) 9%, transparent), transparent 38%),
-    linear-gradient(117deg, color-mix(in oklch, #000 82%, transparent) 0%, transparent 42%);
+    radial-gradient(circle at 64% 46%, color-mix(in oklch, var(--portfolio-cyan) 14%, transparent), transparent 38%),
+    linear-gradient(117deg, color-mix(in oklch, var(--portfolio-paper) 68%, transparent) 0%, transparent 48%);
 }
 
 .portfolio-webgl-mount {
-  opacity: 0.66;
-  filter: saturate(1.1) contrast(1.03);
-  mix-blend-mode: screen;
+  opacity: 0.52;
+  filter: saturate(1.18) contrast(1.08);
+  mix-blend-mode: multiply;
 }
 
 .dark .portfolio-webgl-mount {
-  opacity: 0.72;
-  filter: saturate(1.12) contrast(1.06);
+  opacity: 0.58;
+  filter: saturate(1.2) contrast(1.08);
 }
 
 .portfolio-shell--cinematic {
@@ -4302,11 +4589,11 @@ html[data-route-transition] .portfolio-flow-field span {
 .portfolio-race-hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(20rem, 30rem);
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 24rem);
   align-items: center;
-  gap: 2rem;
+  gap: clamp(1rem, 2vw, 1.6rem);
   min-height: 100svh;
-  padding: clamp(2.4rem, 5vw, 4.7rem) 0 5.8rem;
+  padding: clamp(1.5rem, 3.2vw, 3rem) 0 clamp(3.2rem, 5vw, 4.8rem);
   perspective: 1400px;
 }
 
@@ -4348,19 +4635,41 @@ html[data-route-transition] .portfolio-flow-field span {
   z-index: 3;
   pointer-events: none;
   background:
-    linear-gradient(90deg, var(--portfolio-lime) 0%, var(--portfolio-cyan) 58%, white 100%);
+    linear-gradient(90deg, var(--portfolio-lime, #b9f300) 0%, var(--portfolio-cyan, #00b8d4) 58%, white 100%);
   transform: translate3d(-112%, 0, 0) skewX(-9deg);
   transform-origin: 0 50%;
   animation: portfolio-text-mask-sweep 920ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   animation-delay: var(--wipe-delay);
   box-shadow:
-    0 0 1.8rem color-mix(in oklch, var(--portfolio-cyan) 42%, transparent),
-    0 0 0.9rem color-mix(in oklch, var(--portfolio-lime) 28%, transparent);
+    0 0 1.8rem color-mix(in oklch, var(--portfolio-cyan, #00b8d4) 42%, transparent),
+    0 0 0.9rem color-mix(in oklch, var(--portfolio-lime, #b9f300) 28%, transparent);
 }
 
 .portfolio-text-wipe > * {
   position: relative;
   z-index: 1;
+}
+
+.case-title.portfolio-text-wipe {
+  display: grid;
+  gap: 0.06em;
+}
+
+.portfolio-text-wipe.is-wipe-ready {
+  animation: none;
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  transform: translate3d(0, 0, 0);
+  transition:
+    clip-path 920ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 80ms linear,
+    transform 920ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.portfolio-text-wipe.is-wipe-ready::after {
+  animation: none;
+  transform: translate3d(116%, 0, 0) skewX(-9deg);
+  transition: transform 920ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .portfolio-text-wipe.delay-100 {
@@ -4388,16 +4697,16 @@ html[data-route-transition] .portfolio-flow-field span {
 }
 
 .portfolio-home-title {
-  margin: 0.5rem 0 1rem;
+  margin: 0.35rem 0 0.7rem;
   max-width: 9ch;
-  color: white;
-  font-size: 7rem;
+  color: var(--portfolio-ink);
+  font-size: 5.6rem;
   font-weight: 950;
-  line-height: 0.76;
+  line-height: 0.78;
   text-transform: uppercase;
   text-shadow:
-    0 0 2rem color-mix(in oklch, var(--portfolio-cyan) 24%, transparent),
-    0 2.4rem 5rem color-mix(in oklch, black 78%, transparent);
+    0 0.08em 0 color-mix(in oklch, white 62%, transparent),
+    0 1.2rem 3.2rem color-mix(in oklch, var(--portfolio-cyan) 22%, transparent);
 }
 
 .portfolio-home-title a {
@@ -4412,24 +4721,24 @@ html[data-route-transition] .portfolio-flow-field span {
 
 .portfolio-hero-role {
   max-width: 34rem;
-  color: var(--foreground);
-  font-size: 1.35rem;
+  color: var(--portfolio-ink);
+  font-size: 1.18rem;
   font-weight: 800;
   line-height: 1.18;
 }
 
 .portfolio-hero-bio {
   max-width: 34rem;
-  margin-top: 1.15rem;
+  margin-top: 0.8rem;
   color: var(--muted-foreground);
-  font-size: 1rem;
-  line-height: 1.72;
+  font-size: 0.96rem;
+  line-height: 1.58;
 }
 
 .portfolio-hero-actions {
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 1.65rem;
+  margin-top: 1.15rem;
 }
 
 .portfolio-action {
@@ -4458,9 +4767,9 @@ html[data-route-transition] .portfolio-flow-field span {
 
 .portfolio-category-rails {
   display: grid;
-  gap: 0.42rem;
+  gap: 0.32rem;
   width: min(100%, 35rem);
-  margin-top: 1.3rem;
+  margin-top: 1rem;
 }
 
 .portfolio-category-rail {
@@ -4469,10 +4778,10 @@ html[data-route-transition] .portfolio-flow-field span {
   display: grid;
   grid-template-columns: 2.2rem minmax(0, 1fr) auto;
   align-items: center;
-  min-height: 2.55rem;
+  min-height: 2.28rem;
   overflow: hidden;
   border: 1px solid color-mix(in oklch, var(--scene-accent) 34%, white 8%);
-  padding: 0.48rem 0.72rem;
+  padding: 0.4rem 0.68rem;
   color: white;
   text-decoration: none;
   text-transform: uppercase;
@@ -4538,7 +4847,7 @@ html[data-route-transition] .portfolio-flow-field span {
 .portfolio-category-rail strong {
   min-width: 0;
   overflow: hidden;
-  font-size: clamp(0.92rem, 2vw, 1.15rem);
+  font-size: 1rem;
   font-weight: 950;
   line-height: 0.95;
   text-overflow: ellipsis;
@@ -4560,6 +4869,7 @@ html[data-route-transition] .portfolio-flow-field span {
   align-self: center;
   display: grid;
   gap: 0.9rem;
+  max-width: 24rem;
   transform-style: preserve-3d;
   animation: portfolio-figure-drive 7.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
@@ -4768,7 +5078,7 @@ html[data-route-transition] .portfolio-flow-field span {
   z-index: 2;
   display: flex;
   gap: 0.65rem;
-  color: color-mix(in oklch, white 58%, transparent);
+  color: color-mix(in oklch, var(--portfolio-ink) 52%, transparent);
   font-size: 0.72rem;
   font-weight: 900;
   line-height: 1;
@@ -4792,8 +5102,8 @@ html[data-route-transition] .portfolio-flow-field span {
   display: flex;
   gap: 1.25rem;
   min-width: 140rem;
-  color: color-mix(in oklch, white 8%, transparent);
-  font-size: 6.4rem;
+  color: color-mix(in oklch, var(--portfolio-ink) 10%, transparent);
+  font-size: 5.4rem;
   font-weight: 950;
   line-height: 0.82;
   text-transform: uppercase;
@@ -4861,7 +5171,7 @@ html[data-route-transition] .portfolio-flow-field span {
 
 .portfolio-work-intro h2 {
   max-width: 56rem;
-  color: white;
+  color: var(--portfolio-ink);
   font-size: 3.7rem;
   font-weight: 950;
   line-height: 0.95;
@@ -4874,8 +5184,17 @@ html[data-route-transition] .portfolio-flow-field span {
 }
 
 .portfolio-genre-section {
+  --section-pop: 1;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  opacity: clamp(0.52, calc(0.5 + var(--section-pop) * 0.5), 1);
+  transform: translate3d(0, calc((1 - var(--section-pop)) * 8.5rem), 0)
+    scale(calc(0.91 + var(--section-pop) * 0.095));
+  transform-origin: 50% 0%;
+  transition:
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.2, 1.24, 0.3, 1);
+  will-change: transform;
 }
 
 .portfolio-genre-head {
@@ -4903,7 +5222,7 @@ html[data-route-transition] .portfolio-flow-field span {
 
 .portfolio-genre-head h2 {
   margin-top: 0.4rem;
-  color: white;
+  color: var(--portfolio-ink);
   font-size: 4.8rem;
   font-weight: 950;
   line-height: 0.82;
@@ -4939,6 +5258,120 @@ html[data-route-transition] .portfolio-flow-field span {
   text-shadow:
     0 0 2.5rem color-mix(in oklch, var(--scene-accent) 12%, transparent),
     0.03em 0.03em 0 color-mix(in oklch, white 5%, transparent);
+}
+
+.portfolio-genre-brake {
+  --brake-progress: 0;
+  position: relative;
+  z-index: 2;
+  grid-column: 1 / -1;
+  min-height: 118svh;
+  margin-top: clamp(2rem, 6vw, 5rem);
+}
+
+.portfolio-genre-brake-inner {
+  position: sticky;
+  top: 12svh;
+  display: grid;
+  align-content: center;
+  gap: 0.85rem;
+  min-height: min(68svh, 42rem);
+  overflow: visible;
+  border: 0;
+  padding: 0;
+  color: var(--portfolio-paper);
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.portfolio-genre-brake-marquee {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 1.6rem;
+  min-width: max-content;
+  color: var(--portfolio-paper);
+  font-family: "Space Grotesk", "Noto Sans TC", Arial, sans-serif;
+  font-size: clamp(4.4rem, 10vw, 10rem);
+  font-weight: 950;
+  font-style: normal;
+  line-height: 0.78;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: portfolio-brake-marquee-left var(--marquee-duration-c) linear infinite;
+  will-change: transform;
+}
+
+.portfolio-genre-brake-marquee--top {
+  transform: translate3d(
+      calc(-8% - var(--brake-progress) * 60%),
+      calc(-1 * var(--brake-progress) * 2.4rem),
+      0
+    )
+    rotate(-2.5deg)
+    skewX(-4deg);
+}
+
+.portfolio-genre-brake-marquee--bottom {
+  color: var(--scene-accent);
+  animation-name: portfolio-brake-marquee-right;
+  animation-duration: var(--marquee-duration-a);
+  transform: translate3d(
+      calc(-42% + var(--brake-progress) * 58%),
+      calc(var(--brake-progress) * 2.35rem),
+      0
+    )
+    rotate(2.5deg)
+    skewX(4deg);
+}
+
+.portfolio-genre-brake-marquee span {
+  min-width: max-content;
+  text-shadow: none;
+}
+
+.portfolio-genre-brake-next {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  min-width: min(88vw, 36rem);
+  color: var(--portfolio-ink);
+  text-align: center;
+  text-transform: uppercase;
+  opacity: clamp(0, calc((var(--brake-progress) - 0.34) * 2.45), 1);
+  transform:
+    translate3d(
+      -50%,
+      calc(-50% + (1 - var(--brake-progress)) * 48svh),
+      0
+    )
+    scale(calc(0.74 + var(--brake-progress) * 0.34));
+  filter: blur(calc((1 - var(--brake-progress)) * 7px));
+  will-change: transform, opacity, filter;
+}
+
+.portfolio-genre-brake-next span {
+  color: color-mix(in oklch, var(--portfolio-ink) 58%, var(--scene-accent));
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.18em;
+}
+
+.portfolio-genre-brake-next strong {
+  color: var(--portfolio-ink);
+  font-size: clamp(2.6rem, 7vw, 7rem);
+  font-weight: 950;
+  line-height: 0.82;
+  text-shadow:
+    0.04em 0.04em 0 color-mix(in oklch, white 74%, transparent),
+    0 0 2.5rem color-mix(in oklch, var(--scene-accent) 28%, transparent);
 }
 
 @media (min-width: 1024px) {
@@ -5143,7 +5576,7 @@ html[data-route-transition] .portfolio-flow-field span {
 
 @media (min-width: 768px) {
   .portfolio-home-title {
-    font-size: 10.5rem;
+    font-size: 7.4rem;
   }
 
   .portfolio-project-title {
@@ -5153,7 +5586,7 @@ html[data-route-transition] .portfolio-flow-field span {
 
 @media (min-width: 1280px) {
   .portfolio-home-title {
-    font-size: 11.6rem;
+    font-size: 8.8rem;
   }
 
   .portfolio-work-intro h2 {
@@ -5163,7 +5596,7 @@ html[data-route-transition] .portfolio-flow-field span {
 
 @media (min-width: 1536px) {
   .portfolio-home-title {
-    font-size: 15rem;
+    font-size: 10.4rem;
   }
 }
 
@@ -5183,8 +5616,8 @@ html[data-route-transition] .portfolio-flow-field span {
 
   .portfolio-race-hero {
     grid-template-columns: 1fr;
-    min-height: auto;
-    padding: 3.5rem 0 5rem;
+    min-height: 100svh;
+    padding: 1.4rem 0 3.2rem;
   }
 
   .portfolio-track-panel {
@@ -5194,15 +5627,18 @@ html[data-route-transition] .portfolio-flow-field span {
   }
 
   .portfolio-hero-figure {
-    width: min(100%, 28rem);
+    position: absolute;
+    right: 0;
+    bottom: 4rem;
+    z-index: 1;
+    width: min(38vw, 15rem);
+    opacity: 0.24;
+    pointer-events: none;
     justify-self: center;
   }
 
   .portfolio-water-caption {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    writing-mode: horizontal-tb;
+    display: none;
   }
 
   .portfolio-hero-marquee {
@@ -5226,6 +5662,20 @@ html[data-route-transition] .portfolio-flow-field span {
 
   .portfolio-project-grid {
     grid-template-columns: 1fr;
+  }
+
+  .portfolio-genre-brake {
+    min-height: 82svh;
+    margin-top: 2.2rem;
+  }
+
+  .portfolio-genre-brake-inner {
+    top: 18svh;
+    min-height: 56svh;
+  }
+
+  .portfolio-genre-brake-marquee {
+    font-size: 4rem;
   }
 
   .portfolio-category-rails {
@@ -5258,11 +5708,51 @@ html[data-route-transition] .portfolio-flow-field span {
   }
 
   .portfolio-home-title {
-    font-size: 4.6rem;
+    font-size: 3.9rem;
   }
 
   .portfolio-hero-role {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+
+  .portfolio-hero-bio {
+    font-size: 0.9rem;
+    line-height: 1.48;
+  }
+
+  .portfolio-hero-actions {
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+  }
+
+  .portfolio-action {
+    min-height: 2.6rem;
+    padding: 0.72rem 0.9rem;
+    font-size: 0.78rem;
+  }
+
+  .portfolio-category-rails {
+    gap: 0.26rem;
+    margin-top: 0.78rem;
+  }
+
+  .portfolio-category-rail {
+    grid-template-columns: 1.85rem minmax(0, 1fr) auto;
+    min-height: 2.12rem;
+    padding: 0.34rem 0.58rem;
+  }
+
+  .portfolio-category-rail strong {
+    font-size: 0.86rem;
+  }
+
+  .portfolio-category-rail span,
+  .portfolio-category-rail i {
+    font-size: 0.62rem;
+  }
+
+  .portfolio-hero-figure {
+    display: none;
   }
 
   .portfolio-track-stats {
@@ -5283,9 +5773,7 @@ html[data-route-transition] .portfolio-flow-field span {
   }
 
   .portfolio-scroll-cue {
-    position: relative;
-    bottom: auto;
-    margin-top: 2rem;
+    display: none;
   }
 
   .portfolio-project-title {
@@ -5317,17 +5805,87 @@ html[data-route-transition] .portfolio-flow-field span {
   .portfolio-project-thumb {
     min-height: 12rem;
   }
+
+  .portfolio-genre-brake {
+    min-height: 72svh;
+  }
+
+  .portfolio-genre-brake-inner {
+    top: 22svh;
+    min-height: 48svh;
+  }
+
+  .portfolio-genre-brake-marquee {
+    font-size: 3.1rem;
+  }
+
+  .portfolio-genre-brake-next {
+    min-width: min(92vw, 22rem);
+  }
+
+  .portfolio-genre-brake-next strong {
+    font-size: 2.4rem;
+  }
 }
 
 @keyframes portfolio-track-drift {
   0% {
-    background-position: 52% 48%, 0 0, 0 0, 0 0;
-    transform: translate3d(-1.2rem, 0, 0) skewX(-0.8deg);
+    background-position: 50% 50%, 52% 48%, 34% 38%, 76% 58%, 18% 82%, 52% 48%, 50% 50%, 50% 50%, 0 0;
+    background-size: 100% 100%, 100% 100%, 124% 118%, 136% 126%, 120% 116%, 112% 108%, 120% 112%, 128% 116%, 100% 100%;
+    transform: translate3d(-1.2rem, 0, 0) skewX(-0.5deg) scale(calc(1 + var(--portfolio-ripple-strength) * 0.006));
+  }
+
+  52% {
+    background-position: 51% 49%, 50% 52%, 42% 32%, 68% 64%, 24% 74%, 58% 52%, 8rem -5rem, -6rem 4rem, 0 0;
+    background-size: 112% 110%, 108% 108%, 146% 138%, 132% 124%, 138% 130%, 120% 116%, 120% 112%, 140% 128%, 100% 100%;
+    transform: translate3d(0.5rem, -0.55rem, 0) skewX(0.18deg) scale(calc(1.018 + var(--portfolio-ripple-strength) * 0.008));
   }
 
   100% {
-    background-position: 58% 52%, 8rem -5rem, -6rem 4rem, 0 0;
-    transform: translate3d(1.2rem, -0.7rem, 0) skewX(0.6deg);
+    background-position: 54% 47%, 48% 53%, 45% 44%, 72% 50%, 14% 88%, 58% 52%, 8rem -5rem, -6rem 4rem, 0 0;
+    background-size: 104% 106%, 112% 108%, 118% 114%, 144% 134%, 126% 120%, 116% 112%, 116% 108%, 136% 124%, 100% 100%;
+    transform: translate3d(1.35rem, -0.85rem, 0) skewX(0.45deg) scale(calc(1.01 + var(--portfolio-ripple-strength) * 0.008));
+  }
+}
+
+@keyframes portfolio-idle-ripple-breathe {
+  0%,
+  100% {
+    filter: blur(0.85rem);
+    box-shadow:
+      0 0 4.2rem color-mix(in oklch, var(--portfolio-cyan) 28%, transparent),
+      0 0 7rem color-mix(in oklch, #b8ff70 10%, transparent);
+  }
+
+  50% {
+    filter: blur(1.7rem) saturate(1.2);
+    box-shadow:
+      0 0 7rem color-mix(in oklch, var(--portfolio-cyan) 42%, transparent),
+      0 0 11rem color-mix(in oklch, #b8ff70 18%, transparent);
+  }
+}
+
+@keyframes portfolio-auto-ripple-spread {
+  0% {
+    opacity: 0;
+    filter: blur(0.28rem);
+    transform: translate3d(-50%, -50%, 0) scale(0.16) rotate(var(--auto-ripple-rotate, 0deg));
+  }
+
+  16% {
+    opacity: var(--auto-ripple-opacity, 0.5);
+  }
+
+  58% {
+    opacity: calc(var(--auto-ripple-opacity, 0.5) * 0.76);
+    filter: blur(0.82rem) saturate(1.12);
+    transform: translate3d(-50%, -50%, 0) scale(1.08) rotate(calc(var(--auto-ripple-rotate, 0deg) + 5deg));
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(1.45rem);
+    transform: translate3d(-50%, -50%, 0) scale(1.86) rotate(calc(var(--auto-ripple-rotate, 0deg) + 12deg));
   }
 }
 
@@ -5364,6 +5922,26 @@ html[data-route-transition] .portfolio-flow-field span {
 @keyframes portfolio-genre-marquee-reverse {
   0% {
     translate: -42rem 0;
+  }
+
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes portfolio-brake-marquee-left {
+  0% {
+    translate: 0 0;
+  }
+
+  100% {
+    translate: -30% 0;
+  }
+}
+
+@keyframes portfolio-brake-marquee-right {
+  0% {
+    translate: -30% 0;
   }
 
   100% {
@@ -5830,6 +6408,7 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   .portfolio-click-lens::after,
   .portfolio-click-lens span,
   .portfolio-text-wipe,
+  .portfolio-genre-brake-marquee,
   .work-case::after,
   .case-background-interface::before,
   .case-flow-ribbon,
@@ -5867,6 +6446,10 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   .portfolio-home::after {
     animation: none !important;
     transform: none !important;
+  }
+
+  .portfolio-auto-ripple {
+    display: none !important;
   }
 }
 

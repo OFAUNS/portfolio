@@ -84,7 +84,7 @@ const EXPERIENCE: ExperienceItem[] = [
 ---
 
 <Layout title="About OFANUS" description="About page">
-    <main class="container mx-auto px-6 py-12 max-w-4xl animate-blur-in">
+    <main class="container mx-auto px-6 py-12 max-w-4xl">
         <div class="absolute right-6 top-6 z-50">
             <ThemeToggle />
         </div>
@@ -114,16 +114,16 @@ const EXPERIENCE: ExperienceItem[] = [
                     
                     <div class="space-y-4 pt-2">
                         <div>
-                            <p class="text-sm font-mono text-muted-foreground/60 mb-1">{PROFILE.enName}</p>
-                            <h1 class="text-5xl md:text-6xl font-black uppercase tracking-tighter mb-2">
+                            <p class="text-sm font-mono text-muted-foreground/60 mb-1 portfolio-text-wipe delay-100">{PROFILE.enName}</p>
+                            <h1 class="text-5xl md:text-6xl font-black uppercase tracking-tighter mb-2 portfolio-text-wipe portfolio-text-wipe--title delay-200">
                                 {PROFILE.name}
                             </h1>
-                            <h3 class="text-lg text-muted-foreground font-light">{PROFILE.cnName}</h3>
+                            <h3 class="text-lg text-muted-foreground font-light portfolio-text-wipe delay-300">{PROFILE.cnName}</h3>
                         </div>
-                        <h2 class="text-xl md:text-2xl text-muted-foreground font-light">
+                        <h2 class="text-xl md:text-2xl text-muted-foreground font-light portfolio-text-wipe delay-300">
                             {PROFILE.role}
                         </h2>
-                        <p class="text-lg text-muted-foreground/80 leading-relaxed max-w-2xl">
+                        <p class="text-lg text-muted-foreground/80 leading-relaxed max-w-2xl portfolio-text-wipe delay-400">
                             {PROFILE.bio}
                         </p>
                     </div>

@@ -350,37 +350,70 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
                         window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
                         !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+                    const textWipes = Array.from(
+                        document.querySelectorAll(".portfolio-text-wipe"),
+                    );
+
+                    if (textWipes.length) {
+                        const wipeTimers = [];
+                        const reducedMotion = window.matchMedia(
+                            "(prefers-reduced-motion: reduce)",
+                        ).matches;
+
+                        textWipes.forEach((element) => {
+                            element.classList.remove("is-wipe-ready");
+
+                            if (reducedMotion) {
+                                element.classList.add("is-wipe-ready");
+                                return;
+                            }
+
+                            const delay = window
+                                .getComputedStyle(element)
+                                .getPropertyValue("--wipe-delay")
+                                .trim();
+                            const delayMs = delay.endsWith("ms")
+                                ? Number.parseFloat(delay)
+                                : delay.endsWith("s")
+                                  ? Number.parseFloat(delay) * 1000
+                                  : Number.parseFloat(delay) || 0;
+
+                            const timer = window.setTimeout(() => {
+                                element.classList.add("is-wipe-ready");
+                            }, Math.max(0, delayMs));
+                            wipeTimers.push(timer);
+                        });
+
+                        cleanups.push(() => {
+                            wipeTimers.forEach((timer) => window.clearTimeout(timer));
+                            textWipes.forEach((element) => {
+                                element.classList.remove("is-wipe-ready");
+                            });
+                        });
+                    }
+
                     if (portfolioHome) {
                         let lastScrollY = window.scrollY;
                         let lastScrollTime = performance.now();
                         let scrollFrame = 0;
                         let settleTimer = 0;
+                        let marqueeSyncTimer = 0;
                         let smoothedBoost = 0;
 
-                        const getPositionBoost = (scrollY) => {
-                            const maxScroll = Math.max(
-                                document.documentElement.scrollHeight - window.innerHeight,
-                                1,
-                            );
-                            const progressBoost = (scrollY / maxScroll) * 0.42;
-                            const earlyBoost = Math.min(scrollY / Math.max(window.innerHeight, 1), 1) * 0.08;
-
-                            return Math.min(0.46, progressBoost + earlyBoost);
-                        };
-
                         const setMarqueeBoost = (boost) => {
-                            portfolioHome.style.setProperty("--scroll-boost", boost.toFixed(3));
+                            const easedBoost = Math.min(1, Math.max(0, boost));
+                            portfolioHome.style.setProperty("--scroll-boost", easedBoost.toFixed(3));
                             portfolioHome.style.setProperty(
                                 "--marquee-duration-a",
-                                `${(24 - boost * 15).toFixed(2)}s`,
+                                `${(12 - easedBoost * 8.5).toFixed(2)}s`,
                             );
                             portfolioHome.style.setProperty(
                                 "--marquee-duration-b",
-                                `${(18 - boost * 11).toFixed(2)}s`,
+                                `${(9 - easedBoost * 6).toFixed(2)}s`,
                             );
                             portfolioHome.style.setProperty(
                                 "--marquee-duration-c",
-                                `${(30 - boost * 19).toFixed(2)}s`,
+                                `${(15 - easedBoost * 11).toFixed(2)}s`,
                             );
                         };
 
@@ -390,12 +423,11 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
                             const currentY = window.scrollY;
                             const delta = Math.abs(currentY - lastScrollY);
                             const elapsed = Math.max(now - lastScrollTime, 16);
-                            const velocity = Math.min(delta / elapsed, 3.2);
-                            const targetBoost = Math.min(1, velocity / 2.4);
-                            const positionBoost = getPositionBoost(currentY);
+                            const velocity = Math.min(delta / elapsed, 4.2);
+                            const targetBoost = Math.min(1, velocity / 2.05);
 
                             smoothedBoost += (targetBoost - smoothedBoost) * 0.48;
-                            setMarqueeBoost(Math.max(smoothedBoost, positionBoost));
+                            setMarqueeBoost(smoothedBoost);
                             lastScrollY = currentY;
                             lastScrollTime = now;
 
@@ -403,10 +435,18 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
                                 window.clearTimeout(settleTimer);
                             }
 
+                            const settleY = currentY;
                             settleTimer = window.setTimeout(() => {
-                                smoothedBoost = getPositionBoost(window.scrollY);
-                                setMarqueeBoost(smoothedBoost);
-                            }, 1200);
+                                if (window.scrollY !== settleY) {
+                                    onMarqueeScroll();
+                                    return;
+                                }
+
+                                smoothedBoost = 0;
+                                setMarqueeBoost(0);
+                                lastScrollY = window.scrollY;
+                                lastScrollTime = performance.now();
+                            }, 1100);
                         };
 
                         const onMarqueeScroll = () => {
@@ -414,16 +454,296 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
                             scrollFrame = window.requestAnimationFrame(updateScrollVelocity);
                         };
 
-                        setMarqueeBoost(getPositionBoost(window.scrollY));
+                        setMarqueeBoost(0);
                         window.addEventListener("scroll", onMarqueeScroll, { passive: true });
+                        marqueeSyncTimer = window.setInterval(() => {
+                            if (window.scrollY !== lastScrollY) {
+                                onMarqueeScroll();
+                            }
+                        }, 120);
                         cleanups.push(() => {
                             window.removeEventListener("scroll", onMarqueeScroll);
                             if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
                             if (settleTimer) window.clearTimeout(settleTimer);
+                            if (marqueeSyncTimer) window.clearInterval(marqueeSyncTimer);
                             portfolioHome.style.removeProperty("--scroll-boost");
                             portfolioHome.style.removeProperty("--marquee-duration-a");
                             portfolioHome.style.removeProperty("--marquee-duration-b");
                             portfolioHome.style.removeProperty("--marquee-duration-c");
+                        });
+                    }
+
+                    if (portfolioHome && canUsePointerEffects) {
+                        let rippleFrame = 0;
+                        let rippleFadeTimer = 0;
+                        let rippleSettleFrame = 0;
+                        let ripplePoint = { x: 50, y: 50 };
+
+                        const applyPortfolioRipple = () => {
+                            rippleFrame = 0;
+                            const x = `${ripplePoint.x.toFixed(2)}%`;
+                            const y = `${ripplePoint.y.toFixed(2)}%`;
+
+                            portfolioHome.style.setProperty("--portfolio-pointer-x", x);
+                            portfolioHome.style.setProperty("--portfolio-pointer-y", y);
+                            portfolioHome.style.setProperty("--portfolio-ripple-strength", "0.96");
+                            portfolioHome.style.setProperty("--portfolio-ripple-scale", "0.58");
+                            portfolioHome.classList.add("is-rippling");
+
+                            if (rippleSettleFrame) {
+                                window.cancelAnimationFrame(rippleSettleFrame);
+                            }
+
+                            rippleSettleFrame = window.requestAnimationFrame(() => {
+                                portfolioHome.style.setProperty(
+                                    "--portfolio-ripple-scale",
+                                    "1.48",
+                                );
+                                portfolioHome.style.setProperty(
+                                    "--portfolio-ripple-strength",
+                                    "0.72",
+                                );
+                            });
+                        };
+
+                        const schedulePortfolioRipple = (event) => {
+                            ripplePoint = {
+                                x: Math.min(
+                                    100,
+                                    Math.max(0, (event.clientX / window.innerWidth) * 100),
+                                ),
+                                y: Math.min(
+                                    100,
+                                    Math.max(0, (event.clientY / window.innerHeight) * 100),
+                                ),
+                            };
+
+                            if (rippleFadeTimer) {
+                                window.clearTimeout(rippleFadeTimer);
+                            }
+
+                            if (!rippleFrame) {
+                                rippleFrame =
+                                    window.requestAnimationFrame(applyPortfolioRipple);
+                            }
+                        };
+
+                        const calmPortfolioRipple = () => {
+                            if (rippleFadeTimer) {
+                                window.clearTimeout(rippleFadeTimer);
+                            }
+
+                            rippleFadeTimer = window.setTimeout(() => {
+                                portfolioHome.style.setProperty(
+                                    "--portfolio-ripple-strength",
+                                    "0",
+                                );
+                                portfolioHome.style.setProperty(
+                                    "--portfolio-ripple-scale",
+                                    "1.68",
+                                );
+                                portfolioHome.classList.remove("is-rippling");
+                            }, 260);
+                        };
+
+                        portfolioHome.addEventListener(
+                            "pointermove",
+                            schedulePortfolioRipple,
+                            { passive: true },
+                        );
+                        portfolioHome.addEventListener("pointerleave", calmPortfolioRipple);
+
+                        cleanups.push(() => {
+                            portfolioHome.removeEventListener(
+                                "pointermove",
+                                schedulePortfolioRipple,
+                            );
+                            portfolioHome.removeEventListener(
+                                "pointerleave",
+                                calmPortfolioRipple,
+                            );
+                            if (rippleFrame) window.cancelAnimationFrame(rippleFrame);
+                            if (rippleSettleFrame) {
+                                window.cancelAnimationFrame(rippleSettleFrame);
+                            }
+                            if (rippleFadeTimer) window.clearTimeout(rippleFadeTimer);
+                            portfolioHome.classList.remove("is-rippling");
+                            portfolioHome.style.removeProperty("--portfolio-pointer-x");
+                            portfolioHome.style.removeProperty("--portfolio-pointer-y");
+                            portfolioHome.style.removeProperty("--portfolio-ripple-strength");
+                            portfolioHome.style.removeProperty("--portfolio-ripple-scale");
+                        });
+                    }
+
+                    if (
+                        portfolioHome &&
+                        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                    ) {
+                        const autoRipples = new Set();
+                        const maxAutoRipples = window.matchMedia("(max-width: 768px)")
+                            .matches
+                            ? 3
+                            : 5;
+                        let autoRippleTimer = 0;
+                        let autoRippleFrame = 0;
+
+                        const removeAutoRipple = (ripple) => {
+                            if (!autoRipples.has(ripple)) return;
+                            autoRipples.delete(ripple);
+                            ripple.remove();
+                        };
+
+                        const scheduleAutoRipple = () => {
+                            const delay = 520 + Math.random() * 880;
+                            autoRippleTimer = window.setTimeout(() => {
+                                autoRippleFrame =
+                                    window.requestAnimationFrame(spawnAutoRipple);
+                            }, delay);
+                        };
+
+                        const spawnAutoRipple = () => {
+                            autoRippleFrame = 0;
+
+                            if (
+                                !document.hidden &&
+                                document.documentElement.dataset.fxCalm !== "true" &&
+                                autoRipples.size < maxAutoRipples
+                            ) {
+                                const ripple = document.createElement("span");
+                                const x = 8 + Math.random() * 84;
+                                const y = 9 + Math.random() * 82;
+                                const size = 18 + Math.random() * 28;
+                                const duration = 2.4 + Math.random() * 1.35;
+                                const opacity = 0.34 + Math.random() * 0.26;
+                                const rotate = -24 + Math.random() * 48;
+
+                                ripple.className = "portfolio-auto-ripple";
+                                ripple.setAttribute("aria-hidden", "true");
+                                ripple.style.setProperty("--auto-ripple-x", `${x}%`);
+                                ripple.style.setProperty("--auto-ripple-y", `${y}%`);
+                                ripple.style.setProperty(
+                                    "--auto-ripple-size",
+                                    `${size.toFixed(2)}rem`,
+                                );
+                                ripple.style.setProperty(
+                                    "--auto-ripple-duration",
+                                    `${duration.toFixed(2)}s`,
+                                );
+                                ripple.style.setProperty(
+                                    "--auto-ripple-opacity",
+                                    opacity.toFixed(2),
+                                );
+                                ripple.style.setProperty(
+                                    "--auto-ripple-rotate",
+                                    `${rotate.toFixed(2)}deg`,
+                                );
+
+                                portfolioHome.append(ripple);
+                                autoRipples.add(ripple);
+
+                                const cleanupRipple = () => removeAutoRipple(ripple);
+                                ripple.addEventListener("animationend", cleanupRipple, {
+                                    once: true,
+                                });
+                                window.setTimeout(cleanupRipple, (duration + 0.8) * 1000);
+                            }
+
+                            scheduleAutoRipple();
+                        };
+
+                        scheduleAutoRipple();
+
+                        cleanups.push(() => {
+                            if (autoRippleTimer) window.clearTimeout(autoRippleTimer);
+                            if (autoRippleFrame) {
+                                window.cancelAnimationFrame(autoRippleFrame);
+                            }
+                            autoRipples.forEach((ripple) => ripple.remove());
+                            autoRipples.clear();
+                        });
+                    }
+
+                    const genreBrakes = Array.from(
+                        document.querySelectorAll("[data-genre-brake]"),
+                    );
+
+                    if (
+                        genreBrakes.length &&
+                        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                    ) {
+                        let brakeFrame = 0;
+                        const brakePairs = genreBrakes.map((element) => {
+                            const section = element.closest(".portfolio-genre-section");
+                            const nextSection =
+                                section?.nextElementSibling instanceof HTMLElement
+                                    ? section.nextElementSibling
+                                    : null;
+
+                            return { element, nextSection };
+                        });
+
+                        const updateGenreBrakes = () => {
+                            brakeFrame = 0;
+                            const viewportHeight = Math.max(window.innerHeight, 1);
+
+                            brakePairs.forEach(({ element, nextSection }) => {
+                                const rect = element.getBoundingClientRect();
+                                const travel = rect.height + viewportHeight * 0.42;
+                                const progress = Math.max(
+                                    0,
+                                    Math.min(
+                                        1,
+                                        (viewportHeight * 0.88 - rect.top) / travel,
+                                    ),
+                                );
+
+                                element.style.setProperty(
+                                    "--brake-progress",
+                                    progress.toFixed(3),
+                                );
+
+                                if (nextSection) {
+                                    const rawPop = Math.max(
+                                        0,
+                                        Math.min(1, (progress - 0.58) / 0.42),
+                                    );
+                                    const bounce =
+                                        rawPop +
+                                        Math.sin(rawPop * Math.PI) * 0.2 +
+                                        rawPop * 0.06;
+
+                                    nextSection.style.setProperty(
+                                        "--section-pop",
+                                        Math.min(1.18, bounce).toFixed(3),
+                                    );
+                                }
+                            });
+                        };
+
+                        const scheduleGenreBrakes = () => {
+                            if (brakeFrame) return;
+                            brakeFrame = window.requestAnimationFrame(updateGenreBrakes);
+                        };
+                        const brakeSyncTimer = window.setInterval(
+                            scheduleGenreBrakes,
+                            160,
+                        );
+
+                        updateGenreBrakes();
+                        window.addEventListener("scroll", scheduleGenreBrakes, {
+                            passive: true,
+                        });
+                        window.addEventListener("resize", scheduleGenreBrakes);
+
+                        cleanups.push(() => {
+                            window.removeEventListener("scroll", scheduleGenreBrakes);
+                            window.removeEventListener("resize", scheduleGenreBrakes);
+                            window.clearInterval(brakeSyncTimer);
+                            if (brakeFrame) window.cancelAnimationFrame(brakeFrame);
+                            brakePairs.forEach(({ element, nextSection }) => {
+                                element.style.removeProperty("--brake-progress");
+                                nextSection?.style.removeProperty("--section-pop");
+                            });
                         });
                     }
 

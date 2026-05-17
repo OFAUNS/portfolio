@@ -438,6 +438,10 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                     featuredProjects={featuredSceneProjects}
                 />
 
+                <div class="portfolio-theme-toggle animate-blur-in delay-300">
+                    <ThemeToggle />
+                </div>
+
                 <div class="portfolio-shell portfolio-shell--cinematic relative z-10 min-h-screen">
                     <section class="portfolio-race-hero" aria-labelledby="home-title">
                         <div class="portfolio-hero-copy">
@@ -715,6 +719,37 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                                     </a>
                                                 );
                                             })}
+                                        </div>
+
+                                        <div
+                                            class="portfolio-genre-brake"
+                                            data-genre-brake
+                                            aria-hidden="true"
+                                        >
+                                            <div class="portfolio-genre-brake-inner">
+                                                <div class="portfolio-genre-brake-marquee portfolio-genre-brake-marquee--top">
+                                                    <span>{genre}</span>
+                                                    <span>{genre}</span>
+                                                    <span>{genre}</span>
+                                                    <span>{genre}</span>
+                                                </div>
+                                                <div class="portfolio-genre-brake-marquee portfolio-genre-brake-marquee--bottom">
+                                                    <span>Next Field</span>
+                                                    <span>{genre}</span>
+                                                    <span>Pull Apart</span>
+                                                    <span>{genre}</span>
+                                                </div>
+                                                <div class="portfolio-genre-brake-next">
+                                                    <span>Next</span>
+                                                    <strong>
+                                                        {
+                                                            orderedGroupedPortfolio[
+                                                                genreIndex + 1
+                                                            ]?.[0] || "Index"
+                                                        }
+                                                    </strong>
+                                                </div>
+                                            </div>
                                         </div>
                                     </section>
                                 ),
