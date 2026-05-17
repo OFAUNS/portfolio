@@ -439,67 +439,26 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                 />
 
                 <div class="portfolio-shell portfolio-shell--cinematic relative z-10 min-h-screen">
-                    <header class="portfolio-topbar animate-blur-in delay-100">
-                        <div class="portfolio-topbar-brand">
-                            <a
-                                href="/about"
-                                class="profile-flip-container group relative z-50 h-16 w-16 shrink-0 cursor-pointer border border-border/70 [perspective:1000px] transition-transform duration-500 hover:scale-110"
-                                aria-label="About OFAUNS"
-                            >
-                                <div class="profile-flip-inner relative h-full w-full transition-[transform] duration-700 ease-in-out [transform-style:preserve-3d]">
-                                    <ResponsiveImage
-                                        src={PROFILE.avatar}
-                                        alt="OFAUNS profile"
-                                        class="absolute inset-0 h-full w-full bg-muted object-cover [backface-visibility:hidden]"
-                                        decoding="async"
-                                        fetchpriority="high"
-                                        loading="eager"
-                                        sizes="4rem"
-                                    />
-                                    <ResponsiveImage
-                                        src="/melogo.png"
-                                        alt="OFAUNS mark"
-                                        class="flip-180 absolute inset-0 h-full w-full bg-white object-cover [backface-visibility:hidden]"
-                                        loading="lazy"
-                                        decoding="async"
-                                        sizes="4rem"
-                                    />
-                                </div>
-                            </a>
-                            <div class="portfolio-topbar-title">
-                                <span>OFAUNS</span>
-                                <span>Visual Systems</span>
-                            </div>
-                        </div>
-
-                        <nav class="portfolio-topbar-links" aria-label="Primary">
-                            <a href="#work">Work</a>
-                            <a href={PROFILE.links.email}>Contact</a>
-                        </nav>
-
-                        <ThemeToggle />
-                    </header>
-
                     <section class="portfolio-race-hero" aria-labelledby="home-title">
                         <div class="portfolio-hero-copy">
-                            <p class="portfolio-hero-kicker animate-blur-in delay-200">
+                            <p class="portfolio-hero-kicker portfolio-text-wipe delay-100">
                                 Motion / Web / Interaction
                             </p>
                             <h1
                                 id="home-title"
-                                class="portfolio-home-title animate-blur-in delay-300"
+                                class="portfolio-home-title portfolio-text-wipe portfolio-text-wipe--title delay-200"
                             >
                                 <a href="/about">
                                     {PROFILE.name}
                                 </a>
                             </h1>
-                            <p class="portfolio-hero-role animate-blur-in delay-400">
+                            <p class="portfolio-hero-role portfolio-text-wipe delay-300">
                                 {PROFILE.role}
                             </p>
-                            <p class="portfolio-hero-bio animate-blur-in delay-500">
+                            <p class="portfolio-hero-bio portfolio-text-wipe delay-400">
                                 {PROFILE.bio}
                             </p>
-                            <div class="portfolio-hero-actions animate-blur-in delay-600">
+                            <div class="portfolio-hero-actions animate-blur-in delay-500">
                                 <a class="portfolio-action portfolio-chip" href="#work">
                                     Explore Work
                                 </a>
@@ -511,7 +470,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                                 </a>
                             </div>
                             <nav
-                                class="portfolio-category-rails animate-blur-in delay-700"
+                                class="portfolio-category-rails animate-blur-in delay-600"
                                 aria-label="Jump to portfolio category"
                             >
                                 {genreNames.map((genre, index) => (
@@ -541,7 +500,7 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
                             </nav>
                         </div>
 
-                        <div class="portfolio-hero-figure animate-blur-in delay-400">
+                        <div class="portfolio-hero-figure animate-blur-in delay-300">
                             <div class="portfolio-figure-track" aria-hidden="true">
                                 <span>Visual Designer</span>
                                 <span>Motion</span>

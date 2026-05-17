@@ -71,14 +71,6 @@ const WATER_FRAGMENT_SHADER = `
         float slowSwell = sin((p.x * 1.25 + p.y * 0.8) + uTime * 0.5) * 0.035;
         vec2 q = p + warp + slowSwell;
 
-        float thin = max(
-            lineMask(q.x + sin(q.y * 2.2 + uTime * 0.24) * 0.032, 3.85, 0.020),
-            lineMask(q.y + cos(q.x * 2.0 - uTime * 0.22) * 0.032, 3.85, 0.020)
-        );
-        float thick = max(
-            lineMask(q.x + ripple * 0.026, 1.28, 0.027),
-            lineMask(q.y - ripple * 0.022, 1.28, 0.027)
-        );
         float rings = pow(max(0.0, sin(distanceToPointer * 43.0 - uTime * 6.0)), 3.0);
         rings *= exp(-distanceToPointer * 2.05) * pulse;
         float caustic = pow(0.5 + 0.5 * sin((q.x + q.y) * 5.0 + uTime * 1.2 + ripple * 2.0), 3.0);
@@ -88,7 +80,7 @@ const WATER_FRAGMENT_SHADER = `
         trackEdge *= 0.5 + pulse * 0.18;
 
         float vignette = 1.0 - smoothstep(0.28, 1.85, length(p * vec2(0.76, 1.0)));
-        float intensity = thin * 0.22 + thick * 0.38 + rings * 0.58 + caustic * 0.11 + velocity * 0.42 + trackEdge * 0.2;
+        float intensity = rings * 0.62 + caustic * 0.18 + velocity * 0.36 + trackEdge * 0.16;
 
         vec3 lightLine = vec3(0.06, 0.18, 0.34);
         vec3 darkLine = vec3(0.78, 0.9, 1.0);
