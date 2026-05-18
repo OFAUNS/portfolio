@@ -87,6 +87,39 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
     <body
         class="min-h-screen bg-background font-sans antialiased text-foreground overflow-x-hidden"
     >
+        <svg
+            class="portfolio-distortion-defs"
+            aria-hidden="true"
+            focusable="false"
+            width="0"
+            height="0"
+        >
+            <filter
+                id="portfolio-ripple-distortion"
+                x="-24%"
+                y="-24%"
+                width="148%"
+                height="148%"
+                color-interpolation-filters="sRGB"
+            >
+                <feTurbulence
+                    type="fractalNoise"
+                    baseFrequency="0.018 0.034"
+                    numOctaves="2"
+                    seed="12"
+                    result="rippleNoise"
+                />
+                <feDisplacementMap
+                    in="SourceGraphic"
+                    in2="rippleNoise"
+                    scale="34"
+                    xChannelSelector="R"
+                    yChannelSelector="G"
+                    result="warped"
+                />
+                <feGaussianBlur in="warped" stdDeviation="0.22" />
+            </filter>
+        </svg>
         <div id="ambient-particles" aria-hidden="true"></div>
         <div class="portfolio-click-lens" aria-hidden="true">
             <span></span>
@@ -474,36 +507,71 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
                     }
 
                     if (portfolioHome && canUsePointerEffects) {
-                        let rippleFrame = 0;
-                        let rippleFadeTimer = 0;
-                        let rippleSettleFrame = 0;
+                        let pointerRippleFrame = 0;
+                        let lastPointerRipple = 0;
                         let ripplePoint = { x: 50, y: 50 };
+                        const pointerRipples = new Set();
 
-                        const applyPortfolioRipple = () => {
-                            rippleFrame = 0;
-                            const x = `${ripplePoint.x.toFixed(2)}%`;
-                            const y = `${ripplePoint.y.toFixed(2)}%`;
+                        const removePointerRipple = (ripple) => {
+                            if (!pointerRipples.has(ripple)) return;
+                            pointerRipples.delete(ripple);
+                            ripple.remove();
+                        };
 
-                            portfolioHome.style.setProperty("--portfolio-pointer-x", x);
-                            portfolioHome.style.setProperty("--portfolio-pointer-y", y);
-                            portfolioHome.style.setProperty("--portfolio-ripple-strength", "0.96");
-                            portfolioHome.style.setProperty("--portfolio-ripple-scale", "0.58");
-                            portfolioHome.classList.add("is-rippling");
+                        const spawnPointerRipple = () => {
+                            pointerRippleFrame = 0;
 
-                            if (rippleSettleFrame) {
-                                window.cancelAnimationFrame(rippleSettleFrame);
+                            if (
+                                document.hidden ||
+                                document.documentElement.dataset.fxCalm === "true" ||
+                                pointerRipples.size > 5
+                            ) {
+                                return;
                             }
 
-                            rippleSettleFrame = window.requestAnimationFrame(() => {
-                                portfolioHome.style.setProperty(
-                                    "--portfolio-ripple-scale",
-                                    "1.48",
-                                );
-                                portfolioHome.style.setProperty(
-                                    "--portfolio-ripple-strength",
-                                    "0.72",
-                                );
+                            const ripple = document.createElement("span");
+                            const viewportScale = window.innerWidth < 768 ? 0.8 : 1;
+                            const size = (20 + Math.random() * 10) * viewportScale;
+                            const duration = 2.15 + Math.random() * 0.35;
+                            const opacity = 0.36 + Math.random() * 0.16;
+                            const rotate = -18 + Math.random() * 36;
+
+                            ripple.className =
+                                "portfolio-distortion-ripple portfolio-distortion-ripple--pointer";
+                            ripple.setAttribute("aria-hidden", "true");
+                            ripple.style.setProperty(
+                                "--auto-ripple-x",
+                                `${ripplePoint.x.toFixed(2)}%`,
+                            );
+                            ripple.style.setProperty(
+                                "--auto-ripple-y",
+                                `${ripplePoint.y.toFixed(2)}%`,
+                            );
+                            ripple.style.setProperty(
+                                "--auto-ripple-size",
+                                `${size.toFixed(2)}rem`,
+                            );
+                            ripple.style.setProperty(
+                                "--auto-ripple-duration",
+                                `${duration.toFixed(2)}s`,
+                            );
+                            ripple.style.setProperty(
+                                "--auto-ripple-opacity",
+                                opacity.toFixed(2),
+                            );
+                            ripple.style.setProperty(
+                                "--auto-ripple-rotate",
+                                `${rotate.toFixed(2)}deg`,
+                            );
+
+                            portfolioHome.append(ripple);
+                            pointerRipples.add(ripple);
+
+                            const cleanupRipple = () => removePointerRipple(ripple);
+                            ripple.addEventListener("animationend", cleanupRipple, {
+                                once: true,
                             });
+                            window.setTimeout(cleanupRipple, (duration + 0.8) * 1000);
                         };
 
                         const schedulePortfolioRipple = (event) => {
@@ -518,32 +586,12 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
                                 ),
                             };
 
-                            if (rippleFadeTimer) {
-                                window.clearTimeout(rippleFadeTimer);
+                            const now = performance.now();
+                            if (now - lastPointerRipple > 150 && !pointerRippleFrame) {
+                                lastPointerRipple = now;
+                                pointerRippleFrame =
+                                    window.requestAnimationFrame(spawnPointerRipple);
                             }
-
-                            if (!rippleFrame) {
-                                rippleFrame =
-                                    window.requestAnimationFrame(applyPortfolioRipple);
-                            }
-                        };
-
-                        const calmPortfolioRipple = () => {
-                            if (rippleFadeTimer) {
-                                window.clearTimeout(rippleFadeTimer);
-                            }
-
-                            rippleFadeTimer = window.setTimeout(() => {
-                                portfolioHome.style.setProperty(
-                                    "--portfolio-ripple-strength",
-                                    "0",
-                                );
-                                portfolioHome.style.setProperty(
-                                    "--portfolio-ripple-scale",
-                                    "1.68",
-                                );
-                                portfolioHome.classList.remove("is-rippling");
-                            }, 260);
                         };
 
                         portfolioHome.addEventListener(
@@ -551,27 +599,17 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
                             schedulePortfolioRipple,
                             { passive: true },
                         );
-                        portfolioHome.addEventListener("pointerleave", calmPortfolioRipple);
 
                         cleanups.push(() => {
                             portfolioHome.removeEventListener(
                                 "pointermove",
                                 schedulePortfolioRipple,
                             );
-                            portfolioHome.removeEventListener(
-                                "pointerleave",
-                                calmPortfolioRipple,
-                            );
-                            if (rippleFrame) window.cancelAnimationFrame(rippleFrame);
-                            if (rippleSettleFrame) {
-                                window.cancelAnimationFrame(rippleSettleFrame);
+                            if (pointerRippleFrame) {
+                                window.cancelAnimationFrame(pointerRippleFrame);
                             }
-                            if (rippleFadeTimer) window.clearTimeout(rippleFadeTimer);
-                            portfolioHome.classList.remove("is-rippling");
-                            portfolioHome.style.removeProperty("--portfolio-pointer-x");
-                            portfolioHome.style.removeProperty("--portfolio-pointer-y");
-                            portfolioHome.style.removeProperty("--portfolio-ripple-strength");
-                            portfolioHome.style.removeProperty("--portfolio-ripple-scale");
+                            pointerRipples.forEach((ripple) => ripple.remove());
+                            pointerRipples.clear();
                         });
                     }
 
@@ -612,12 +650,12 @@ const transitionSpeedLines = Array.from({ length: 16 }, (_, index) => index);
                                 const ripple = document.createElement("span");
                                 const x = 8 + Math.random() * 84;
                                 const y = 9 + Math.random() * 82;
-                                const size = 18 + Math.random() * 28;
+                                const size = 14 + Math.random() * 20;
                                 const duration = 2.4 + Math.random() * 1.35;
                                 const opacity = 0.34 + Math.random() * 0.26;
                                 const rotate = -24 + Math.random() * 48;
 
-                                ripple.className = "portfolio-auto-ripple";
+                                ripple.className = "portfolio-distortion-ripple";
                                 ripple.setAttribute("aria-hidden", "true");
                                 ripple.style.setProperty("--auto-ripple-x", `${x}%`);
                                 ripple.style.setProperty("--auto-ripple-y", `${y}%`);

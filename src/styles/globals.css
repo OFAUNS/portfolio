@@ -744,37 +744,10 @@ main .portfolio-project.scroll-reveal {
   color: color-mix(in oklch, #d8e6ff 76%, var(--foreground)) !important;
 }
 
-.portfolio-home::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    repeating-radial-gradient(ellipse at 50% 48%, transparent 0 34px, var(--portfolio-wave-thin) 35px 36px, transparent 37px 74px),
-    repeating-linear-gradient(92deg, transparent 0 68px, var(--portfolio-wave-thin) 68px 69px, transparent 69px 136px),
-    repeating-linear-gradient(2deg, transparent 0 74px, var(--portfolio-wave-thin) 74px 75px, transparent 75px 148px),
-    linear-gradient(135deg, color-mix(in oklch, var(--portfolio-depth) 46%, transparent), transparent 44%, color-mix(in oklch, var(--foreground) 6%, transparent) 100%);
-  background-size: 140% 140%, 160px 160px, 174px 174px, 100% 100%;
-  background-position: 50% 50%, 0 0, 0 0, 0 0;
-  mask-image: linear-gradient(90deg, black 0%, black 46%, transparent 88%);
-  opacity: 0.18;
-}
-
+.portfolio-home::before,
 .portfolio-home::after {
-  content: "";
-  position: fixed;
-  inset: clamp(1rem, 3vw, 2.5rem);
-  z-index: 1;
-  pointer-events: none;
-  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
-  background:
-    repeating-radial-gradient(ellipse at 50% 50%, transparent 0 86px, var(--portfolio-wave-thick) 87px 89px, transparent 90px 174px),
-    repeating-linear-gradient(90deg, transparent 0 168px, var(--portfolio-wave-thick) 168px 170px, transparent 170px 336px),
-    repeating-linear-gradient(0deg, transparent 0 132px, var(--portfolio-wave-thick) 132px 134px, transparent 134px 264px);
-  background-size: 115% 115%, 336px 336px, 264px 264px;
-  opacity: 0.1;
-  mask-image: linear-gradient(90deg, black 0%, transparent 82%);
+  content: none !important;
+  display: none !important;
 }
 
 .portfolio-scene-layer {
@@ -4300,70 +4273,21 @@ html[data-route-transition] .portfolio-flow-field span {
     linear-gradient(150deg, #f9fff5 0%, #d5e6dd 50%, #ffffff 100%);
 }
 
-.portfolio-home::before {
-  inset: -14vh -12vw;
-  z-index: 0;
-  background:
-    radial-gradient(circle at var(--portfolio-pointer-x) var(--portfolio-pointer-y), color-mix(in oklch, var(--portfolio-cyan) 52%, transparent) 0%, color-mix(in oklch, #77eeff 28%, transparent) 18%, transparent 48%),
-    radial-gradient(circle at calc(var(--portfolio-pointer-x) + 8%) calc(var(--portfolio-pointer-y) + 6%), color-mix(in oklch, white 64%, transparent) 0%, color-mix(in oklch, #d9ffff 24%, transparent) 18%, transparent 34%),
-    radial-gradient(ellipse at 36% 36%, color-mix(in oklch, #5eeaff 36%, transparent) 0%, transparent 44%),
-    radial-gradient(ellipse at 76% 58%, color-mix(in oklch, #bff8ff 30%, transparent) 0%, transparent 48%),
-    radial-gradient(ellipse at 18% 82%, color-mix(in oklch, #b8ff70 22%, transparent) 0%, transparent 44%),
-    radial-gradient(circle at 74% 18%, color-mix(in oklch, var(--portfolio-cyan) 28%, transparent), transparent 36%),
-    radial-gradient(circle at 12% 86%, color-mix(in oklch, var(--portfolio-lime) 20%, transparent), transparent 38%),
-    radial-gradient(circle at 82% 82%, color-mix(in oklch, var(--portfolio-signal) 11%, transparent), transparent 34%),
-    linear-gradient(150deg, color-mix(in oklch, white 44%, transparent) 0%, transparent 62%);
-  background-size: 100% 100%, 100% 100%, 124% 118%, 136% 126%, 120% 116%, 112% 108%, 120% 112%, 128% 116%, 100% 100%;
-  mask-image: linear-gradient(90deg, transparent 0%, black 14%, black 88%, transparent 100%);
-  opacity: calc(0.64 + var(--portfolio-ripple-strength) * 0.24);
-  filter: blur(calc(0.26rem + var(--portfolio-ripple-strength) * 0.42rem)) saturate(1.24);
-  mix-blend-mode: normal;
-  transform: translate3d(0, 0, 0) scale(calc(1 + var(--portfolio-ripple-strength) * 0.006));
-  transition:
-    opacity 260ms ease,
-    filter 260ms ease,
-    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
-  animation: portfolio-track-drift 12s ease-in-out infinite alternate;
-}
-
+.portfolio-home::before,
 .portfolio-home::after {
-  content: "";
-  position: fixed;
-  left: var(--portfolio-pointer-x);
-  top: var(--portfolio-pointer-y);
-  z-index: 1;
-  display: block !important;
-  width: clamp(20rem, 42vw, 48rem);
-  aspect-ratio: 1;
-  border: 0;
-  border-radius: 9999px;
+  content: none !important;
+  display: none !important;
+}
+
+.portfolio-distortion-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(circle, transparent 0 29%, color-mix(in oklch, #020606 26%, transparent) 35%, transparent 43%),
-    radial-gradient(circle, transparent 0 46%, color-mix(in oklch, #020606 20%, transparent) 51%, transparent 62%),
-    radial-gradient(circle, color-mix(in oklch, white 34%, transparent) 0%, color-mix(in oklch, var(--portfolio-cyan) 42%, transparent) 18%, color-mix(in oklch, #72f2ff 28%, transparent) 34%, color-mix(in oklch, #b8ff70 12%, transparent) 50%, transparent 74%),
-    radial-gradient(circle, transparent 0 34%, color-mix(in oklch, #9ef6ff 20%, transparent) 46%, transparent 66%);
-  box-shadow:
-    0 0 5.4rem color-mix(in oklch, var(--portfolio-cyan) 34%, transparent),
-    0 0 9rem color-mix(in oklch, #b8ff70 12%, transparent);
-  filter: blur(0.8rem);
-  opacity: calc(0.2 + var(--portfolio-ripple-strength) * 0.78);
-  mix-blend-mode: normal;
-  transform: translate3d(-50%, -50%, 0) scale(var(--portfolio-ripple-scale));
-  transition:
-    left 120ms linear,
-    top 120ms linear,
-    opacity 580ms ease,
-    transform 960ms cubic-bezier(0.16, 1, 0.3, 1),
-    filter 580ms ease;
-  animation: portfolio-idle-ripple-breathe 5.4s ease-in-out infinite;
 }
 
-.portfolio-home.is-rippling::after {
-  filter: blur(1.18rem) saturate(1.16);
-}
-
-.portfolio-auto-ripple {
+.portfolio-distortion-ripple {
   position: fixed;
   left: var(--auto-ripple-x, 50%);
   top: var(--auto-ripple-y, 50%);
@@ -4371,34 +4295,50 @@ html[data-route-transition] .portfolio-flow-field span {
   display: block;
   width: var(--auto-ripple-size, 28rem);
   aspect-ratio: 1;
-  border-radius: 9999px;
+  border-radius: 9999px !important;
+  clip-path: circle(49% at 50% 50%);
+  -webkit-mask-image: radial-gradient(circle, black 0 58%, rgb(0 0 0 / 0.72) 68%, transparent 82%);
+  mask-image: radial-gradient(circle, black 0 58%, rgb(0 0 0 / 0.72) 68%, transparent 82%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  overflow: hidden;
   pointer-events: none;
   background:
-    radial-gradient(circle, transparent 0 26%, color-mix(in oklch, #020606 24%, transparent) 32%, transparent 39%),
-    radial-gradient(circle, transparent 0 45%, color-mix(in oklch, #020606 18%, transparent) 51%, transparent 61%),
-    radial-gradient(circle, color-mix(in oklch, white 20%, transparent) 0%, color-mix(in oklch, var(--portfolio-cyan) 30%, transparent) 20%, color-mix(in oklch, #72f2ff 22%, transparent) 38%, color-mix(in oklch, #b8ff70 10%, transparent) 54%, transparent 74%);
+    radial-gradient(circle, transparent 0 28%, color-mix(in oklch, white 28%, transparent) 31%, transparent 35%),
+    radial-gradient(circle, transparent 0 43%, color-mix(in oklch, var(--portfolio-cyan) 30%, transparent) 46%, transparent 54%),
+    radial-gradient(circle, color-mix(in oklch, white 10%, transparent) 0%, transparent 64%);
   box-shadow:
-    0 0 3.5rem color-mix(in oklch, var(--portfolio-cyan) 22%, transparent),
-    0 0 6rem color-mix(in oklch, #b8ff70 8%, transparent);
-  filter: blur(0.62rem);
+    inset 0 0 1.2rem color-mix(in oklch, white 18%, transparent),
+    inset 0 0 4rem color-mix(in oklch, var(--portfolio-cyan) 18%, transparent),
+    0 0 4.8rem color-mix(in oklch, var(--portfolio-cyan) 12%, transparent);
+  -webkit-backdrop-filter: blur(5px) saturate(1.24) contrast(1.08);
+  backdrop-filter: url("#portfolio-ripple-distortion") blur(5px) saturate(1.24) contrast(1.08);
   mix-blend-mode: normal;
   opacity: 0;
-  transform: translate3d(-50%, -50%, 0) scale(0.18) rotate(var(--auto-ripple-rotate, 0deg));
-  animation: portfolio-auto-ripple-spread var(--auto-ripple-duration, 3.2s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity, filter;
+  transform: translate3d(-50%, -50%, 0) scale(0.42) rotate(var(--auto-ripple-rotate, 0deg));
+  animation: portfolio-distortion-ripple-spread var(--auto-ripple-duration, 2.9s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter, backdrop-filter;
 }
 
-.dark .portfolio-auto-ripple {
+.portfolio-distortion-ripple--pointer {
+  z-index: 1;
+}
+
+.dark .portfolio-distortion-ripple {
   background:
-    radial-gradient(circle, transparent 0 25%, color-mix(in oklch, #000 36%, transparent) 32%, transparent 40%),
-    radial-gradient(circle, transparent 0 44%, color-mix(in oklch, #000 30%, transparent) 51%, transparent 62%),
-    radial-gradient(circle, color-mix(in oklch, white 13%, transparent) 0%, color-mix(in oklch, var(--portfolio-cyan) 36%, transparent) 20%, color-mix(in oklch, #72f2ff 28%, transparent) 38%, color-mix(in oklch, #b8ff70 9%, transparent) 54%, transparent 74%);
+    radial-gradient(circle, transparent 0 28%, color-mix(in oklch, white 20%, transparent) 31%, transparent 35%),
+    radial-gradient(circle, transparent 0 43%, color-mix(in oklch, var(--portfolio-cyan) 36%, transparent) 46%, transparent 54%),
+    radial-gradient(circle, color-mix(in oklch, white 8%, transparent) 0%, transparent 64%);
   box-shadow:
-    0 0 4.5rem color-mix(in oklch, var(--portfolio-cyan) 28%, transparent),
-    0 0 7rem color-mix(in oklch, #b8ff70 8%, transparent);
+    inset 0 0 1.4rem color-mix(in oklch, white 16%, transparent),
+    inset 0 0 4.4rem color-mix(in oklch, var(--portfolio-cyan) 22%, transparent),
+    0 0 5.4rem color-mix(in oklch, var(--portfolio-cyan) 18%, transparent);
+  mix-blend-mode: screen;
 }
 
-html[data-fx-calm="true"] .portfolio-auto-ripple {
+html[data-fx-calm="true"] .portfolio-distortion-ripple {
   display: none !important;
 }
 
@@ -4420,53 +4360,35 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
 }
 
 .dark .portfolio-home {
-  --background: oklch(0.145 0.028 204);
+  --background: oklch(0 0 0);
   --foreground: oklch(0.94 0.018 190);
-  --muted: oklch(0.22 0.026 204);
+  --muted: oklch(0.09 0.016 204);
   --muted-foreground: oklch(0.74 0.034 190);
-  --card: oklch(0.17 0.028 204);
+  --card: oklch(0.062 0.016 204);
   --card-foreground: oklch(0.96 0.014 190);
   --primary: oklch(0.78 0.13 195);
-  --secondary: oklch(0.24 0.034 202);
+  --secondary: oklch(0.094 0.022 202);
   --border: oklch(0.94 0.012 190 / 18%);
   --portfolio-cyan: #58e8ff;
   --portfolio-signal: #ff5c3a;
   --portfolio-lime: #d8ff48;
   --portfolio-ink: #f7fffb;
-  --portfolio-paper: #071416;
-  --portfolio-panel-mix: #061d21;
-  --portfolio-depth: #02242d;
-  background:
-    radial-gradient(circle at 72% 18%, color-mix(in oklch, var(--portfolio-cyan) 24%, transparent), transparent 36%),
-    radial-gradient(circle at 14% 86%, color-mix(in oklch, var(--portfolio-lime) 14%, transparent), transparent 40%),
-    radial-gradient(circle at 82% 82%, color-mix(in oklch, var(--portfolio-signal) 12%, transparent), transparent 38%),
-    linear-gradient(150deg, #020a0d 0%, #061b20 54%, #010506 100%);
+  --portfolio-paper: #000000;
+  --portfolio-panel-mix: #030606;
+  --portfolio-depth: #000000;
+  background: #000 !important;
+  background-image: none !important;
+  background-color: #000 !important;
 }
 
 .dark .portfolio-home::before {
-  background:
-    radial-gradient(circle at var(--portfolio-pointer-x) var(--portfolio-pointer-y), color-mix(in oklch, var(--portfolio-cyan) 56%, transparent) 0%, color-mix(in oklch, #77eeff 34%, transparent) 18%, transparent 50%),
-    radial-gradient(circle at calc(var(--portfolio-pointer-x) + 8%) calc(var(--portfolio-pointer-y) + 6%), color-mix(in oklch, #d9ffff 34%, transparent) 0%, transparent 34%),
-    radial-gradient(ellipse at 36% 36%, color-mix(in oklch, #5eeaff 34%, transparent) 0%, transparent 46%),
-    radial-gradient(ellipse at 76% 58%, color-mix(in oklch, #bff8ff 20%, transparent) 0%, transparent 50%),
-    radial-gradient(ellipse at 18% 82%, color-mix(in oklch, #b8ff70 14%, transparent) 0%, transparent 46%),
-    radial-gradient(circle at 74% 18%, color-mix(in oklch, var(--portfolio-cyan) 24%, transparent), transparent 38%),
-    radial-gradient(circle at 12% 86%, color-mix(in oklch, var(--portfolio-lime) 12%, transparent), transparent 40%),
-    radial-gradient(circle at 82% 82%, color-mix(in oklch, var(--portfolio-signal) 9%, transparent), transparent 36%),
-    linear-gradient(150deg, color-mix(in oklch, #0e3038 58%, transparent) 0%, transparent 64%);
-  opacity: calc(0.58 + var(--portfolio-ripple-strength) * 0.28);
-  filter: blur(calc(0.22rem + var(--portfolio-ripple-strength) * 0.46rem)) saturate(1.22);
+  content: none !important;
+  display: none !important;
 }
 
 .dark .portfolio-home::after {
-  background:
-    radial-gradient(circle, transparent 0 28%, color-mix(in oklch, #000 38%, transparent) 35%, transparent 44%),
-    radial-gradient(circle, transparent 0 45%, color-mix(in oklch, #000 30%, transparent) 51%, transparent 63%),
-    radial-gradient(circle, color-mix(in oklch, white 20%, transparent) 0%, color-mix(in oklch, var(--portfolio-cyan) 48%, transparent) 18%, color-mix(in oklch, #72f2ff 34%, transparent) 34%, color-mix(in oklch, #b8ff70 12%, transparent) 52%, transparent 74%),
-    radial-gradient(circle, transparent 0 34%, color-mix(in oklch, #9ef6ff 24%, transparent) 46%, transparent 66%);
-  box-shadow:
-    0 0 6.2rem color-mix(in oklch, var(--portfolio-cyan) 34%, transparent),
-    0 0 10rem color-mix(in oklch, #b8ff70 10%, transparent);
+  content: none !important;
+  display: none !important;
 }
 
 .dark .portfolio-theme-toggle [data-theme-toggle] {
@@ -4504,8 +4426,10 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
 
 .portfolio-shell--cinematic {
   width: min(100% - 2rem, 104rem);
+  max-width: calc(100vw - 2rem);
   margin: 0 auto;
   letter-spacing: 0;
+  overflow-x: clip;
 }
 
 .portfolio-topbar {
@@ -4595,6 +4519,7 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
   min-height: 100svh;
   padding: clamp(1.5rem, 3.2vw, 3rem) 0 clamp(3.2rem, 5vw, 4.8rem);
   perspective: 1400px;
+  overflow: hidden;
 }
 
 .portfolio-hero-copy,
@@ -4607,6 +4532,8 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
 
 .portfolio-hero-copy {
   align-self: center;
+  width: 100%;
+  min-width: 0;
   max-width: 70rem;
 }
 
@@ -5092,6 +5019,7 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
   inset: auto -18vw -0.7rem -18vw;
   display: grid;
   gap: 0.28rem;
+  max-width: none;
   overflow: hidden;
   pointer-events: none;
   transform: skewY(-1.2deg);
@@ -5603,6 +5531,7 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
 @media (max-width: 1023px) {
   .portfolio-shell--cinematic {
     width: min(100% - 1rem, 58rem);
+    max-width: calc(100vw - 1rem);
   }
 
   .portfolio-topbar {
@@ -5618,6 +5547,13 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
     grid-template-columns: 1fr;
     min-height: 100svh;
     padding: 1.4rem 0 3.2rem;
+    overflow: hidden;
+  }
+
+  .portfolio-hero-copy {
+    width: 100%;
+    max-width: min(100%, 42rem);
+    min-width: 0;
   }
 
   .portfolio-track-panel {
@@ -5642,7 +5578,15 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
   }
 
   .portfolio-hero-marquee {
+    min-width: max(54rem, 180vw);
     font-size: 4.5rem;
+  }
+
+  .portfolio-speed-marquees {
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: 100%;
+    transform: skewY(-1.2deg);
   }
 
   .portfolio-workstream {
@@ -5680,10 +5624,14 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
 
   .portfolio-category-rails {
     width: 100%;
+    max-width: 100%;
+    overflow: visible;
   }
 
   .portfolio-category-rail:nth-child(even) {
-    width: calc(100% - 0.8rem);
+    justify-self: stretch;
+    width: 100%;
+    animation-name: portfolio-rail-enter-mobile;
   }
 
   .portfolio-project,
@@ -5694,6 +5642,27 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
 }
 
 @media (max-width: 640px) {
+  .portfolio-home {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+
+  .portfolio-shell--cinematic {
+    width: calc(100% - 1rem);
+    max-width: calc(100vw - 1rem);
+  }
+
+  .portfolio-race-hero {
+    min-height: auto;
+    padding: 4.6rem 0 2.4rem;
+  }
+
+  .portfolio-hero-copy {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .portfolio-topbar {
     grid-template-columns: minmax(0, 1fr) auto;
     min-height: 4.35rem;
@@ -5708,7 +5677,8 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
   }
 
   .portfolio-home-title {
-    font-size: 3.9rem;
+    max-width: 8.5ch;
+    font-size: clamp(3.05rem, 15vw, 3.9rem);
   }
 
   .portfolio-hero-role {
@@ -5721,11 +5691,14 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
   }
 
   .portfolio-hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.5rem;
     margin-top: 0.9rem;
   }
 
   .portfolio-action {
+    width: 100%;
     min-height: 2.6rem;
     padding: 0.72rem 0.9rem;
     font-size: 0.78rem;
@@ -5733,13 +5706,24 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
 
   .portfolio-category-rails {
     gap: 0.26rem;
+    width: 100%;
+    max-width: 100%;
     margin-top: 0.78rem;
   }
 
   .portfolio-category-rail {
     grid-template-columns: 1.85rem minmax(0, 1fr) auto;
+    justify-self: stretch;
+    width: 100%;
     min-height: 2.12rem;
     padding: 0.34rem 0.58rem;
+    transform: none;
+    animation-name: portfolio-rail-enter-mobile;
+  }
+
+  .portfolio-category-rail:nth-child(even) {
+    justify-self: stretch;
+    width: 100%;
   }
 
   .portfolio-category-rail strong {
@@ -5769,7 +5753,15 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
   }
 
   .portfolio-hero-marquee {
-    font-size: 3rem;
+    min-width: max(42rem, 220vw);
+    font-size: clamp(2.2rem, 13vw, 3rem);
+  }
+
+  .portfolio-speed-marquees {
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: 100%;
+    transform: none;
   }
 
   .portfolio-scroll-cue {
@@ -5828,64 +5820,28 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
   }
 }
 
-@keyframes portfolio-track-drift {
+@keyframes portfolio-distortion-ripple-spread {
   0% {
-    background-position: 50% 50%, 52% 48%, 34% 38%, 76% 58%, 18% 82%, 52% 48%, 50% 50%, 50% 50%, 0 0;
-    background-size: 100% 100%, 100% 100%, 124% 118%, 136% 126%, 120% 116%, 112% 108%, 120% 112%, 128% 116%, 100% 100%;
-    transform: translate3d(-1.2rem, 0, 0) skewX(-0.5deg) scale(calc(1 + var(--portfolio-ripple-strength) * 0.006));
+    opacity: 0;
+    filter: blur(0.18rem);
+    transform: translate3d(-50%, -50%, 0) scale(0.42) rotate(var(--auto-ripple-rotate, 0deg));
+  }
+
+  18% {
+    opacity: var(--auto-ripple-opacity, 0.5);
+    filter: blur(0.24rem) saturate(1.14);
   }
 
   52% {
-    background-position: 51% 49%, 50% 52%, 42% 32%, 68% 64%, 24% 74%, 58% 52%, 8rem -5rem, -6rem 4rem, 0 0;
-    background-size: 112% 110%, 108% 108%, 146% 138%, 132% 124%, 138% 130%, 120% 116%, 120% 112%, 140% 128%, 100% 100%;
-    transform: translate3d(0.5rem, -0.55rem, 0) skewX(0.18deg) scale(calc(1.018 + var(--portfolio-ripple-strength) * 0.008));
-  }
-
-  100% {
-    background-position: 54% 47%, 48% 53%, 45% 44%, 72% 50%, 14% 88%, 58% 52%, 8rem -5rem, -6rem 4rem, 0 0;
-    background-size: 104% 106%, 112% 108%, 118% 114%, 144% 134%, 126% 120%, 116% 112%, 116% 108%, 136% 124%, 100% 100%;
-    transform: translate3d(1.35rem, -0.85rem, 0) skewX(0.45deg) scale(calc(1.01 + var(--portfolio-ripple-strength) * 0.008));
-  }
-}
-
-@keyframes portfolio-idle-ripple-breathe {
-  0%,
-  100% {
-    filter: blur(0.85rem);
-    box-shadow:
-      0 0 4.2rem color-mix(in oklch, var(--portfolio-cyan) 28%, transparent),
-      0 0 7rem color-mix(in oklch, #b8ff70 10%, transparent);
-  }
-
-  50% {
-    filter: blur(1.7rem) saturate(1.2);
-    box-shadow:
-      0 0 7rem color-mix(in oklch, var(--portfolio-cyan) 42%, transparent),
-      0 0 11rem color-mix(in oklch, #b8ff70 18%, transparent);
-  }
-}
-
-@keyframes portfolio-auto-ripple-spread {
-  0% {
-    opacity: 0;
-    filter: blur(0.28rem);
-    transform: translate3d(-50%, -50%, 0) scale(0.16) rotate(var(--auto-ripple-rotate, 0deg));
-  }
-
-  16% {
-    opacity: var(--auto-ripple-opacity, 0.5);
-  }
-
-  58% {
     opacity: calc(var(--auto-ripple-opacity, 0.5) * 0.76);
-    filter: blur(0.82rem) saturate(1.12);
-    transform: translate3d(-50%, -50%, 0) scale(1.08) rotate(calc(var(--auto-ripple-rotate, 0deg) + 5deg));
+    filter: blur(0.34rem) saturate(1.18);
+    transform: translate3d(-50%, -50%, 0) scale(1.34) rotate(calc(var(--auto-ripple-rotate, 0deg) + 5deg));
   }
 
   100% {
     opacity: 0;
-    filter: blur(1.45rem);
-    transform: translate3d(-50%, -50%, 0) scale(1.86) rotate(calc(var(--auto-ripple-rotate, 0deg) + 12deg));
+    filter: blur(0.62rem);
+    transform: translate3d(-50%, -50%, 0) scale(1.68) rotate(calc(var(--auto-ripple-rotate, 0deg) + 10deg));
   }
 }
 
@@ -5985,6 +5941,26 @@ html[data-fx-calm="true"] .portfolio-auto-ripple {
   100% {
     opacity: 1;
     transform: translateX(0) scaleX(1) skewX(-8deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes portfolio-rail-enter-mobile {
+  0% {
+    opacity: 0;
+    transform: translateY(0.6rem) scaleY(0.72);
+    filter: blur(0.4rem);
+  }
+
+  64% {
+    opacity: 1;
+    transform: translateY(-0.08rem) scaleY(1.02);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
     filter: blur(0);
   }
 }
@@ -6448,7 +6424,7 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
     transform: none !important;
   }
 
-  .portfolio-auto-ripple {
+  .portfolio-distortion-ripple {
     display: none !important;
   }
 }
