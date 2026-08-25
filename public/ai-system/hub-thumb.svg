@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="AI 資源整合 App 架構圖">
+  <defs>
+    <linearGradient id="hubBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a14"/>
+      <stop offset="100%" stop-color="#141026"/>
+    </linearGradient>
+    <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#818cf8" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      .t { font-family: 'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif; }
+      .m { font-family: 'JetBrains Mono','Consolas',monospace; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#hubBg)"/>
+  <circle cx="800" cy="580" r="420" fill="url(#hubGlow)"/>
+  <g stroke="#818cf8" stroke-opacity="0.06">
+    <circle cx="800" cy="580" r="180" fill="none"/>
+    <circle cx="800" cy="580" r="290" fill="none"/>
+    <circle cx="800" cy="580" r="400" fill="none"/>
+  </g>
+
+  <text class="m" x="80" y="92" fill="#818cf8" font-size="22" letter-spacing="6">AI RESOURCE HUB</text>
+  <text class="t" x="80" y="160" fill="#f2f0ff" font-size="56" font-weight="700">AI 資源整合 App</text>
+  <text class="t" x="80" y="208" fill="#9b96bd" font-size="24">把散落各處的模型、工具與提示詞收斂成單一入口</text>
+
+  <g class="t" stroke="#818cf8" stroke-opacity="0.35" stroke-width="1.5" fill="none">
+    <path d="M800 470 L360 360"/>
+    <path d="M800 470 L1240 360"/>
+    <path d="M760 700 L360 810"/>
+    <path d="M840 700 L1240 810"/>
+    <path d="M660 580 L250 580"/>
+    <path d="M940 580 L1350 580"/>
+  </g>
+
+  <g class="t">
+    <rect x="640" y="470" width="320" height="220" rx="20" fill="#1a1730" stroke="#818cf8" stroke-opacity="0.8" stroke-width="2"/>
+    <text x="800" y="546" fill="#f0abfc" font-size="20" text-anchor="middle" class="m" letter-spacing="4">CORE</text>
+    <text x="800" y="600" fill="#f2f0ff" font-size="34" font-weight="700" text-anchor="middle">統一調度層</text>
+    <text x="800" y="642" fill="#9b96bd" font-size="20" text-anchor="middle">路由 / 憑證 / 用量</text>
+  </g>
+
+  <g class="t">
+    <g>
+      <rect x="180" y="296" width="300" height="128" rx="14" fill="#15132a" stroke="#818cf8" stroke-opacity="0.4"/>
+      <text x="208" y="346" fill="#f2f0ff" font-size="25" font-weight="600">模型供應商</text>
+      <text x="208" y="384" fill="#9b96bd" font-size="19">多家 API 收斂為同一介面</text>
+    </g>
+    <g>
+      <rect x="1120" y="296" width="300" height="128" rx="14" fill="#15132a" stroke="#818cf8" stroke-opacity="0.4"/>
+      <text x="1148" y="346" fill="#f2f0ff" font-size="25" font-weight="600">提示詞庫</text>
+      <text x="1148" y="384" fill="#9b96bd" font-size="19">可版本化、可複用的模板</text>
+    </g>
+    <g>
+      <rect x="60" y="516" width="300" height="128" rx="14" fill="#15132a" stroke="#818cf8" stroke-opacity="0.4"/>
+      <text x="88" y="566" fill="#f2f0ff" font-size="25" font-weight="600">工具與外掛</text>
+      <text x="88" y="604" fill="#9b96bd" font-size="19">MCP / 本機腳本註冊</text>
+    </g>
+    <g>
+      <rect x="1240" y="516" width="300" height="128" rx="14" fill="#15132a" stroke="#818cf8" stroke-opacity="0.4"/>
+      <text x="1268" y="566" fill="#f2f0ff" font-size="25" font-weight="600">知識來源</text>
+      <text x="1268" y="604" fill="#9b96bd" font-size="19">檔案、筆記與外部資料</text>
+    </g>
+    <g>
+      <rect x="180" y="746" width="300" height="128" rx="14" fill="#15132a" stroke="#f0abfc" stroke-opacity="0.4"/>
+      <text x="208" y="796" fill="#f2f0ff" font-size="25" font-weight="600">用量與成本</text>
+      <text x="208" y="834" fill="#9b96bd" font-size="19">單一儀表看完所有支出</text>
+    </g>
+    <g>
+      <rect x="1120" y="746" width="300" height="128" rx="14" fill="#15132a" stroke="#f0abfc" stroke-opacity="0.4"/>
+      <text x="1148" y="796" fill="#f2f0ff" font-size="25" font-weight="600">工作流編排</text>
+      <text x="1148" y="834" fill="#9b96bd" font-size="19">把資源串成可重跑的任務</text>
+    </g>
+  </g>
+
+  <text class="m" x="80" y="944" fill="#3d3760" font-size="18">PLACEHOLDER DIAGRAM — 待實際 App 畫面替換</text>
+</svg>

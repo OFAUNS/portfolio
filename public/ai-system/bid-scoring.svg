@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="標案三維評分與決策閘門">
+  <defs>
+    <linearGradient id="scBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#070d12"/>
+      <stop offset="100%" stop-color="#0d1a20"/>
+    </linearGradient>
+    <style>
+      .t { font-family: 'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif; }
+      .m { font-family: 'JetBrains Mono','Consolas',monospace; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#scBg)"/>
+  <text class="m" x="80" y="88" fill="#22d3ee" font-size="20" letter-spacing="6">SCORING GATE</text>
+  <text class="t" x="80" y="146" fill="#eaf6f8" font-size="44" font-weight="700">三維評分與決策閘門</text>
+  <line x1="80" y1="184" x2="1520" y2="184" stroke="#22d3ee" stroke-opacity="0.3" stroke-width="2"/>
+
+  <g class="t">
+    <g>
+      <rect x="80" y="240" width="440" height="300" rx="16" fill="#0f1f26" stroke="#22d3ee" stroke-opacity="0.4"/>
+      <text x="112" y="296" fill="#eaf6f8" font-size="30" font-weight="600">契合度</text>
+      <text x="112" y="334" fill="#7f9aa3" font-size="20">公司領域與標案需求的重疊程度</text>
+      <g>
+        <rect x="112" y="374" width="376" height="14" rx="7" fill="#16323b"/>
+        <rect x="112" y="374" width="316" height="14" rx="7" fill="#22d3ee"/>
+        <text class="m" x="112" y="424" fill="#22d3ee" font-size="22">4 / 5</text>
+      </g>
+      <text x="112" y="478" fill="#7f9aa3" font-size="19">· 技術項目命中率</text>
+      <text x="112" y="510" fill="#7f9aa3" font-size="19">· 資格門檻是否卡住</text>
+    </g>
+
+    <g>
+      <rect x="560" y="240" width="440" height="300" rx="16" fill="#0f1f26" stroke="#a3e635" stroke-opacity="0.4"/>
+      <text x="592" y="296" fill="#eaf6f8" font-size="30" font-weight="600">效益</text>
+      <text x="592" y="334" fill="#7f9aa3" font-size="20">得標後的實質報酬與延伸價值</text>
+      <g>
+        <rect x="592" y="374" width="376" height="14" rx="7" fill="#2a3218"/>
+        <rect x="592" y="374" width="256" height="14" rx="7" fill="#a3e635"/>
+        <text class="m" x="592" y="424" fill="#a3e635" font-size="22">3 / 5</text>
+      </g>
+      <text x="592" y="478" fill="#7f9aa3" font-size="19">· 契約金額與利潤空間</text>
+      <text x="592" y="510" fill="#7f9aa3" font-size="19">· 可否轉為長期實績</text>
+    </g>
+
+    <g>
+      <rect x="1040" y="240" width="480" height="300" rx="16" fill="#0f1f26" stroke="#f97066" stroke-opacity="0.4"/>
+      <text x="1072" y="296" fill="#eaf6f8" font-size="30" font-weight="600">成本風險</text>
+      <text x="1072" y="334" fill="#7f9aa3" font-size="20">投標投入與履約失敗的代價</text>
+      <g>
+        <rect x="1072" y="374" width="416" height="14" rx="7" fill="#33201e"/>
+        <rect x="1072" y="374" width="166" height="14" rx="7" fill="#f97066"/>
+        <text class="m" x="1072" y="424" fill="#f97066" font-size="22">2 / 5</text>
+      </g>
+      <text x="1072" y="478" fill="#7f9aa3" font-size="19">· 文件製作工時</text>
+      <text x="1072" y="510" fill="#7f9aa3" font-size="19">· 履約期程與人力缺口</text>
+    </g>
+  </g>
+
+  <g class="t">
+    <rect x="80" y="596" width="1440" height="170" rx="16" fill="#0b161b" stroke="#a3e635" stroke-opacity="0.3"/>
+    <text class="m" x="112" y="644" fill="#a3e635" font-size="18" letter-spacing="4">GATE OUTPUT</text>
+    <text x="112" y="694" fill="#eaf6f8" font-size="27">三軸皆達門檻 → 進入提案產出；任一軸不過 → 產出「不投標理由書」歸檔為組織記憶。</text>
+    <text x="112" y="736" fill="#7f9aa3" font-size="21">落標案件同樣回寫記憶庫，讓下一次評分的基準會隨著實際結果收斂。</text>
+  </g>
+
+  <text class="m" x="80" y="852" fill="#334b52" font-size="18">PLACEHOLDER DIAGRAM — 待實際系統畫面替換</text>
+</svg>

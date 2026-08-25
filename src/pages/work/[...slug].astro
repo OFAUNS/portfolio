@@ -67,14 +67,100 @@ const embedUrl = isYouTubeUrl(rawVideoUrl) ? getEmbedUrl(rawVideoUrl) : undefine
 const displayYear = new Date(entry.data.date).getFullYear();
 const mediaLabel = embedUrl || directVideoUrl ? "Featured Motion" : "Featured Image";
 const caseStyle = `--case-accent: ${presentation.accent}; --case-accent-2: ${presentation.accent2};`;
+const CODE_LAYOUTS = ["product", "system", "workflow", "hub", "telemetry"];
 const themeVariant =
     presentation.layout === "projection"
         ? "projection"
-        : presentation.layout === "product" || presentation.layout === "system"
+        : CODE_LAYOUTS.includes(presentation.layout)
           ? "code"
           : presentation.layout === "installation"
             ? "sensor"
             : "edit";
+const codeCopyByLayout: Record<string, { eyebrow: string; title: string; status: string; log: string }> = {
+    product: {
+        eyebrow: "AI Runtime",
+        title: "AI 鷹架遊戲終端",
+        status: "LLM role scaffold / cryptography puzzle",
+        log: "boot ai_peer.js|mentor.role=guided|judge.feedback=locked|cipher.caesar.shift=3|session.flow=active",
+    },
+    system: {
+        eyebrow: "Web Runtime",
+        title: "救災網站後端終端",
+        status: "PHP route / MySQL upload pipeline",
+        log: "php artisan route:list|mysql INSERT rescue_report|jquery upload ok|storm_feed sync|dashboard render",
+    },
+    workflow: {
+        eyebrow: "Pipeline Runtime",
+        title: "標案流水線排程台",
+        status: "tender scan / rfp parse / score gate",
+        log: "cron tender.scan 06:00|fetch 42 new tenders|parse rfp > 18 conditions|match memory 7 hits|score fit=4 value=3 risk=2|gate PASS|render proposal.docx",
+    },
+    hub: {
+        eyebrow: "Router Runtime",
+        title: "AI 資源調度終端",
+        status: "provider route / credential vault / usage meter",
+        log: "load registry 34 resources|route model=long-summary|vault unlock provider_key|prompt v3 resolved|usage 62% of budget|dispatch ok",
+    },
+    telemetry: {
+        eyebrow: "Telemetry Runtime",
+        title: "VR 學習事件監控終端",
+        status: "event ingest / metric rollup / alert rules",
+        log: "ingest 24 headsets online|event lv03.fail x5 uid=S-021|rollup completion 63%|alert THRESHOLD_HIT|replay session ready|reconnect S-009 backfilled",
+    },
+};
+const codePanelByLayout: Record<string, { file: string; lines: string[] }> = {
+    product: {
+        file: "ai_scaffold.ts",
+        lines: [
+            'const roles = ["peer", "mentor", "judge"];',
+            'cipher.lock("caesar", puzzle.shift);',
+            'ai.reply({ hintOnly: true, anxiety: "low" });',
+            'flow.save("classroom", player.memory);',
+            "renderPhoneQuest(scene, scaffold);",
+        ],
+    },
+    system: {
+        file: "rescue_api.php",
+        lines: [
+            "$report = RescueReport::fromUpload($form);",
+            '$db->insert("typhoon_cases", $report);',
+            "syncShelterMap($city, $severity);",
+            'renderDashboard("storm-feed");',
+            'echo json_encode(["status" => "ready"]);',
+        ],
+    },
+    workflow: {
+        file: "bid_pipeline.n8n.json",
+        lines: [
+            'const tenders = await scan("gov-eprocurement");',
+            "const rfp = parseRequirements(tender.document);",
+            'const past = memory.match(rfp, { limit: 5 });',
+            "const score = rate(rfp, past); // fit / value / risk",
+            'if (score.passes) draftProposal("docx", rfp, past);',
+        ],
+    },
+    hub: {
+        file: "resource_router.ts",
+        lines: [
+            "const registry = await loadResources();",
+            'const model = registry.resolve("long-summary");',
+            'const prompt = prompts.version("bid-brief", "v3");',
+            "const key = vault.lease(model.provider);",
+            "return dispatch({ model, prompt, key, budget });",
+        ],
+    },
+    telemetry: {
+        file: "vr_telemetry.ts",
+        lines: [
+            "ingest(headset.id, event); // level, action, dwell",
+            "const rollup = metrics.byClass(sessionId);",
+            "if (student.fails >= threshold(level)) raiseAlert(student);",
+            "buffer.flushOnReconnect(headset.id);",
+            "return console.render(rollup, alerts);",
+        ],
+    },
+};
+const codePanel = codePanelByLayout[presentation.layout] || codePanelByLayout.system;
 const themeCopy = {
     projection: {
         eyebrow: "Projection Console",
@@ -82,21 +168,7 @@ const themeCopy = {
         status: "Plane mapping / light pass / calibration",
         log: "INIT PROJECTOR_01|SCAN PLANE_A 16:9|MAP EDGE POINTS|SYNC AE OUTPUT|RUN LUMA PASS",
     },
-    code: {
-        eyebrow: presentation.layout === "product" ? "AI Runtime" : "Web Runtime",
-        title:
-            presentation.layout === "product"
-                ? "AI 鷹架遊戲終端"
-                : "救災網站後端終端",
-        status:
-            presentation.layout === "product"
-                ? "LLM role scaffold / cryptography puzzle"
-                : "PHP route / MySQL upload pipeline",
-        log:
-            presentation.layout === "product"
-                ? "boot ai_peer.js|mentor.role=guided|judge.feedback=locked|cipher.caesar.shift=3|session.flow=active"
-                : "php artisan route:list|mysql INSERT rescue_report|jquery upload ok|storm_feed sync|dashboard render",
-    },
+    code: codeCopyByLayout[presentation.layout] || codeCopyByLayout.system,
     sensor: {
         eyebrow: "TouchDesigner Patch",
         title: "身體感測與殘影畫布",
@@ -318,30 +390,12 @@ const themeCopy = {
                                     <span></span>
                                     <span></span>
                                     <span></span>
-                                    <strong>
-                                        {presentation.layout === "product"
-                                            ? "ai_scaffold.ts"
-                                            : "rescue_api.php"}
-                                    </strong>
+                                    <strong>{codePanel.file}</strong>
                                 </div>
                                 <ol>
-                                    {presentation.layout === "product" ? (
-                                        <>
-                                            <li><code>const roles = ["peer", "mentor", "judge"];</code></li>
-                                            <li><code>cipher.lock("caesar", puzzle.shift);</code></li>
-                                            <li><code>ai.reply(&#123; hintOnly: true, anxiety: "low" &#125;);</code></li>
-                                            <li><code>flow.save("classroom", player.memory);</code></li>
-                                            <li><code>renderPhoneQuest(scene, scaffold);</code></li>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <li><code>$report = RescueReport::fromUpload($form);</code></li>
-                                            <li><code>$db-&gt;insert("typhoon_cases", $report);</code></li>
-                                            <li><code>syncShelterMap($city, $severity);</code></li>
-                                            <li><code>renderDashboard("storm-feed");</code></li>
-                                            <li><code>echo json_encode(["status" =&gt; "ready"]);</code></li>
-                                        </>
-                                    )}
+                                    {codePanel.lines.map((line) => (
+                                        <li><code>{line}</code></li>
+                                    ))}
                                 </ol>
                             </div>
                             <div class="theme-terminal-panel">
