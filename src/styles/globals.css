@@ -5898,17 +5898,61 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   --gg-y: calc((100vh - var(--gg-h)) / 2);
   --gg-accent: #5ddcff;
   --gg-progress: 5000ms;
+  /* accent 多半是亮色，直接畫在亮色主題的近白背景上會整條消失。
+     線條、弧線、序號一律用這個壓深過的墨色，暗色主題才用原本的 accent。 */
+  --gg-ink: color-mix(in oklch, var(--gg-accent) 55%, #06202b 45%);
 }
 
+html.dark {
+  --gg-ink: var(--gg-accent);
+}
+
+/* screen 混色在近白背景上等於不存在，亮色主題改用 multiply 才看得到水 */
+html:not(.dark) #water-field {
+  mix-blend-mode: multiply;
+}
+
+/* 頁面最外層容器多半是不透明的（例如 .portfolio-home 是整片黑），
+   而 #page-content 的 z-index 是 2。格線與水波若排在它下面，等於整片
+   被蓋住——先前只有 404 看得到就是因為那一頁的容器沒有背景色。
+   所以這兩層都要抬到內容之上，靠 pointer-events: none 保持可點。 */
 .golden-grid {
   position: fixed;
   left: var(--gg-x);
   top: var(--gg-y);
   width: var(--gg-w);
   height: var(--gg-h);
-  z-index: 1;
+  z-index: 4;
   pointer-events: none;
   perspective: 1600px;
+  animation: gg-grid-settle var(--gg-progress) ease-out both;
+}
+
+#water-field {
+  z-index: 3;
+}
+
+/* 五秒進程期間滿強度，畫完之後降下來，讓內容維持可讀但結構還在 */
+@keyframes gg-grid-settle {
+  0%,
+  74% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.62;
+  }
+}
+
+@keyframes gg-water-settle {
+  0%,
+  74% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
 }
 
 .golden-cell {
@@ -5926,10 +5970,10 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
 /* --- 格線本體：實線 + 角標，強度拉到看得見為止 --- */
 
 .golden-cell__edge {
-  border: 1.5px solid color-mix(in oklch, var(--gg-accent) 58%, transparent);
+  border: 1.5px solid color-mix(in oklch, var(--gg-ink) 58%, transparent);
   box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--gg-accent) 10%, transparent),
-    0 0 22px color-mix(in oklch, var(--gg-accent) 12%, transparent);
+    inset 0 0 0 1px color-mix(in oklch, var(--gg-ink) 10%, transparent),
+    0 0 22px color-mix(in oklch, var(--gg-ink) 12%, transparent);
 }
 
 /* 角標：四個角各露一小段更亮的線，讓方格的「被畫出來」更明確 */
@@ -5939,7 +5983,7 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   position: absolute;
   width: 14%;
   height: 14%;
-  border: 2.5px solid var(--gg-accent);
+  border: 2.5px solid var(--gg-ink);
 }
 
 .golden-cell__edge::before {
@@ -5957,15 +6001,15 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
 }
 
 .golden-cell--stage .golden-cell__edge {
-  border-color: color-mix(in oklch, var(--gg-accent) 78%, transparent);
+  border-color: color-mix(in oklch, var(--gg-ink) 78%, transparent);
 }
 
 .golden-cell--field .golden-cell__edge {
-  border-color: color-mix(in oklch, var(--gg-accent) 68%, transparent);
+  border-color: color-mix(in oklch, var(--gg-ink) 68%, transparent);
 }
 
 .golden-cell--chip .golden-cell__edge {
-  border-color: color-mix(in oklch, var(--gg-accent) 46%, transparent);
+  border-color: color-mix(in oklch, var(--gg-ink) 46%, transparent);
 }
 
 /* 序號：標示這一格在螺旋上的順序 */
@@ -5976,7 +6020,7 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   font-family: "Space Grotesk", monospace;
   font-size: clamp(0.6rem, 0.9vw, 0.85rem);
   letter-spacing: 0.18em;
-  color: color-mix(in oklch, var(--gg-accent) 72%, transparent);
+  color: color-mix(in oklch, var(--gg-ink) 72%, transparent);
   opacity: 0;
   animation: gg-tick-in 420ms ease-out var(--gg-delay, 0ms) both;
 }
@@ -5988,7 +6032,7 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   background:
     radial-gradient(
       circle at 30% 30%,
-      color-mix(in oklch, var(--gg-accent) 26%, transparent),
+      color-mix(in oklch, var(--gg-ink) 26%, transparent),
       transparent 62%
     );
   animation: gg-wave-in var(--gg-step, 700ms) ease-out var(--gg-delay, 0ms) both;
@@ -5998,7 +6042,7 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   content: "";
   position: absolute;
   inset: 8%;
-  border: 1px solid color-mix(in oklch, var(--gg-accent) 34%, transparent);
+  border: 1px solid color-mix(in oklch, var(--gg-ink) 34%, transparent);
   border-radius: 999px;
   opacity: 0;
   animation: gg-wave-ring var(--gg-step, 700ms) cubic-bezier(0.2, 0.7, 0.3, 1)
@@ -6060,11 +6104,11 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
 }
 
 .golden-spiral__arc {
-  stroke: var(--gg-accent);
+  stroke: var(--gg-ink);
   stroke-width: 2.5;
   stroke-linecap: round;
   fill: none;
-  filter: drop-shadow(0 0 8px color-mix(in oklch, var(--gg-accent) 45%, transparent));
+  filter: drop-shadow(0 0 8px color-mix(in oklch, var(--gg-ink) 45%, transparent));
   stroke-dasharray: var(--arc-len) var(--arc-len);
   stroke-dashoffset: var(--arc-len);
   animation: gg-arc-draw var(--gg-step, 700ms) cubic-bezier(0.5, 0, 0.5, 1)

@@ -50,7 +50,9 @@ const sweepFrames = cells
 const pageStyle =
     `:root{--gg-accent:${accent};--gg-progress:${PROGRESS_MS}ms}` +
     `@keyframes ${sweepName}{${sweepFrames}}` +
-    `#water-field{animation:${sweepName} var(--gg-progress) steps(1,end) 1 both;clip-path:${clipFor(cells[0])}}`;
+    `#water-field{animation:${sweepName} var(--gg-progress) steps(1,end) 1 both,`
+    + `gg-water-settle var(--gg-progress) ease-out 1 both;`
+    + `clip-path:${clipFor(cells[0])}}`;
 ---
 
 <style is:global set:html={pageStyle}></style>
