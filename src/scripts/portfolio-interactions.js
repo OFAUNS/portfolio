@@ -973,7 +973,10 @@ import { water, ticker } from "./water-field.js";
 
                 window.__portfolioFxMount = mountEnhancements;
 
-                // ClientRouter 只執行 module script 一次，之後每次導覽都靠 astro:page-load
+                // ClientRouter 只執行 module script 一次，之後每次導覽都要自己重掛。
+                // 用 after-swap 而不是 page-load：page-load 會等整段 view transition
+                // 播完才觸發，而方格蒙太奇有兩秒多，特效會晚兩秒才接上。
+                // mountEnhancements 每次都會先跑上一輪的 cleanup，重複呼叫是安全的。
                 mountEnhancements();
-                document.addEventListener("astro:page-load", mountEnhancements);
+                document.addEventListener("astro:after-swap", mountEnhancements);
             })();

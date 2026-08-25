@@ -5886,6 +5886,7 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
    黃金比例方格系統
    同一套格線負責兩件事：頁面的結構骨架，以及轉場時的分割單位。
    方格邊長是 1 : 1/φ : 1/φ² … 的等比遞減（見 src/lib/goldenGrid.ts）。
+   螺旋弧線是主進程：五秒鐘依序畫完，方格的水波也跟著逐格點亮。
    ========================================================================== */
 
 :root {
@@ -5895,11 +5896,8 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   --gg-h: max(100vh, calc(100vw / var(--gg-phi)));
   --gg-x: calc((100vw - var(--gg-w)) / 2);
   --gg-y: calc((100vh - var(--gg-h)) / 2);
-  /* GoldenGrid.astro 逐頁覆寫這三個 */
-  --gg-field-x: 0;
-  --gg-field-y: 0;
-  --gg-field-size: 0.382;
   --gg-accent: #5ddcff;
+  --gg-progress: 5000ms;
 }
 
 .golden-grid {
@@ -5910,8 +5908,7 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   height: var(--gg-h);
   z-index: 1;
   pointer-events: none;
-  perspective: 1400px;
-  contain: strict;
+  perspective: 1600px;
 }
 
 .golden-cell {
@@ -5920,40 +5917,170 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   transform-style: preserve-3d;
 }
 
-.golden-cell__edge {
+.golden-cell__edge,
+.golden-cell__wave {
   position: absolute;
   inset: 0;
-  border: 1px solid color-mix(in oklch, var(--gg-accent) 22%, transparent);
 }
 
-/* 最大格是主進程所在，邊界要最實 */
+/* --- 格線本體：實線 + 角標，強度拉到看得見為止 --- */
+
+.golden-cell__edge {
+  border: 1.5px solid color-mix(in oklch, var(--gg-accent) 58%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--gg-accent) 10%, transparent),
+    0 0 22px color-mix(in oklch, var(--gg-accent) 12%, transparent);
+}
+
+/* 角標：四個角各露一小段更亮的線，讓方格的「被畫出來」更明確 */
+.golden-cell__edge::before,
+.golden-cell__edge::after {
+  content: "";
+  position: absolute;
+  width: 14%;
+  height: 14%;
+  border: 2.5px solid var(--gg-accent);
+}
+
+.golden-cell__edge::before {
+  top: -1.5px;
+  left: -1.5px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.golden-cell__edge::after {
+  right: -1.5px;
+  bottom: -1.5px;
+  border-left: 0;
+  border-top: 0;
+}
+
 .golden-cell--stage .golden-cell__edge {
-  border-color: color-mix(in oklch, var(--gg-accent) 34%, transparent);
+  border-color: color-mix(in oklch, var(--gg-accent) 78%, transparent);
 }
 
-/* 背景動態格：水波在這裡露出來，所以只留一圈更亮的框 */
 .golden-cell--field .golden-cell__edge {
-  border-color: color-mix(in oklch, var(--gg-accent) 46%, transparent);
-  box-shadow: inset 0 0 60px color-mix(in oklch, var(--gg-accent) 10%, transparent);
+  border-color: color-mix(in oklch, var(--gg-accent) 68%, transparent);
 }
 
-/* 小碎格：越小越淡，避免畫面被線切碎 */
 .golden-cell--chip .golden-cell__edge {
-  border-color: color-mix(in oklch, var(--gg-accent) 14%, transparent);
+  border-color: color-mix(in oklch, var(--gg-accent) 46%, transparent);
 }
 
-/* 水波只在背景方格裡跑，其餘畫面保持乾淨 */
-#water-field {
-  clip-path: inset(
-    calc(var(--gg-y) + var(--gg-h) * var(--gg-field-y))
-    calc(100vw - var(--gg-x) - var(--gg-w) * (var(--gg-field-x) + var(--gg-field-size)))
-    calc(100vh - var(--gg-y) - var(--gg-h) * var(--gg-field-y) - var(--gg-w) * var(--gg-field-size))
-    calc(var(--gg-x) + var(--gg-w) * var(--gg-field-x))
-  );
+/* 序號：標示這一格在螺旋上的順序 */
+.golden-cell__tick {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.6rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.6rem, 0.9vw, 0.85rem);
+  letter-spacing: 0.18em;
+  color: color-mix(in oklch, var(--gg-accent) 72%, transparent);
+  opacity: 0;
+  animation: gg-tick-in 420ms ease-out var(--gg-delay, 0ms) both;
+}
+
+/* --- 逐格點亮的水波：輪到自己時亮起來，之後留著 --- */
+
+.golden-cell__wave {
+  opacity: 0;
+  background:
+    radial-gradient(
+      circle at 30% 30%,
+      color-mix(in oklch, var(--gg-accent) 26%, transparent),
+      transparent 62%
+    );
+  animation: gg-wave-in var(--gg-step, 700ms) ease-out var(--gg-delay, 0ms) both;
+}
+
+.golden-cell__wave::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border: 1px solid color-mix(in oklch, var(--gg-accent) 34%, transparent);
+  border-radius: 999px;
+  opacity: 0;
+  animation: gg-wave-ring var(--gg-step, 700ms) cubic-bezier(0.2, 0.7, 0.3, 1)
+    var(--gg-delay, 0ms) both;
+}
+
+@keyframes gg-tick-in {
+  from {
+    opacity: 0;
+    translate: 0 -0.4rem;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes gg-wave-in {
+  0% {
+    opacity: 0;
+    scale: 0.82;
+  }
+
+  55% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.72;
+    scale: 1;
+  }
+}
+
+@keyframes gg-wave-ring {
+  0% {
+    opacity: 0;
+    scale: 0.15;
+  }
+
+  40% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1.25;
+  }
+}
+
+/* --- 主進程：黃金螺旋在五秒內畫完 --- */
+
+.golden-spiral {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.golden-spiral__arc {
+  stroke: var(--gg-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  fill: none;
+  filter: drop-shadow(0 0 8px color-mix(in oklch, var(--gg-accent) 45%, transparent));
+  stroke-dasharray: var(--arc-len) var(--arc-len);
+  stroke-dashoffset: var(--arc-len);
+  animation: gg-arc-draw var(--gg-step, 700ms) cubic-bezier(0.5, 0, 0.5, 1)
+    var(--gg-delay, 0ms) both;
+}
+
+@keyframes gg-arc-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* --------------------------------------------------------------------------
-   轉場：每個方格各自翻面，大格慢、小格快，依序把新頁面拼出來
+   轉場：每個方格各自翻面，大格慢、小格快，依序把新頁面拼出來。
+   內容本身（root）只用 400ms 交還，方格的蒙太奇繼續在上層跑，
+   所以畫面很快就能讀、能點，不會被整段動畫鎖住。
    -------------------------------------------------------------------------- */
 
 @keyframes gg-flip-out {
@@ -5976,89 +6103,99 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 380ms;
+  animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.66, 0, 0.28, 1);
 }
 
 ::view-transition-old(gg-0) {
-  animation: gg-flip-out 520ms cubic-bezier(0.66, 0, 0.28, 1) 0ms both;
+  animation: gg-flip-out 1100ms cubic-bezier(0.66, 0, 0.28, 1) 0ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-0) {
-  animation: gg-flip-in 520ms cubic-bezier(0.66, 0, 0.28, 1) 45ms both;
+  animation: gg-flip-in 1100ms cubic-bezier(0.66, 0, 0.28, 1) 90ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-1) {
-  animation: gg-flip-out 468ms cubic-bezier(0.66, 0, 0.28, 1) 40ms both;
+  animation: gg-flip-out 990ms cubic-bezier(0.66, 0, 0.28, 1) 230ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-1) {
-  animation: gg-flip-in 468ms cubic-bezier(0.66, 0, 0.28, 1) 85ms both;
+  animation: gg-flip-in 990ms cubic-bezier(0.66, 0, 0.28, 1) 320ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-2) {
-  animation: gg-flip-out 421ms cubic-bezier(0.66, 0, 0.28, 1) 80ms both;
+  animation: gg-flip-out 891ms cubic-bezier(0.66, 0, 0.28, 1) 460ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-2) {
-  animation: gg-flip-in 421ms cubic-bezier(0.66, 0, 0.28, 1) 125ms both;
+  animation: gg-flip-in 891ms cubic-bezier(0.66, 0, 0.28, 1) 550ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-3) {
-  animation: gg-flip-out 379ms cubic-bezier(0.66, 0, 0.28, 1) 120ms both;
+  animation: gg-flip-out 802ms cubic-bezier(0.66, 0, 0.28, 1) 690ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-3) {
-  animation: gg-flip-in 379ms cubic-bezier(0.66, 0, 0.28, 1) 165ms both;
+  animation: gg-flip-in 802ms cubic-bezier(0.66, 0, 0.28, 1) 780ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-4) {
-  animation: gg-flip-out 341ms cubic-bezier(0.66, 0, 0.28, 1) 160ms both;
+  animation: gg-flip-out 722ms cubic-bezier(0.66, 0, 0.28, 1) 920ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-4) {
-  animation: gg-flip-in 341ms cubic-bezier(0.66, 0, 0.28, 1) 205ms both;
+  animation: gg-flip-in 722ms cubic-bezier(0.66, 0, 0.28, 1) 1010ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-5) {
-  animation: gg-flip-out 307ms cubic-bezier(0.66, 0, 0.28, 1) 200ms both;
+  animation: gg-flip-out 650ms cubic-bezier(0.66, 0, 0.28, 1) 1150ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-5) {
-  animation: gg-flip-in 307ms cubic-bezier(0.66, 0, 0.28, 1) 245ms both;
+  animation: gg-flip-in 650ms cubic-bezier(0.66, 0, 0.28, 1) 1240ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-6) {
-  animation: gg-flip-out 276ms cubic-bezier(0.66, 0, 0.28, 1) 240ms both;
+  animation: gg-flip-out 585ms cubic-bezier(0.66, 0, 0.28, 1) 1380ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-6) {
-  animation: gg-flip-in 276ms cubic-bezier(0.66, 0, 0.28, 1) 285ms both;
+  animation: gg-flip-in 585ms cubic-bezier(0.66, 0, 0.28, 1) 1470ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-7) {
-  animation: gg-flip-out 249ms cubic-bezier(0.66, 0, 0.28, 1) 280ms both;
+  animation: gg-flip-out 526ms cubic-bezier(0.66, 0, 0.28, 1) 1610ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-7) {
-  animation: gg-flip-in 249ms cubic-bezier(0.66, 0, 0.28, 1) 325ms both;
+  animation: gg-flip-in 526ms cubic-bezier(0.66, 0, 0.28, 1) 1700ms both;
   transform-origin: 50% 50%;
 }
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
   }
 
-  .golden-cell__edge {
-    border-color: color-mix(in oklch, var(--gg-accent) 18%, transparent);
+  .golden-cell__wave,
+  .golden-cell__wave::after,
+  .golden-cell__tick,
+  .golden-spiral__arc {
+    animation: none !important;
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+
+  #water-field {
+    animation: none !important;
   }
 }

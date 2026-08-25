@@ -126,3 +126,124 @@ export const buildGoldenCells = (preset: GoldenPreset): GoldenCell[] => {
 
     return cells;
 };
+
+/** 螺旋弧線的一段：一個方格內的四分之一圓。 */
+export type GoldenArc = {
+    index: number;
+    /** SVG path，座標系為 viewBox 0 0 1618 1000。 */
+    d: string;
+    /** 弧長，用來設 stroke-dasharray。 */
+    length: number;
+};
+
+/** 弧線用的 viewBox 尺寸；1618 : 1000 就是 φ，所以方格在裡面是真的正方形。 */
+export const SPIRAL_VIEWBOX = { w: 1618, h: 1000 };
+
+type Pt = [number, number];
+
+const sub = (a: Pt, b: Pt): Pt => [a[0] - b[0], a[1] - b[1]];
+const near = (a: number, b: number) => Math.abs(a - b) < 0.5;
+const samePoint = (a: Pt, b: Pt) => near(a[0], b[0]) && near(a[1], b[1]);
+/**
+ * 兩個向量是否共線（同向或反向）。
+ * 外積必須除以兩個長度再比：外積大小會隨向量長度放大，用絕對門檻的話
+ * 座標 0.1px 的捨入誤差乘上邊長就足以被誤判成不平行。
+ */
+const parallel = (a: Pt, b: Pt) => {
+    const scale = Math.hypot(a[0], a[1]) * Math.hypot(b[0], b[1]);
+    if (scale === 0) return false;
+    return Math.abs(a[0] * b[1] - a[1] * b[0]) / scale < 0.01;
+};
+
+/**
+ * 沿著方格串出黃金螺旋。
+ *
+ * 每一格裡畫一個四分之一圓，圓心必定是該格的某個角。挑哪個角不能亂選：
+ * 進入點 P 只有兩個相鄰角可以當圓心，其中只有一個會讓新弧線在 P 處的
+ * 切線與前一段一致（半徑向量共線 ⇔ 切線共線），選錯就會在接點折斷。
+ */
+export const buildGoldenSpiral = (cells: GoldenCell[]): GoldenArc[] => {
+    if (cells.length === 0) return [];
+
+    const rects = cells.map((cell) => {
+        const x = (cell.x / 100) * SPIRAL_VIEWBOX.w;
+        const y = (cell.y / 100) * SPIRAL_VIEWBOX.h;
+        const s = (cell.size / 100) * SPIRAL_VIEWBOX.w;
+        return { x, y, s, corners: [[x, y], [x + s, y], [x + s, y + s], [x, y + s]] as Pt[] };
+    });
+
+    const arcs: GoldenArc[] = [];
+    let entry: Pt | null = null;
+    let prevCentre: Pt | null = null;
+
+    for (let i = 0; i < rects.length; i += 1) {
+        const { s, corners } = rects[i];
+        let centre: Pt;
+        let from: Pt;
+
+        if (entry === null || prevCentre === null) {
+            // 第一格沒有前一段可以對切線，改用另一個約束：弧線必須「收」在
+            // 與下一格共用的那個角，鏈條才接得下去。圓心是該角的兩個相鄰角
+            // 之一，取離下一格較近的那個，弧線才會往內捲而不是往外甩。
+            const next = rects[1];
+            if (!next) break;
+
+            const shared = corners.find((corner) =>
+                next.corners.some((other) => samePoint(corner, other)),
+            );
+            if (!shared) break;
+
+            const nextCentre: Pt = [next.x + next.s / 2, next.y + next.s / 2];
+            const adjacent = corners.filter(
+                (corner) =>
+                    !samePoint(corner, shared) && near(Math.hypot(...sub(corner, shared)), s),
+            );
+            centre = adjacent.reduce((best, corner) =>
+                Math.hypot(...sub(corner, nextCentre)) < Math.hypot(...sub(best, nextCentre))
+                    ? corner
+                    : best,
+            );
+            from = corners.find(
+                (corner) =>
+                    !samePoint(corner, centre) &&
+                    !samePoint(corner, shared) &&
+                    near(Math.hypot(...sub(corner, centre)), s),
+            )!;
+        } else {
+            const incoming = sub(entry, prevCentre);
+            const candidates = corners.filter(
+                (corner) =>
+                    !samePoint(corner, entry as Pt) &&
+                    near(Math.hypot(...sub(entry as Pt, corner)), s),
+            );
+            const picked = candidates.find((corner) => parallel(sub(entry as Pt, corner), incoming));
+            if (!picked) break;
+            centre = picked;
+            from = entry;
+        }
+
+        const to = corners.find(
+            (corner) =>
+                !samePoint(corner, centre) &&
+                !samePoint(corner, from) &&
+                near(Math.hypot(...sub(corner, centre)), s),
+        );
+        if (!to) break;
+
+        // 用外積決定 SVG 的 sweep-flag（y 軸向下，所以正的外積是順時針）
+        const a = sub(from, centre);
+        const b = sub(to, centre);
+        const sweep = a[0] * b[1] - a[1] * b[0] > 0 ? 1 : 0;
+
+        arcs.push({
+            index: i,
+            d: `M ${from[0].toFixed(2)} ${from[1].toFixed(2)} A ${s.toFixed(2)} ${s.toFixed(2)} 0 0 ${sweep} ${to[0].toFixed(2)} ${to[1].toFixed(2)}`,
+            length: (Math.PI / 2) * s,
+        });
+
+        entry = to;
+        prevCentre = centre;
+    }
+
+    return arcs;
+};
