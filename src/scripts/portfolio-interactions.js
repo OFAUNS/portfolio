@@ -1,0 +1,1188 @@
+import { water, ticker } from "./water-field.js";
+
+            (() => {
+                const cleanupKey = "__portfolioFxCleanup";
+
+                // 轉場時長：CSS 的 route-* 動畫必須跟這兩個值一致
+                const ROUTE_LEAVE_MS = 650;
+                const ROUTE_ENTER_MS = 950;
+
+                /**
+                 * 從指定點推出一圈持續向外擴張的波。
+                 * 單發 drop 只會產生一個同心圓；持續注入擴張中的環才會讓整個畫面
+                 * 布滿互相干涉的紋路，這是「水漫過來」的關鍵。
+                 */
+                const surgeWaterField = (originX, originY, duration = 420) => {
+                    water.drop(originX, originY, 9, 7);
+
+                    const startedAt = performance.now();
+                    let unsubscribe = null;
+
+                    unsubscribe = ticker.add((now) => {
+                        const progress = (now - startedAt) / duration;
+
+                        if (progress >= 1) {
+                            unsubscribe?.();
+                            return;
+                        }
+
+                        // 波前隨時間外擴，強度同步遞減
+                        const radius = 60 + progress * 460;
+                        const strength = 2.6 * (1 - progress);
+                        const points = 5;
+                        const spin = progress * 2.4;
+
+                        for (let i = 0; i < points; i += 1) {
+                            const angle = spin + (i / points) * Math.PI * 2;
+                            water.drop(
+                                originX + Math.cos(angle) * radius,
+                                originY + Math.sin(angle) * radius,
+                                strength,
+                                3,
+                            );
+                        }
+                    });
+                };
+                const suppressMotion = (duration = 1100) => {
+                    const root = document.documentElement;
+                    const until = performance.now() + duration;
+                    window.__portfolioFxSuppressUntil = until;
+                    root.dataset.fxCalm = "true";
+
+                    if (window.__portfolioFxCalmTimer) {
+                        window.clearTimeout(window.__portfolioFxCalmTimer);
+                    }
+
+                    window.__portfolioFxCalmTimer = window.setTimeout(() => {
+                        if (performance.now() >= window.__portfolioFxSuppressUntil) {
+                            delete root.dataset.fxCalm;
+                        }
+                    }, duration + 60);
+                };
+
+                const isMotionSuppressed = () =>
+                    performance.now() < (window.__portfolioFxSuppressUntil || 0) ||
+                    document.documentElement.dataset.fxCalm === "true";
+
+                const setupInputMode = () => {
+                    const root = document.documentElement;
+
+                    const onKeyDown = (event) => {
+                        if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+                        root.dataset.inputMode = "keyboard";
+                        suppressMotion(
+                            ["Tab", "ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)
+                                ? 1400
+                                : 900,
+                        );
+                    };
+
+                    const onPointerDown = () => {
+                        root.dataset.inputMode = "pointer";
+                        delete root.dataset.fxCalm;
+                        window.__portfolioFxSuppressUntil = 0;
+
+                        if (window.__portfolioFxCalmTimer) {
+                            window.clearTimeout(window.__portfolioFxCalmTimer);
+                            window.__portfolioFxCalmTimer = 0;
+                        }
+                    };
+
+                    document.addEventListener("keydown", onKeyDown, true);
+                    window.addEventListener("pointerdown", onPointerDown, {
+                        passive: true,
+                    });
+
+                    return () => {
+                        document.removeEventListener("keydown", onKeyDown, true);
+                        window.removeEventListener("pointerdown", onPointerDown);
+                    };
+                };
+
+                const setupParticles = () => {
+                    const container = document.getElementById("ambient-particles");
+                    if (!container) return () => {};
+
+                    container.innerHTML = "";
+                    const particleCount = window.matchMedia("(max-width: 768px)").matches
+                        ? 4
+                        : 7;
+
+                    for (let index = 0; index < particleCount; index += 1) {
+                        const particle = document.createElement("span");
+                        particle.className = "particle";
+                        particle.style.left = `${Math.random() * 100}%`;
+                        particle.style.width = `${2 + Math.random() * 4}px`;
+                        particle.style.height = particle.style.width;
+                        particle.style.opacity = `${0.08 + Math.random() * 0.16}`;
+                        particle.style.animationDelay = `${Math.random() * 8}s`;
+                        particle.style.animationDuration = `${10 + Math.random() * 12}s`;
+                        container.appendChild(particle);
+                    }
+
+                    return () => {
+                        container.innerHTML = "";
+                    };
+                };
+
+                const setupScrollReveal = () => {
+                    const selectors = [
+                        "main h2",
+                        "main h3",
+                        "main h4",
+                        "main h5",
+                        "main h6",
+                        "main .portfolio-project",
+                        "main img",
+                        "main .aspect-video",
+                    ].join(", ");
+
+                    const targets = Array.from(document.querySelectorAll(selectors)).filter(
+                        (element) => {
+                            if (element.classList.contains("scroll-reveal-ignore")) {
+                                return false;
+                            }
+
+                            const project = element.closest(".portfolio-project");
+                            return !project || project === element;
+                        },
+                    );
+
+                    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                        targets.forEach((element) => element.classList.add("is-revealed"));
+                        return () => {};
+                    }
+
+                    targets.forEach((element, index) => {
+                        const rect = element.getBoundingClientRect();
+                        const initiallyVisible =
+                            rect.top <= window.innerHeight * 0.96 && rect.bottom >= -80;
+
+                        element.classList.add("scroll-reveal");
+                        if (initiallyVisible) {
+                            element.classList.add("is-revealed");
+                            return;
+                        }
+
+                        if (!element.style.getPropertyValue("--reveal-delay")) {
+                            const delay = Math.min((index % 6) * 70, 350);
+                            element.style.setProperty("--reveal-delay", `${delay}ms`);
+                        }
+                    });
+
+                    let observer = null;
+                    const revealElement = (element) => {
+                        element.classList.add("is-revealed");
+                        if (observer) {
+                            observer.unobserve(element);
+                        }
+                    };
+
+                    const revealVisibleElements = () => {
+                        const triggerPoint = window.innerHeight * 0.98;
+                        targets.forEach((element) => {
+                            if (element.classList.contains("is-revealed")) return;
+
+                            const rect = element.getBoundingClientRect();
+                            if (rect.top <= triggerPoint && rect.bottom >= -80) {
+                                revealElement(element);
+                            }
+                        });
+                    };
+
+                    let ticking = false;
+                    const scheduleReveal = () => {
+                        if (ticking) return;
+                        ticking = true;
+                        window.requestAnimationFrame(() => {
+                            revealVisibleElements();
+                            ticking = false;
+                        });
+                    };
+
+                    const cleanupFallbackListeners = [];
+
+                    if ("IntersectionObserver" in window) {
+                        observer = new IntersectionObserver(
+                            (entries) => {
+                                entries.forEach((entry) => {
+                                    if (entry.isIntersecting || entry.intersectionRatio > 0) {
+                                        revealElement(entry.target);
+                                    }
+                                });
+                            },
+                            {
+                                rootMargin: "0px 0px -4% 0px",
+                                threshold: 0.01,
+                            },
+                        );
+
+                        targets.forEach((element) => {
+                            if (!element.classList.contains("is-revealed")) {
+                                observer.observe(element);
+                            }
+                        });
+                    } else {
+                        const timers = [
+                            window.setTimeout(revealVisibleElements, 80),
+                            window.setTimeout(revealVisibleElements, 360),
+                            window.setTimeout(revealVisibleElements, 900),
+                        ];
+
+                        window.requestAnimationFrame(revealVisibleElements);
+                        window.addEventListener("scroll", scheduleReveal, { passive: true });
+                        window.addEventListener("resize", scheduleReveal);
+                        window.addEventListener("load", revealVisibleElements);
+
+                        cleanupFallbackListeners.push(() => {
+                            timers.forEach((timer) => window.clearTimeout(timer));
+                            window.removeEventListener("scroll", scheduleReveal);
+                            window.removeEventListener("resize", scheduleReveal);
+                            window.removeEventListener("load", revealVisibleElements);
+                        });
+                    }
+
+                    return () => {
+                        if (observer) {
+                            observer.disconnect();
+                        }
+                        cleanupFallbackListeners.forEach((cleanup) => cleanup());
+                    };
+                };
+
+                const setupPageInteractions = () => {
+                    const cleanups = [];
+                    const portfolioHome = document.querySelector(".portfolio-home");
+                    const clickLens = document.querySelector(".portfolio-click-lens");
+                    const canUsePointerEffects =
+                        window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+                        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+                    const textWipes = Array.from(
+                        document.querySelectorAll(".portfolio-text-wipe"),
+                    );
+
+                    if (textWipes.length) {
+                        const wipeTimers = [];
+                        const reducedMotion = window.matchMedia(
+                            "(prefers-reduced-motion: reduce)",
+                        ).matches;
+
+                        textWipes.forEach((element) => {
+                            element.classList.remove("is-wipe-ready");
+
+                            if (reducedMotion) {
+                                element.classList.add("is-wipe-ready");
+                                return;
+                            }
+
+                            const delay = window
+                                .getComputedStyle(element)
+                                .getPropertyValue("--wipe-delay")
+                                .trim();
+                            const delayMs = delay.endsWith("ms")
+                                ? Number.parseFloat(delay)
+                                : delay.endsWith("s")
+                                  ? Number.parseFloat(delay) * 1000
+                                  : Number.parseFloat(delay) || 0;
+
+                            const timer = window.setTimeout(() => {
+                                element.classList.add("is-wipe-ready");
+                            }, Math.max(0, delayMs));
+                            wipeTimers.push(timer);
+                        });
+
+                        cleanups.push(() => {
+                            wipeTimers.forEach((timer) => window.clearTimeout(timer));
+                            textWipes.forEach((element) => {
+                                element.classList.remove("is-wipe-ready");
+                            });
+                        });
+                    }
+
+                    if (portfolioHome) {
+                        let lastScrollY = window.scrollY;
+                        let lastScrollTime = performance.now();
+                        let scrollFrame = 0;
+                        let settleTimer = 0;
+                        let marqueeSyncTimer = 0;
+                        let smoothedBoost = 0;
+
+                        const setMarqueeBoost = (boost) => {
+                            const easedBoost = Math.min(1, Math.max(0, boost));
+                            portfolioHome.style.setProperty("--scroll-boost", easedBoost.toFixed(3));
+                            portfolioHome.style.setProperty(
+                                "--marquee-duration-a",
+                                `${(12 - easedBoost * 8.5).toFixed(2)}s`,
+                            );
+                            portfolioHome.style.setProperty(
+                                "--marquee-duration-b",
+                                `${(9 - easedBoost * 6).toFixed(2)}s`,
+                            );
+                            portfolioHome.style.setProperty(
+                                "--marquee-duration-c",
+                                `${(15 - easedBoost * 11).toFixed(2)}s`,
+                            );
+                        };
+
+                        const updateScrollVelocity = () => {
+                            scrollFrame = 0;
+                            const now = performance.now();
+                            const currentY = window.scrollY;
+                            const delta = Math.abs(currentY - lastScrollY);
+                            const elapsed = Math.max(now - lastScrollTime, 16);
+                            const velocity = Math.min(delta / elapsed, 4.2);
+                            const targetBoost = Math.min(1, velocity / 2.05);
+
+                            smoothedBoost += (targetBoost - smoothedBoost) * 0.48;
+                            setMarqueeBoost(smoothedBoost);
+                            lastScrollY = currentY;
+                            lastScrollTime = now;
+
+                            if (settleTimer) {
+                                window.clearTimeout(settleTimer);
+                            }
+
+                            const settleY = currentY;
+                            settleTimer = window.setTimeout(() => {
+                                if (window.scrollY !== settleY) {
+                                    onMarqueeScroll();
+                                    return;
+                                }
+
+                                smoothedBoost = 0;
+                                setMarqueeBoost(0);
+                                lastScrollY = window.scrollY;
+                                lastScrollTime = performance.now();
+                            }, 1100);
+                        };
+
+                        const onMarqueeScroll = () => {
+                            if (scrollFrame) return;
+                            scrollFrame = window.requestAnimationFrame(updateScrollVelocity);
+                        };
+
+                        setMarqueeBoost(0);
+                        window.addEventListener("scroll", onMarqueeScroll, { passive: true });
+                        marqueeSyncTimer = window.setInterval(() => {
+                            if (window.scrollY !== lastScrollY) {
+                                onMarqueeScroll();
+                            }
+                        }, 120);
+                        cleanups.push(() => {
+                            window.removeEventListener("scroll", onMarqueeScroll);
+                            if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+                            if (settleTimer) window.clearTimeout(settleTimer);
+                            if (marqueeSyncTimer) window.clearInterval(marqueeSyncTimer);
+                            portfolioHome.style.removeProperty("--scroll-boost");
+                            portfolioHome.style.removeProperty("--marquee-duration-a");
+                            portfolioHome.style.removeProperty("--marquee-duration-b");
+                            portfolioHome.style.removeProperty("--marquee-duration-c");
+                        });
+                    }
+
+                    // 滑鼠跟隨的水波效果統一交給 water-field 的 canvas 波場處理
+                    // （真實波方程模擬 + #water-refraction 濾鏡），不再用 DOM 漣漪element。
+
+                    const genreBrakes = Array.from(
+                        document.querySelectorAll("[data-genre-brake]"),
+                    );
+
+                    if (
+                        genreBrakes.length &&
+                        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                    ) {
+                        let brakeFrame = 0;
+                        const brakePairs = genreBrakes.map((element) => {
+                            const section = element.closest(".portfolio-genre-section");
+                            const nextSection =
+                                section?.nextElementSibling instanceof HTMLElement
+                                    ? section.nextElementSibling
+                                    : null;
+
+                            return { element, nextSection };
+                        });
+
+                        const updateGenreBrakes = () => {
+                            brakeFrame = 0;
+                            const viewportHeight = Math.max(window.innerHeight, 1);
+
+                            brakePairs.forEach(({ element, nextSection }) => {
+                                const rect = element.getBoundingClientRect();
+                                const travel = rect.height + viewportHeight * 0.42;
+                                const progress = Math.max(
+                                    0,
+                                    Math.min(
+                                        1,
+                                        (viewportHeight * 0.88 - rect.top) / travel,
+                                    ),
+                                );
+
+                                element.style.setProperty(
+                                    "--brake-progress",
+                                    progress.toFixed(3),
+                                );
+
+                                if (nextSection) {
+                                    const rawPop = Math.max(
+                                        0,
+                                        Math.min(1, (progress - 0.58) / 0.42),
+                                    );
+                                    const bounce =
+                                        rawPop +
+                                        Math.sin(rawPop * Math.PI) * 0.2 +
+                                        rawPop * 0.06;
+
+                                    nextSection.style.setProperty(
+                                        "--section-pop",
+                                        Math.min(1.18, bounce).toFixed(3),
+                                    );
+                                }
+                            });
+                        };
+
+                        const scheduleGenreBrakes = () => {
+                            if (brakeFrame) return;
+                            brakeFrame = window.requestAnimationFrame(updateGenreBrakes);
+                        };
+                        const brakeSyncTimer = window.setInterval(
+                            scheduleGenreBrakes,
+                            160,
+                        );
+
+                        updateGenreBrakes();
+                        window.addEventListener("scroll", scheduleGenreBrakes, {
+                            passive: true,
+                        });
+                        window.addEventListener("resize", scheduleGenreBrakes);
+
+                        cleanups.push(() => {
+                            window.removeEventListener("scroll", scheduleGenreBrakes);
+                            window.removeEventListener("resize", scheduleGenreBrakes);
+                            window.clearInterval(brakeSyncTimer);
+                            if (brakeFrame) window.cancelAnimationFrame(brakeFrame);
+                            brakePairs.forEach(({ element, nextSection }) => {
+                                element.style.removeProperty("--brake-progress");
+                                nextSection?.style.removeProperty("--section-pop");
+                            });
+                        });
+                    }
+
+                    const zoomTargets = Array.from(
+                        document.querySelectorAll("[data-scroll-zoom]"),
+                    );
+
+                    if (
+                        zoomTargets.length &&
+                        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                    ) {
+                        let zoomFrame = 0;
+
+                        const updateScrollZoom = () => {
+                            zoomFrame = 0;
+                            const viewportCenter = window.innerHeight * 0.52;
+
+                            zoomTargets.forEach((element) => {
+                                const rect = element.getBoundingClientRect();
+                                const elementCenter = rect.top + rect.height / 2;
+                                const distance = Math.abs(elementCenter - viewportCenter);
+                                const range = Math.max(window.innerHeight * 0.78, 1);
+                                const power = Math.max(0, 1 - distance / range);
+                                const shift = (viewportCenter - elementCenter) * 0.018;
+
+                                element.style.setProperty(
+                                    "--scroll-image-scale",
+                                    power.toFixed(3),
+                                );
+                                element.style.setProperty(
+                                    "--scroll-image-shift",
+                                    `${Math.max(-16, Math.min(16, shift)).toFixed(2)}px`,
+                                );
+                            });
+                        };
+
+                        const scheduleScrollZoom = () => {
+                            if (zoomFrame) return;
+                            zoomFrame = window.requestAnimationFrame(updateScrollZoom);
+                        };
+
+                        updateScrollZoom();
+                        window.addEventListener("scroll", scheduleScrollZoom, {
+                            passive: true,
+                        });
+                        window.addEventListener("resize", scheduleScrollZoom);
+
+                        cleanups.push(() => {
+                            window.removeEventListener("scroll", scheduleScrollZoom);
+                            window.removeEventListener("resize", scheduleScrollZoom);
+                            if (zoomFrame) window.cancelAnimationFrame(zoomFrame);
+                            zoomTargets.forEach((element) => {
+                                element.style.removeProperty("--scroll-image-scale");
+                                element.style.removeProperty("--scroll-image-shift");
+                            });
+                        });
+                    }
+
+                    document.querySelectorAll(".profile-flip-container").forEach((container) => {
+                        const onClick = () => {
+                            const inner = container.querySelector(".profile-flip-inner");
+                            if (inner) {
+                                inner.classList.toggle("flip-180");
+                            }
+                        };
+
+                        container.addEventListener("click", onClick);
+                        cleanups.push(() => container.removeEventListener("click", onClick));
+                    });
+
+                    const backToTopBtn = document.getElementById("back-to-top");
+                    if (backToTopBtn) {
+                        let backToTopFrame = 0;
+                        const onClick = () => {
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                        };
+                        const toggleVisibility = () => {
+                            const scrolled = window.scrollY > 300;
+                            backToTopBtn.dataset.visible = scrolled.toString();
+                            if (scrolled) {
+                                backToTopBtn.classList.remove(
+                                    "invisible",
+                                    "pointer-events-none",
+                                );
+                            }
+                        };
+                        const scheduleToggleVisibility = () => {
+                            if (backToTopFrame) return;
+
+                            backToTopFrame = window.requestAnimationFrame(() => {
+                                backToTopFrame = 0;
+                                toggleVisibility();
+                            });
+                        };
+
+                        backToTopBtn.addEventListener("click", onClick);
+                        window.addEventListener("scroll", scheduleToggleVisibility, {
+                            passive: true,
+                        });
+                        toggleVisibility();
+
+                        cleanups.push(() => {
+                            backToTopBtn.removeEventListener("click", onClick);
+                            window.removeEventListener("scroll", scheduleToggleVisibility);
+                            if (backToTopFrame) {
+                                window.cancelAnimationFrame(backToTopFrame);
+                            }
+                        });
+                    }
+
+                    if (portfolioHome && clickLens && canUsePointerEffects) {
+                        let lensTimeout = 0;
+
+                        const setLensPointer = (event) => {
+                            const x = `${Math.min(100, Math.max(0, (event.clientX / window.innerWidth) * 100)).toFixed(2)}%`;
+                            const y = `${Math.min(100, Math.max(0, (event.clientY / window.innerHeight) * 100)).toFixed(2)}%`;
+                            clickLens.style.setProperty("--portfolio-pointer-x", x);
+                            clickLens.style.setProperty("--portfolio-pointer-y", y);
+                            portfolioHome.style.setProperty("--portfolio-pointer-x", x);
+                            portfolioHome.style.setProperty("--portfolio-pointer-y", y);
+                        };
+
+                        const onLensPointerDown = (event) => {
+                            setLensPointer(event);
+                            clickLens.classList.remove("is-impacting");
+                            void clickLens.offsetWidth;
+                            clickLens.classList.add("is-active", "is-impacting");
+
+                            if (lensTimeout) {
+                                window.clearTimeout(lensTimeout);
+                            }
+
+                            lensTimeout = window.setTimeout(() => {
+                                clickLens.classList.remove("is-active", "is-impacting");
+                            }, 760);
+                        };
+
+                        window.addEventListener("pointerdown", onLensPointerDown, {
+                            passive: true,
+                        });
+
+                        cleanups.push(() => {
+                            window.removeEventListener("pointerdown", onLensPointerDown);
+                            if (lensTimeout) window.clearTimeout(lensTimeout);
+                            clickLens.classList.remove("is-active", "is-impacting");
+                        });
+                    }
+
+                    if (canUsePointerEffects) {
+                        // 卡片互動直接餵進 canvas 波場：不再切 class、不再強制 reflow，
+                        // 也不用替每張卡片掛一層帶 backdrop-filter 的假水面。
+                        const getWaterTarget = (event) => {
+                            const target = event.target;
+                            if (!(target instanceof Element)) return null;
+                            return target.closest(".portfolio-project, .portfolio-chip");
+                        };
+
+                        const onWaterOver = (event) => {
+                            const element = getWaterTarget(event);
+                            if (!element || isMotionSuppressed()) return;
+                            if (
+                                event.relatedTarget instanceof Node &&
+                                element.contains(event.relatedTarget)
+                            ) {
+                                return;
+                            }
+
+                            water.drop(event.clientX, event.clientY, 1.6, 3);
+                        };
+
+                        const onWaterDown = (event) => {
+                            const element = getWaterTarget(event);
+                            if (!element || isMotionSuppressed()) return;
+
+                            water.drop(event.clientX, event.clientY, 4.5, 5);
+                        };
+
+                        document.addEventListener("pointerover", onWaterOver, {
+                            passive: true,
+                        });
+                        document.addEventListener("pointerdown", onWaterDown, {
+                            passive: true,
+                        });
+
+                        cleanups.push(() => {
+                            document.removeEventListener("pointerover", onWaterOver);
+                            document.removeEventListener("pointerdown", onWaterDown);
+                        });
+                    }
+
+                    return () => {
+                        cleanups.forEach((cleanup) => cleanup());
+                    };
+                };
+
+                const setupCaseInteractions = () => {
+                    const caseRoot = document.querySelector(".work-case");
+                    if (!caseRoot) return () => {};
+
+                    const cleanups = [];
+                    const reducedMotionQuery = window.matchMedia(
+                        "(prefers-reduced-motion: reduce)",
+                    );
+                    const canUsePointerEffects =
+                        window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+                        !reducedMotionQuery.matches;
+                    if (canUsePointerEffects) {
+                        caseRoot.classList.add("case-motion-ready");
+                    }
+
+                    const setCasePointer = (x, y) => {
+                        caseRoot.style.setProperty("--case-pointer-x", `${x}%`);
+                        caseRoot.style.setProperty("--case-pointer-y", `${y}%`);
+                        caseRoot.style.setProperty("--flow-drift-x", `${((x - 50) * 0.18).toFixed(2)}px`);
+                        caseRoot.style.setProperty("--flow-drift-y", `${((y - 50) * 0.14).toFixed(2)}px`);
+                        caseRoot.style.setProperty("--flow-field-x", `${((x - 50) * -0.16).toFixed(2)}px`);
+                        caseRoot.style.setProperty("--flow-field-y", `${((y - 50) * 0.13).toFixed(2)}px`);
+                    };
+
+                    setCasePointer(50, 34);
+                    caseRoot.style.setProperty("--flow-boost", "0");
+                    caseRoot.style.setProperty("--scroll-boost", "0");
+
+                    if (canUsePointerEffects) {
+                        let rafId = 0;
+                        let pendingPointer = null;
+                        let pointerBoostTimeout = 0;
+                        let pointerImpactTimeout = 0;
+                        let scrollBoostTimeout = 0;
+                        let lastScrollY = window.scrollY;
+
+                        const getViewportPointer = (event) => ({
+                            x: Math.min(100, Math.max(0, (event.clientX / window.innerWidth) * 100)),
+                            y: Math.min(100, Math.max(0, (event.clientY / window.innerHeight) * 100)),
+                        });
+
+                        const setFlowBoost = (value) => {
+                            caseRoot.style.setProperty("--flow-boost", value.toFixed(3));
+                            caseRoot.style.setProperty("--flow-alpha", (0.5 + value * 0.36).toFixed(3));
+                            caseRoot.style.setProperty("--flow-grid-alpha", (0.24 + value * 0.28).toFixed(3));
+                            caseRoot.style.setProperty("--flow-field-alpha", (0.72 + value * 0.34).toFixed(3));
+                            caseRoot.style.setProperty("--flow-spark-alpha", (0.38 + value * 0.62).toFixed(3));
+                            caseRoot.style.setProperty("--flow-readout-alpha", (0.42 + value * 0.4).toFixed(3));
+                            caseRoot.style.setProperty("--flow-saturate", (1 + value * 0.7).toFixed(3));
+                            caseRoot.style.setProperty("--flow-spark-distance", `${(value * 5.4).toFixed(2)}rem`);
+                            caseRoot.style.setProperty("--flow-spark-scale", (0.72 + value * 0.72).toFixed(3));
+                            caseRoot.style.setProperty("--flow-aura-alpha", (0.22 + value * 0.62).toFixed(3));
+                            caseRoot.style.setProperty("--flow-aura-scale", (1 + value * 0.72).toFixed(3));
+                            caseRoot.style.setProperty("--flow-depth-alpha", (0.34 + value * 0.38).toFixed(3));
+                        };
+
+                        const settleFlowBoost = () => {
+                            if (pointerBoostTimeout) {
+                                window.clearTimeout(pointerBoostTimeout);
+                            }
+
+                            pointerBoostTimeout = window.setTimeout(() => {
+                                setFlowBoost(0);
+                            }, 120);
+                        };
+
+                        const onPointerMove = (event) => {
+                            if (isMotionSuppressed()) return;
+                            pendingPointer = getViewportPointer(event);
+
+                            if (rafId) return;
+                            rafId = window.requestAnimationFrame(() => {
+                                if (pendingPointer) {
+                                    setCasePointer(pendingPointer.x, pendingPointer.y);
+                                    setFlowBoost(1.05);
+                                    settleFlowBoost();
+                                }
+                                rafId = 0;
+                            });
+                        };
+
+                        const onPointerLeave = () => {
+                            pendingPointer = null;
+                            setCasePointer(50, 34);
+                            caseRoot.classList.remove("case-impacting");
+                            setFlowBoost(0);
+                        };
+
+                        const onPointerDown = (event) => {
+                            if (isMotionSuppressed()) return;
+                            const pointer = getViewportPointer(event);
+                            setCasePointer(pointer.x, pointer.y);
+                            caseRoot.classList.add("case-impacting");
+                            setFlowBoost(2.1);
+
+                            if (pointerImpactTimeout) {
+                                window.clearTimeout(pointerImpactTimeout);
+                            }
+
+                            pointerImpactTimeout = window.setTimeout(() => {
+                                caseRoot.classList.remove("case-impacting");
+                                setFlowBoost(0);
+                            }, 260);
+                        };
+
+                        const onScroll = () => {
+                            if (isMotionSuppressed()) return;
+
+                            const delta = Math.min(1, Math.abs(window.scrollY - lastScrollY) / 90);
+                            lastScrollY = window.scrollY;
+                            caseRoot.classList.add("case-is-scrolling");
+                            caseRoot.style.setProperty("--scroll-boost", delta.toFixed(3));
+                            caseRoot.style.setProperty("--flow-alpha", (0.52 + delta * 0.42).toFixed(3));
+                            caseRoot.style.setProperty("--flow-grid-alpha", (0.24 + delta * 0.32).toFixed(3));
+                            caseRoot.style.setProperty("--flow-scale", (1 + delta * 0.055).toFixed(3));
+                            caseRoot.style.setProperty("--flow-readout-y", `${(delta * -1.8).toFixed(2)}rem`);
+                            caseRoot.style.setProperty("--flow-depth-alpha", (0.3 + delta * 0.44).toFixed(3));
+
+                            if (scrollBoostTimeout) {
+                                window.clearTimeout(scrollBoostTimeout);
+                            }
+
+                            scrollBoostTimeout = window.setTimeout(() => {
+                                caseRoot.classList.remove("case-is-scrolling");
+                                caseRoot.style.setProperty("--scroll-boost", "0");
+                                caseRoot.style.setProperty("--flow-alpha", "0.5");
+                                caseRoot.style.setProperty("--flow-grid-alpha", "0.24");
+                                caseRoot.style.setProperty("--flow-scale", "1");
+                                caseRoot.style.setProperty("--flow-readout-y", "0rem");
+                                caseRoot.style.setProperty("--flow-depth-alpha", "0.34");
+                            }, 140);
+                        };
+
+                        caseRoot.addEventListener("pointermove", onPointerMove, {
+                            passive: true,
+                        });
+                        caseRoot.addEventListener("pointerdown", onPointerDown, {
+                            passive: true,
+                        });
+                        caseRoot.addEventListener("pointerleave", onPointerLeave);
+                        window.addEventListener("scroll", onScroll, { passive: true });
+                        cleanups.push(() => {
+                            caseRoot.removeEventListener("pointermove", onPointerMove);
+                            caseRoot.removeEventListener("pointerdown", onPointerDown);
+                            caseRoot.removeEventListener("pointerleave", onPointerLeave);
+                            window.removeEventListener("scroll", onScroll);
+                            if (rafId) window.cancelAnimationFrame(rafId);
+                            if (pointerBoostTimeout) window.clearTimeout(pointerBoostTimeout);
+                            if (pointerImpactTimeout) window.clearTimeout(pointerImpactTimeout);
+                            if (scrollBoostTimeout) window.clearTimeout(scrollBoostTimeout);
+                        });
+                    }
+
+                    const setupTilt = (element, strength = 7) => {
+                        if (!canUsePointerEffects) return;
+
+                        const onMove = (event) => {
+                            const rect = element.getBoundingClientRect();
+                            const localX = (event.clientX - rect.left) / rect.width;
+                            const localY = (event.clientY - rect.top) / rect.height;
+                            const rotateY = (localX - 0.5) * strength;
+                            const rotateX = (0.5 - localY) * strength;
+
+                            element.style.setProperty("--tilt-x", `${rotateX.toFixed(2)}deg`);
+                            element.style.setProperty("--tilt-y", `${rotateY.toFixed(2)}deg`);
+                            element.style.setProperty(
+                                "--local-x",
+                                `${Math.min(100, Math.max(0, localX * 100)).toFixed(2)}%`,
+                            );
+                            element.style.setProperty(
+                                "--local-y",
+                                `${Math.min(100, Math.max(0, localY * 100)).toFixed(2)}%`,
+                            );
+                        };
+
+                        const onLeave = () => {
+                            element.style.setProperty("--tilt-x", "0deg");
+                            element.style.setProperty("--tilt-y", "0deg");
+                            element.style.setProperty("--local-x", "50%");
+                            element.style.setProperty("--local-y", "50%");
+                        };
+
+                        element.addEventListener("pointermove", onMove, { passive: true });
+                        element.addEventListener("pointerleave", onLeave);
+                        onLeave();
+
+                        cleanups.push(() => {
+                            element.removeEventListener("pointermove", onMove);
+                            element.removeEventListener("pointerleave", onLeave);
+                        });
+                    };
+
+                    document.querySelectorAll(".work-case-body img").forEach((image, index) => {
+                        image.classList.add("case-gallery-image");
+                        image.style.setProperty("--gallery-index", `${index % 9}`);
+                        image.style.setProperty("--gallery-delay", `${(index % 9) * -0.62}s`);
+
+                        const parent = image.parentElement;
+                        if (
+                            parent &&
+                            parent.tagName === "P" &&
+                            parent.children.length === 1
+                        ) {
+                            parent.classList.add("case-image-frame");
+                            parent.style.setProperty("--gallery-index", `${index % 9}`);
+                            parent.style.setProperty("--gallery-delay", `${(index % 9) * -0.62}s`);
+                            setupTilt(parent, 4.5);
+                        } else {
+                            setupTilt(image, 3);
+                        }
+                    });
+
+                    document
+                        .querySelectorAll(
+                            ".case-media-frame, .case-theme-interface, .case-focus-card, .case-fact, .case-external-link, .portfolio-project",
+                        )
+                        .forEach((element) => setupTilt(element, 5));
+
+                    const themeInterfaces = Array.from(
+                        document.querySelectorAll("[data-dynamic-interface]"),
+                    );
+                    if (themeInterfaces.length && canUsePointerEffects) {
+                        let themeFrameId = 0;
+                        let lastLogIndex = -1;
+                        let lastThemeTick = 0;
+                        const themeTickInterval = window.matchMedia("(max-width: 768px)").matches
+                            ? 140
+                            : 80;
+                        const startedAt = performance.now();
+
+                        const animateThemeInterfaces = (now = performance.now()) => {
+                            themeFrameId = window.requestAnimationFrame(
+                                animateThemeInterfaces,
+                            );
+
+                            if (
+                                document.hidden ||
+                                isMotionSuppressed() ||
+                                now - lastThemeTick < themeTickInterval
+                            ) {
+                                return;
+                            }
+
+                            lastThemeTick = now;
+                            const elapsed = (now - startedAt) / 1000;
+                            const logIndex = Math.floor(elapsed / 1.35);
+
+                            themeInterfaces.forEach((panel, panelIndex) => {
+                                const offset = elapsed + panelIndex * 0.42;
+                                const progressValue = (offset * 11) % 100;
+                                const progress = progressValue.toFixed(2);
+                                const wave = (50 + Math.sin(offset * 1.6) * 38).toFixed(2);
+                                const pulseValue = 0.45 + Math.sin(offset * 2.2) * 0.28;
+                                const pulse = pulseValue.toFixed(3);
+                                const angle = (progressValue * 3.6).toFixed(2);
+                                const dashOffset = (progressValue * -0.52).toFixed(2);
+                                const sheenAlpha = (pulseValue * 0.34).toFixed(3);
+                                const beamAlpha = (0.24 + pulseValue * 0.22).toFixed(3);
+                                const beamRotateA = ((pulseValue - 0.5) * 8).toFixed(2);
+                                const beamRotateB = ((0.5 - pulseValue) * 10).toFixed(2);
+                                const spinA = (pulseValue * 28).toFixed(2);
+                                const spinB = (pulseValue * -36).toFixed(2);
+                                const spinC = (pulseValue * 18).toFixed(2);
+                                const signalAlpha = (0.46 + pulseValue * 0.36).toFixed(3);
+                                const shiftSoft = ((progressValue - 50) * 0.12).toFixed(2);
+                                const ribbonA = (progressValue * 0.12).toFixed(2);
+                                const ribbonB = ((50 - progressValue) * 0.1).toFixed(2);
+                                const ribbonC = (progressValue * -0.08).toFixed(2);
+                                const ribbonD = ((progressValue - 38) * 0.11).toFixed(2);
+
+                                panel.style.setProperty("--interface-progress", `${progress}%`);
+                                panel.style.setProperty("--interface-wave", `${wave}%`);
+                                panel.style.setProperty("--interface-pulse", pulse);
+                                panel.style.setProperty("--interface-angle", `${angle}deg`);
+                                panel.style.setProperty("--interface-dash-offset", `${dashOffset}px`);
+                                panel.style.setProperty("--interface-sheen-alpha", sheenAlpha);
+                                panel.style.setProperty("--interface-beam-alpha", beamAlpha);
+                                panel.style.setProperty("--interface-beam-rotate-a", `${beamRotateA}deg`);
+                                panel.style.setProperty("--interface-beam-rotate-b", `${beamRotateB}deg`);
+                                panel.style.setProperty("--interface-spin-a", `${spinA}deg`);
+                                panel.style.setProperty("--interface-spin-b", `${spinB}deg`);
+                                panel.style.setProperty("--interface-spin-c", `${spinC}deg`);
+                                panel.style.setProperty("--interface-signal-alpha", signalAlpha);
+                                panel.style.setProperty("--interface-shift-soft", `${shiftSoft}px`);
+                                panel.style.setProperty("--flow-ribbon-a", `${ribbonA}px`);
+                                panel.style.setProperty("--flow-ribbon-b", `${ribbonB}px`);
+                                panel.style.setProperty("--flow-ribbon-c", `${ribbonC}px`);
+                                panel.style.setProperty("--flow-ribbon-d", `${ribbonD}px`);
+
+                                const playhead = panel.querySelector(".edit-playhead span");
+                                if (playhead) {
+                                    const seconds = Math.floor(offset * 4) % 60;
+                                    const frames = Math.floor((offset * 24) % 24);
+                                    playhead.textContent = `00:${String(seconds).padStart(2, "0")}:${String(frames).padStart(2, "0")}`;
+                                }
+
+                                if (logIndex !== lastLogIndex) {
+                                    const logs = (panel.dataset.logStream || "")
+                                        .split("|")
+                                        .map((item) => item.trim())
+                                        .filter(Boolean);
+                                    const terminal = panel.querySelector("[data-dynamic]");
+                                    if (logs.length && terminal) {
+                                        terminal.textContent = logs[logIndex % logs.length];
+                                    }
+                                }
+                            });
+
+                            lastLogIndex = logIndex;
+                        };
+
+                        animateThemeInterfaces();
+                        cleanups.push(() => {
+                            if (themeFrameId) {
+                                window.cancelAnimationFrame(themeFrameId);
+                            }
+                        });
+                    }
+
+                    return () => {
+                        cleanups.forEach((cleanup) => cleanup());
+                    };
+                };
+
+                const setupRouteTransitions = () => {
+                    const overlay = document.querySelector(".transition-overlay");
+                    const reducedMotion = window.matchMedia(
+                        "(prefers-reduced-motion: reduce)",
+                    ).matches;
+                    if (!overlay || reducedMotion) return () => {};
+
+                    const storageKey = "__portfolioRouteTransition";
+                    const root = document.documentElement;
+                    let isTransitioning = false;
+                    let transitionTimer = 0;
+                    let hasPlayedIncoming = false;
+
+                    const setTransitionOrigin = (x = "50%", y = "50%") => {
+                        overlay.style.setProperty("--route-x", x);
+                        overlay.style.setProperty("--route-y", y);
+                    };
+
+                    const cancelOverlayAnimations = () => {
+                        if (typeof overlay.getAnimations !== "function") return;
+
+                        overlay.getAnimations({ subtree: true }).forEach((animation) => {
+                            animation.cancel();
+                        });
+                    };
+
+                    const clearTransition = () => {
+                        if (transitionTimer) {
+                            window.clearTimeout(transitionTimer);
+                            transitionTimer = 0;
+                        }
+
+                        cancelOverlayAnimations();
+                        overlay.classList.remove("is-entering", "is-leaving");
+                        overlay.style.removeProperty("--route-x");
+                        overlay.style.removeProperty("--route-y");
+                        delete root.dataset.routeTransition;
+                        isTransitioning = false;
+                    };
+
+                    const restartTransitionClass = (className) => {
+                        cancelOverlayAnimations();
+                        overlay.classList.remove("is-entering", "is-leaving");
+                        void overlay.offsetWidth;
+                        overlay.classList.add(className);
+                    };
+
+                    const playIncomingTransition = () => {
+                        if (hasPlayedIncoming) return;
+                        if (window.sessionStorage.getItem(storageKey) !== "1") return;
+
+                        hasPlayedIncoming = true;
+                        window.sessionStorage.removeItem(storageKey);
+                        setTransitionOrigin();
+                        root.dataset.routeTransition = "true";
+                        restartTransitionClass("is-entering");
+
+                        // 新頁面從中央擴散開來，銜接上一頁離場時推出的波
+                        surgeWaterField(
+                            window.innerWidth / 2,
+                            window.innerHeight / 2,
+                            560,
+                        );
+
+                        if (transitionTimer) {
+                            window.clearTimeout(transitionTimer);
+                        }
+
+                        transitionTimer = window.setTimeout(clearTransition, ROUTE_ENTER_MS);
+                    };
+
+                    const getTransitionUrl = (link, event) => {
+                        if (
+                            event.defaultPrevented ||
+                            event.button !== 0 ||
+                            event.metaKey ||
+                            event.ctrlKey ||
+                            event.shiftKey ||
+                            event.altKey ||
+                            link.target && link.target !== "_self" ||
+                            link.hasAttribute("download") ||
+                            link.closest("[data-no-transition]")
+                        ) {
+                            return null;
+                        }
+
+                        const href = link.getAttribute("href");
+                        if (!href || href.startsWith("#")) return null;
+
+                        const url = new URL(link.href, window.location.href);
+                        const samePageHash =
+                            url.origin === window.location.origin &&
+                            url.pathname === window.location.pathname &&
+                            url.search === window.location.search &&
+                            url.hash;
+
+                        if (
+                            url.origin !== window.location.origin ||
+                            !/^https?:$/.test(url.protocol) ||
+                            samePageHash
+                        ) {
+                            return null;
+                        }
+
+                        return url;
+                    };
+
+                    const onClick = (event) => {
+                        const target = event.target;
+                        if (!(target instanceof Element)) return;
+
+                        const link = target.closest("a[href]");
+                        if (!link) return;
+
+                        const url = getTransitionUrl(link, event);
+                        if (!url) return;
+
+                        if (event.detail === 0) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        if (isTransitioning) return;
+
+                        isTransitioning = true;
+                        window.sessionStorage.setItem(storageKey, "1");
+                        setTransitionOrigin(
+                            `${Math.min(100, Math.max(0, (event.clientX / window.innerWidth) * 100)).toFixed(2)}%`,
+                            `${Math.min(100, Math.max(0, (event.clientY / window.innerHeight) * 100)).toFixed(2)}%`,
+                        );
+                        root.dataset.routeTransition = "true";
+                        restartTransitionClass("is-leaving");
+
+                        // 離場：從點擊處推出一圈持續向外擴張的波，讓整個畫面布滿干涉紋
+                        surgeWaterField(event.clientX, event.clientY);
+
+                        if (transitionTimer) {
+                            window.clearTimeout(transitionTimer);
+                        }
+
+                        transitionTimer = window.setTimeout(() => {
+                            window.location.href = url.href;
+                        }, ROUTE_LEAVE_MS);
+                    };
+
+                    const onPageShow = (event) => {
+                        if (event.persisted) {
+                            clearTransition();
+                            return;
+                        }
+
+                        playIncomingTransition();
+                    };
+
+                    document.addEventListener("click", onClick);
+                    window.addEventListener("pageshow", onPageShow);
+                    window.addEventListener("pagehide", clearTransition);
+                    playIncomingTransition();
+
+                    return () => {
+                        document.removeEventListener("click", onClick);
+                        window.removeEventListener("pageshow", onPageShow);
+                        window.removeEventListener("pagehide", clearTransition);
+                        clearTransition();
+                    };
+                };
+
+                const mountEnhancements = () => {
+                    const previousCleanup = window[cleanupKey];
+                    if (typeof previousCleanup === "function") {
+                        previousCleanup();
+                    }
+
+                    water.mount();
+                    water.refreshAccent();
+
+                    const cleanups = [
+                        setupInputMode(),
+                        setupScrollReveal(),
+                        setupParticles(),
+                        setupPageInteractions(),
+                        setupCaseInteractions(),
+                    ];
+
+                    window[cleanupKey] = () => {
+                        cleanups.forEach((cleanup) => {
+                            if (typeof cleanup === "function") {
+                                cleanup();
+                            }
+                        });
+                    };
+                };
+
+                window.__portfolioFxMount = mountEnhancements;
+
+                mountEnhancements();
+                if (typeof window.__portfolioRouteTransitionsCleanup === "function") {
+                    window.__portfolioRouteTransitionsCleanup();
+                }
+                window.__portfolioRouteTransitionsCleanup = setupRouteTransitions();
+            })();

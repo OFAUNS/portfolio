@@ -1,15 +1,4 @@
-/* 
-  To change the theme, uncomment one of the lines below and comment out the current one.
-  Make sure only one theme is active at a time.
-*/
-/* @import "./themes/caffeine.css"; */
-/* @import "./themes/catppuccin.css"; */
-/* @import "./themes/claude.css"; */
 @import "./themes/code.css";
-/* @import "./themes/desert.css"; */
-/* @import "./themes/spotify.css"; */
-/* @import "./themes/starbuck.css"; */
-/* @import "./themes/sunset.css"; */
 
 @tailwind base;
 @tailwind components;
@@ -19,6 +8,14 @@
   :root {
     --radius: 0rem;
     --font-sans: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+
+    /* 版面邊界：所有 shell 共用同一組 gutter 與最大寬度 */
+    --page-gutter: clamp(1.25rem, 4vw, 4.5rem);
+    --page-max: 88rem;
+
+    /* 水波與轉場共用的主色。必須定義在 :root，
+       water-field.js 的 readAccent() 是對 documentElement 讀這個值。 */
+    --scene-accent: #5ddcff;
   }
 }
 
@@ -225,6 +222,28 @@ main .portfolio-project.scroll-reveal {
 }
 
 /* Ambient floating particles */
+#water-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  filter: url("#water-refraction");
+}
+
+html[data-fx-calm="true"] #water-field {
+  opacity: 0.3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #water-field {
+    display: none;
+  }
+}
+
 #ambient-particles {
   position: fixed;
   inset: 0;
@@ -367,319 +386,6 @@ main .portfolio-project.scroll-reveal {
   contain: paint;
   will-change: opacity;
   --transition-accent: var(--route-transition-accent, #d8e6ff);
-}
-
-.transition-overlay__base,
-.transition-overlay__water,
-.transition-overlay__pieces,
-.transition-overlay__triangles,
-.transition-overlay__frame,
-.transition-overlay__mark {
-  position: absolute;
-  pointer-events: none;
-}
-
-.transition-overlay__base {
-  inset: 0;
-  background:
-    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, white 18%, transparent), transparent 16%),
-    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, var(--transition-accent) 34%, transparent), transparent 44%),
-    linear-gradient(130deg, color-mix(in oklch, #061225 90%, var(--transition-accent) 10%) 0%, #020609 62%, #000 100%);
-  opacity: 0;
-  transform: scale(1.04);
-  transform-origin: var(--route-x, 50%) var(--route-y, 50%);
-  contain: paint;
-  will-change: opacity, transform;
-}
-
-.transition-overlay__water {
-  inset: 0;
-  z-index: 2;
-  overflow: hidden;
-  contain: paint;
-}
-
-.transition-overlay__water span {
-  position: absolute;
-  left: var(--route-x, 50%);
-  top: var(--route-y, 50%);
-  width: max(34vmax, 24rem);
-  aspect-ratio: 1;
-  border: 1px solid color-mix(in oklch, white 28%, transparent);
-  border-radius: 50% !important;
-  background:
-    radial-gradient(circle, transparent 0 44%, color-mix(in oklch, white 20%, transparent) 45% 45.8%, transparent 47% 100%),
-    radial-gradient(circle, color-mix(in oklch, var(--transition-accent) 22%, transparent), transparent 58%);
-  box-shadow:
-    0 0 48px color-mix(in oklch, var(--transition-accent) 16%, transparent),
-    inset 0 0 44px color-mix(in oklch, white 8%, transparent);
-  opacity: 0;
-  mix-blend-mode: screen;
-  transform: translate(-50%, -50%) scale(0.12);
-  backface-visibility: hidden;
-  contain: paint;
-  will-change: opacity, transform, filter;
-}
-
-.transition-overlay__base::before,
-.transition-overlay__base::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-
-.transition-overlay__base::before {
-  background:
-    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, white 12%, transparent), transparent 28%),
-    radial-gradient(circle at calc(var(--route-x, 50%) + 16%) calc(var(--route-y, 50%) - 12%), color-mix(in oklch, var(--transition-accent) 14%, transparent), transparent 34%);
-  opacity: 0.48;
-}
-
-.transition-overlay__base::after {
-  background:
-    linear-gradient(90deg, transparent 0 17%, color-mix(in oklch, white 12%, transparent) 17% 17.1%, transparent 17.1% 100%),
-    linear-gradient(0deg, transparent 0 62%, color-mix(in oklch, var(--transition-accent) 22%, transparent) 62% 62.12%, transparent 62.12% 100%);
-  opacity: 0.78;
-}
-
-.transition-overlay__pieces {
-  inset: -1px;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  transform-style: preserve-3d;
-}
-
-.transition-overlay__triangles {
-  inset: -14vmax;
-  transform-style: preserve-3d;
-}
-
-.transition-overlay__triangle {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: block;
-  width: clamp(16rem, 28vw, 34rem);
-  aspect-ratio: 1;
-  clip-path: var(--triangle-shape);
-  background:
-    linear-gradient(135deg, color-mix(in oklch, white 18%, transparent), transparent 42%),
-    linear-gradient(160deg, color-mix(in oklch, var(--transition-accent) 24%, #0b1830), color-mix(in oklch, #020609 86%, transparent));
-  border: 1px solid color-mix(in oklch, white 14%, transparent);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--transition-accent) 18%, transparent),
-    0 28px 90px color-mix(in oklch, #000 55%, transparent);
-  mix-blend-mode: screen;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  will-change: transform, opacity;
-}
-
-.transition-overlay__triangle:nth-child(2n) {
-  width: clamp(12rem, 22vw, 28rem);
-  background:
-    linear-gradient(45deg, color-mix(in oklch, var(--transition-accent) 20%, transparent), transparent 52%),
-    linear-gradient(180deg, color-mix(in oklch, white 7%, #061225), #010306);
-}
-
-.transition-overlay__triangle:nth-child(1) {
-  left: 18%;
-  top: 18%;
-}
-
-.transition-overlay__triangle:nth-child(2) {
-  left: 42%;
-  top: 14%;
-}
-
-.transition-overlay__triangle:nth-child(3) {
-  left: 72%;
-  top: 22%;
-}
-
-.transition-overlay__triangle:nth-child(4) {
-  left: 16%;
-  top: 58%;
-}
-
-.transition-overlay__triangle:nth-child(5) {
-  left: 72%;
-  top: 62%;
-}
-
-.transition-overlay__triangle:nth-child(6) {
-  left: 34%;
-  top: 78%;
-}
-
-.transition-overlay__triangle:nth-child(7) {
-  left: 56%;
-  top: 82%;
-}
-
-.transition-overlay__triangle:nth-child(8) {
-  left: 86%;
-  top: 48%;
-}
-
-.transition-overlay__triangle:nth-child(3n) {
-  width: clamp(18rem, 34vw, 42rem);
-  mix-blend-mode: normal;
-  opacity: 0;
-}
-
-.transition-overlay__piece {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, color-mix(in oklch, white 7%, transparent), transparent 45%),
-    linear-gradient(160deg, color-mix(in oklch, var(--transition-accent) 15%, #081426) 0%, #020609 74%);
-  border: 1px solid color-mix(in oklch, white 9%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in oklch, white 11%, transparent),
-    0 24px 80px color-mix(in oklch, var(--transition-accent) 9%, transparent);
-  transform-origin: center;
-  will-change: transform, opacity;
-}
-
-.transition-overlay__piece::before,
-.transition-overlay__piece::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-
-.transition-overlay__piece::before {
-  background:
-    linear-gradient(135deg, transparent 0 48%, color-mix(in oklch, white 11%, transparent) 48% 48.4%, transparent 48.4% 100%),
-    repeating-linear-gradient(90deg, color-mix(in oklch, white 5%, transparent) 0 1px, transparent 1px 18px);
-  opacity: 0.72;
-}
-
-.transition-overlay__piece::after {
-  inset: 12%;
-  border: 1px solid color-mix(in oklch, var(--transition-accent) 18%, transparent);
-  opacity: 0.54;
-}
-
-.transition-overlay__piece:nth-child(3n) {
-  background:
-    linear-gradient(45deg, color-mix(in oklch, var(--transition-accent) 18%, transparent), transparent 50%),
-    linear-gradient(150deg, #0a172a 0%, #020609 72%);
-}
-
-.transition-overlay__piece:nth-child(4n) {
-  background:
-    linear-gradient(120deg, color-mix(in oklch, white 9%, transparent), transparent 40%),
-    linear-gradient(180deg, color-mix(in oklch, #0d1b33 88%, var(--transition-accent) 12%), #010306);
-}
-
-.transition-overlay__frame {
-  inset: 50% auto auto 50%;
-  width: min(62vw, 46rem);
-  height: min(44vh, 24rem);
-  border: 1px solid color-mix(in oklch, white 42%, transparent);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--transition-accent) 22%, transparent),
-    0 0 0 1px color-mix(in oklch, #020609 86%, transparent),
-    0 34px 110px color-mix(in oklch, var(--transition-accent) 13%, transparent);
-  transform: translate(-50%, -50%);
-  mix-blend-mode: screen;
-}
-
-.transition-overlay__frame::before,
-.transition-overlay__frame::after {
-  content: "";
-  position: absolute;
-  background: color-mix(in oklch, white 62%, transparent);
-}
-
-.transition-overlay__frame::before {
-  left: 50%;
-  top: -12vh;
-  bottom: -12vh;
-  width: 1px;
-}
-
-.transition-overlay__frame::after {
-  left: -8vw;
-  right: -8vw;
-  top: 50%;
-  height: 1px;
-}
-
-.transition-overlay__mark {
-  left: 50%;
-  top: 50%;
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: clamp(2rem, 7vw, 6.5rem);
-  font-weight: 950;
-  letter-spacing: 0;
-  line-height: 0.85;
-  text-transform: uppercase;
-  text-shadow: 0 22px 62px color-mix(in oklch, #000 70%, transparent);
-  transform: translate(-50%, -50%);
-}
-
-.transition-overlay__mark span {
-  display: block;
-  border-top: 1px solid color-mix(in oklch, white 36%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, white 28%, transparent);
-  padding: 0.18em 0.12em 0.22em;
-}
-
-.transition-overlay.is-leaving,
-.transition-overlay.is-entering {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.transition-overlay.is-leaving {
-  animation: route-overlay-cover 420ms ease-out both;
-}
-
-.transition-overlay.is-entering {
-  animation: route-overlay-release 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay__piece,
-.transition-overlay__triangle,
-.transition-overlay__frame,
-.transition-overlay__mark {
-  opacity: 0;
-}
-
-.transition-overlay.is-leaving .transition-overlay__base {
-  animation: route-water-backdrop-cover 420ms ease-out both;
-}
-
-.transition-overlay.is-entering .transition-overlay__base {
-  animation: route-water-backdrop-release 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__water span {
-  animation: route-water-ripple-cover 560ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-  animation-delay: calc(var(--ripple-index) * 54ms);
-}
-
-.transition-overlay.is-entering .transition-overlay__water span {
-  animation: route-water-ripple-release 660ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--ripple-index) * 38ms);
-}
-
-.transition-overlay.is-leaving .transition-overlay__frame,
-.transition-overlay.is-leaving .transition-overlay__mark {
-  animation: route-mark-cover 420ms ease-out 120ms both;
-}
-
-.transition-overlay.is-entering .transition-overlay__frame,
-.transition-overlay.is-entering .transition-overlay__mark {
-  animation: route-mark-release 520ms ease-out both;
 }
 
 /* Interactive portfolio homepage */
@@ -1331,17 +1037,8 @@ html[data-route-transition] .portfolio-design-lines span {
   align-items: stretch;
 }
 
-.portfolio-project--product .portfolio-project-thumb {
-  aspect-ratio: 4 / 5;
-}
-
-.portfolio-project--system .portfolio-project-thumb {
-  aspect-ratio: 16 / 10;
-}
-
-.portfolio-project--motion .portfolio-project-thumb {
-  aspect-ratio: 1 / 1;
-}
+/* 圖片比例改由欄寬決定（見 .portfolio-project 的 nth-child 節奏），
+   不再依作品類型各給一種比例——那會讓 span 與比例兩套節奏互相打架。 */
 
 /* Adaptive case-study pages */
 .work-case {
@@ -1683,7 +1380,7 @@ html[data-route-transition] .portfolio-design-lines span {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  width: min(100% - 2rem, 92rem);
+  width: min(100% - var(--page-gutter) * 2, var(--page-max));
   margin-inline: auto;
   padding-block: clamp(1rem, 2.5vw, 1.75rem);
 }
@@ -1691,7 +1388,7 @@ html[data-route-transition] .portfolio-design-lines span {
 .case-shell {
   position: relative;
   z-index: 1;
-  width: min(100% - 2rem, 92rem);
+  width: min(100% - var(--page-gutter) * 2, var(--page-max));
   margin-inline: auto;
   padding-block: clamp(1.5rem, 4vw, 4rem) clamp(4rem, 8vw, 7rem);
 }
@@ -1756,10 +1453,13 @@ html[data-route-transition] .portfolio-design-lines span {
   min-width: 0;
   max-width: min(19ch, 100%);
   color: var(--foreground);
-  font-size: clamp(3rem, 8vw, 8.5rem);
-  font-weight: 950;
-  line-height: 0.98;
-  letter-spacing: 0;
+  /* 上限收到 6.5rem：8.5rem 時四行中文標題會超出視窗底部被裁掉 */
+  font-size: clamp(3rem, 6.2vw, 6.5rem);
+  /* 900 是 Noto Sans TC 的實際最重字重，950 會觸發合成假粗體 */
+  font-weight: 900;
+  /* 中文字面全滿，行高低於 1 會讓上下行相黏 */
+  line-height: 1.06;
+  letter-spacing: -0.01em;
   overflow-wrap: anywhere;
   text-wrap: balance;
   text-transform: uppercase;
@@ -3023,10 +2723,11 @@ html[data-route-transition] .portfolio-design-lines span {
 
 .case-section-heading h2 {
   max-width: 18ch;
-  font-size: clamp(2rem, 5vw, 5.5rem);
-  font-weight: 950;
-  line-height: 0.95;
-  letter-spacing: 0;
+  font-size: clamp(2rem, 4.4vw, 4.6rem);
+  /* 與 .case-title 同一套中文大標規則：900 字重、行高 > 1、負追蹤 */
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
@@ -3238,6 +2939,15 @@ html[data-route-transition] .portfolio-design-lines span {
   aspect-ratio: 1 / 1;
 }
 
+.case-layout-workflow .work-case-body img,
+.case-layout-hub .work-case-body img,
+.case-layout-telemetry .work-case-body img {
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: color-mix(in oklch, var(--background) 92%, var(--case-accent) 8%);
+  padding: clamp(0.5rem, 1.4vw, 1rem);
+}
+
 .case-credits {
   display: grid;
   grid-template-columns: minmax(10rem, 0.24fr) minmax(0, 1fr);
@@ -3288,6 +2998,78 @@ html[data-route-transition] .portfolio-design-lines span {
   font-size: 0.8rem;
 }
 
+/* About 頁：沿用 case 頁的玻璃面板配方，不另立一套視覺 */
+.about-panel-list {
+  display: grid;
+  gap: 1px;
+  margin-top: clamp(1.4rem, 4vw, 3rem);
+  background: color-mix(in oklch, var(--foreground) 12%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+}
+
+.about-panel {
+  display: grid;
+  gap: 0.4rem;
+  background: color-mix(in oklch, var(--case-panel) 92%, transparent);
+  padding: clamp(1rem, 2.4vw, 1.6rem);
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.about-panel > span {
+  color: color-mix(in oklch, var(--case-accent) 76%, var(--foreground));
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.about-panel > strong {
+  color: var(--foreground);
+  font-size: clamp(1rem, 1.6vw, 1.22rem);
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.about-panel-cn {
+  color: color-mix(in oklch, var(--foreground) 70%, transparent);
+  font-weight: 500;
+}
+
+.about-panel-org {
+  color: color-mix(in oklch, var(--case-accent) 70%, var(--foreground));
+  font-weight: 700;
+}
+
+.about-panel ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+
+.about-panel--link:hover,
+.about-panel--link:focus-visible {
+  background: color-mix(in oklch, var(--case-accent) 12%, var(--case-panel));
+}
+
+.about-panel--link:hover > strong,
+.about-panel--link:focus-visible > strong {
+  color: color-mix(in oklch, var(--case-accent) 82%, white);
+}
+
+.about-skill-groups {
+  display: grid;
+  gap: clamp(1.4rem, 3vw, 2.2rem);
+  margin-top: clamp(1.4rem, 4vw, 3rem);
+}
+
+.about-skill-group {
+  display: grid;
+  gap: 0.75rem;
+}
+
 .case-layout-film {
   --case-surface: color-mix(in oklch, var(--background) 84%, #170b03 16%);
 }
@@ -3311,6 +3093,24 @@ html[data-route-transition] .portfolio-design-lines span {
 }
 
 .case-layout-system .case-title {
+  max-width: 13ch;
+}
+
+.case-layout-workflow {
+  --case-surface: color-mix(in oklch, var(--background) 84%, #03161a 16%);
+}
+
+.case-layout-hub {
+  --case-surface: color-mix(in oklch, var(--background) 84%, #0d0a1e 16%);
+}
+
+.case-layout-telemetry {
+  --case-surface: color-mix(in oklch, var(--background) 84%, #191202 16%);
+}
+
+.case-layout-workflow .case-title,
+.case-layout-hub .case-title,
+.case-layout-telemetry .case-title {
   max-width: 13ch;
 }
 
@@ -3480,13 +3280,13 @@ html[data-route-transition] .portfolio-design-lines span {
 @media (max-width: 640px) {
   .case-nav,
   .case-footer {
-    width: min(100% - 1.25rem, 92rem);
-    max-width: calc(100vw - 1.25rem);
+    width: min(100% - var(--page-gutter) * 2, var(--page-max));
+    max-width: calc(100vw - var(--page-gutter) * 2);
   }
 
   .case-shell {
-    width: min(100% - 1.25rem, 92rem);
-    max-width: calc(100vw - 1.25rem);
+    width: min(100% - var(--page-gutter) * 2, var(--page-max));
+    max-width: calc(100vw - var(--page-gutter) * 2);
     overflow-x: clip;
   }
 
@@ -4007,150 +3807,37 @@ html[data-route-transition] .portfolio-design-lines span {
   }
 }
 
-@keyframes route-water-backdrop-cover {
-  0% {
-    opacity: 0;
-    filter: blur(12px) saturate(1.25);
-    transform: scale(1.06);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0) saturate(1.05);
-    transform: scale(1);
-  }
-}
-
-@keyframes route-water-backdrop-release {
-  0% {
-    opacity: 1;
-    filter: blur(0) saturate(1.05);
-    transform: scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(14px) saturate(1.35);
-    transform: scale(1.05);
-  }
-}
-
-@keyframes route-water-ripple-cover {
-  0% {
-    opacity: 0;
-    filter: blur(0.4rem) saturate(1.5);
-    transform: translate(-50%, -50%) scale(0.1);
-  }
-
-  48% {
-    opacity: 0.78;
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(0.08rem) saturate(1.1);
-    transform: translate(-50%, -50%) scale(2.55);
-  }
-}
-
-@keyframes route-water-ripple-release {
-  0% {
-    opacity: 0.62;
-    filter: blur(0.08rem) saturate(1.2);
-    transform: translate(-50%, -50%) scale(2.2);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(0.7rem) saturate(1.55);
-    transform: translate(-50%, -50%) scale(0.22);
-  }
-}
-
-@keyframes route-piece-cover {
-  0% {
-    opacity: 0;
-    filter: blur(10px);
-    transform: translate3d(var(--enter-x), var(--enter-y), 0) rotate(var(--enter-rotate)) scale(0.82);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
-  }
-}
-
-@keyframes route-piece-release {
-  0% {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(12px);
-    transform: translate3d(var(--exit-x), var(--exit-y), 0) rotate(var(--exit-rotate)) scale(0.78);
-  }
-}
-
-@keyframes route-triangle-cover {
-  0% {
-    opacity: 0;
-    filter: blur(10px);
-    transform: translate(calc(-50% + var(--enter-x)), calc(-50% + var(--enter-y))) rotate(var(--enter-rotate)) scale(0.68);
-  }
-
-  100% {
-    opacity: 0.78;
-    filter: blur(0);
-    transform: translate(-50%, -50%) rotate(0deg) scale(1);
-  }
-}
-
-@keyframes route-triangle-release {
-  0% {
-    opacity: 0.78;
-    filter: blur(0);
-    transform: translate(-50%, -50%) rotate(0deg) scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(12px);
-    transform: translate(calc(-50% + var(--exit-x)), calc(-50% + var(--exit-y))) rotate(var(--exit-rotate)) scale(0.72);
-  }
-}
-
+/* 浮出水面：從深處被折射得糊掉，逐漸上浮到清晰 */
 @keyframes route-mark-cover {
   0% {
     opacity: 0;
-    filter: blur(8px);
+    filter: blur(14px) saturate(1.3);
+    transform: translate(-50%, -50%) scale(0.86);
   }
 
   100% {
     opacity: 1;
-    filter: blur(0);
+    filter: blur(0) saturate(1);
+    transform: translate(-50%, -50%) scale(0.94);
   }
 }
 
+/* 沉回水裡 */
 @keyframes route-mark-release {
   0% {
     opacity: 1;
-    filter: blur(0);
+    filter: blur(0) saturate(1);
+    transform: translate(-50%, -50%) scale(0.94);
   }
 
   100% {
     opacity: 0;
-    filter: blur(10px);
+    filter: blur(16px) saturate(1.35);
+    transform: translate(-50%, -50%) scale(1.06);
   }
 }
 
 /* Visual cleanup: remove decorative grid backgrounds while keeping layout grids. */
-.transition-overlay__base::before,
-.transition-overlay__base::after,
-.transition-overlay__piece::before,
 .portfolio-home::after,
 .portfolio-map::before,
 .portfolio-design-lines,
@@ -4335,61 +4022,6 @@ html[data-route-transition] .portfolio-flow-field span {
   pointer-events: none;
 }
 
-.portfolio-distortion-ripple {
-  position: fixed;
-  left: var(--auto-ripple-x, 50%);
-  top: var(--auto-ripple-y, 50%);
-  z-index: 1;
-  display: block;
-  width: var(--auto-ripple-size, 28rem);
-  aspect-ratio: 1;
-  border-radius: 9999px !important;
-  clip-path: circle(49% at 50% 50%);
-  -webkit-mask-image: radial-gradient(circle, black 0 58%, rgb(0 0 0 / 0.72) 68%, transparent 82%);
-  mask-image: radial-gradient(circle, black 0 58%, rgb(0 0 0 / 0.72) 68%, transparent 82%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  overflow: hidden;
-  pointer-events: none;
-  background:
-    radial-gradient(circle, transparent 0 28%, color-mix(in oklch, white 28%, transparent) 31%, transparent 35%),
-    radial-gradient(circle, transparent 0 43%, color-mix(in oklch, var(--portfolio-cyan) 30%, transparent) 46%, transparent 54%),
-    radial-gradient(circle, color-mix(in oklch, white 10%, transparent) 0%, transparent 64%);
-  box-shadow:
-    inset 0 0 1.2rem color-mix(in oklch, white 18%, transparent),
-    inset 0 0 4rem color-mix(in oklch, var(--portfolio-cyan) 18%, transparent),
-    0 0 4.8rem color-mix(in oklch, var(--portfolio-cyan) 12%, transparent);
-  -webkit-backdrop-filter: blur(5px) saturate(1.24) contrast(1.08);
-  backdrop-filter: url("#portfolio-ripple-distortion") blur(5px) saturate(1.24) contrast(1.08);
-  mix-blend-mode: normal;
-  opacity: 0;
-  transform: translate3d(-50%, -50%, 0) scale(0.42) rotate(var(--auto-ripple-rotate, 0deg));
-  animation: portfolio-distortion-ripple-spread var(--auto-ripple-duration, 2.9s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity, filter, backdrop-filter;
-}
-
-.portfolio-distortion-ripple--pointer {
-  z-index: 1;
-}
-
-.dark .portfolio-distortion-ripple {
-  background:
-    radial-gradient(circle, transparent 0 28%, color-mix(in oklch, white 20%, transparent) 31%, transparent 35%),
-    radial-gradient(circle, transparent 0 43%, color-mix(in oklch, var(--portfolio-cyan) 36%, transparent) 46%, transparent 54%),
-    radial-gradient(circle, color-mix(in oklch, white 8%, transparent) 0%, transparent 64%);
-  box-shadow:
-    inset 0 0 1.4rem color-mix(in oklch, white 16%, transparent),
-    inset 0 0 4.4rem color-mix(in oklch, var(--portfolio-cyan) 22%, transparent),
-    0 0 5.4rem color-mix(in oklch, var(--portfolio-cyan) 18%, transparent);
-  mix-blend-mode: screen;
-}
-
-html[data-fx-calm="true"] .portfolio-distortion-ripple {
-  display: none !important;
-}
-
 .portfolio-theme-toggle {
   position: fixed;
   top: clamp(0.85rem, 2vw, 1.4rem);
@@ -4473,8 +4105,8 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
 }
 
 .portfolio-shell--cinematic {
-  width: min(100% - 2rem, 104rem);
-  max-width: calc(100vw - 2rem);
+  width: min(100% - var(--page-gutter) * 2, var(--page-max));
+  max-width: calc(100vw - var(--page-gutter) * 2);
   margin: 0 auto;
   letter-spacing: 0;
   overflow-x: clip;
@@ -4676,8 +4308,10 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   max-width: 9ch;
   color: var(--portfolio-ink);
   font-size: 5.6rem;
-  font-weight: 950;
-  line-height: 0.78;
+  font-weight: 900;
+  line-height: 0.82;
+  /* 展示級字必須負追蹤，預設的 normal 在 5.6rem 下字間過鬆 */
+  letter-spacing: -0.03em;
   text-transform: uppercase;
   text-shadow:
     0 0.08em 0 color-mix(in oklch, white 62%, transparent),
@@ -5394,7 +5028,7 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1.1rem;
+  gap: 1.75rem;
 }
 
 .portfolio-project {
@@ -5412,6 +5046,8 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   backdrop-filter: blur(18px) saturate(1.12);
 }
 
+/* 兩種比例的節奏：寬卡走 16/9、窄卡走 4/5，
+   跟欄寬綁在一起才讀得出是刻意的錯落而不是壞掉。 */
 .portfolio-project:nth-child(4n + 1) {
   grid-column: span 7;
 }
@@ -5428,6 +5064,16 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
 .portfolio-project:nth-child(4n) {
   grid-column: span 7;
   margin-top: -1.5rem;
+}
+
+.portfolio-project:nth-child(4n + 1) .portfolio-project-thumb,
+.portfolio-project:nth-child(4n) .portfolio-project-thumb {
+  aspect-ratio: 16 / 9;
+}
+
+.portfolio-project:nth-child(4n + 2) .portfolio-project-thumb,
+.portfolio-project:nth-child(4n + 3) .portfolio-project-thumb {
+  aspect-ratio: 4 / 5;
 }
 
 .portfolio-project:hover {
@@ -5578,8 +5224,8 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
 
 @media (max-width: 1023px) {
   .portfolio-shell--cinematic {
-    width: min(100% - 1rem, 58rem);
-    max-width: calc(100vw - 1rem);
+    width: min(100% - var(--page-gutter) * 2, 58rem);
+    max-width: calc(100vw - var(--page-gutter) * 2);
   }
 
   .portfolio-topbar {
@@ -5770,8 +5416,8 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   }
 
   .portfolio-shell--cinematic {
-    width: calc(100% - 1rem);
-    max-width: calc(100vw - 1rem);
+    width: calc(100% - var(--page-gutter) * 2);
+    max-width: calc(100vw - var(--page-gutter) * 2);
   }
 
   .portfolio-race-hero {
@@ -5949,31 +5595,6 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   }
 }
 
-@keyframes portfolio-distortion-ripple-spread {
-  0% {
-    opacity: 0;
-    filter: blur(0.18rem);
-    transform: translate3d(-50%, -50%, 0) scale(0.42) rotate(var(--auto-ripple-rotate, 0deg));
-  }
-
-  18% {
-    opacity: var(--auto-ripple-opacity, 0.5);
-    filter: blur(0.24rem) saturate(1.14);
-  }
-
-  52% {
-    opacity: calc(var(--auto-ripple-opacity, 0.5) * 0.76);
-    filter: blur(0.34rem) saturate(1.18);
-    transform: translate3d(-50%, -50%, 0) scale(1.34) rotate(calc(var(--auto-ripple-rotate, 0deg) + 5deg));
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(0.62rem);
-    transform: translate3d(-50%, -50%, 0) scale(1.68) rotate(calc(var(--auto-ripple-rotate, 0deg) + 10deg));
-  }
-}
-
 @keyframes portfolio-marquee-left {
   0% {
     translate: -2rem 0;
@@ -6112,115 +5733,64 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   }
 }
 
-/* Route transition: speed-tunnel pass */
+/* Route transition: 半透明疊層，讓底下 canvas 水波在轉場時透出來 */
 .transition-overlay {
-  --transition-accent: var(--route-transition-accent, #76f7ff);
+  --transition-accent: var(--route-transition-accent, var(--scene-accent));
   --transition-signal: #d8ff38;
   background: transparent;
   perspective: 900px;
 }
 
 .transition-overlay__base,
-.transition-overlay__tunnel,
-.transition-overlay__runway,
+.transition-overlay__caustics,
 .transition-overlay__speedcopy,
-.transition-overlay__water,
 .transition-overlay__mark {
   position: absolute;
   pointer-events: none;
 }
 
+/* 水位線：以點擊處為圓心的水面，靠 #water-refraction 的 turbulence 位移
+   把正圓邊緣打成波動的水線。跟 canvas 波場用同一顆濾鏡，是同一套系統。
+   inset 與 scale 都要壓住——被濾鏡處理的面積是 (inset 放大 × scale)²，
+   放大一點點都會讓每幀成本暴增。 */
 .transition-overlay__base {
   inset: 0;
   background:
-    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, white 20%, transparent), transparent 15%),
-    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--transition-accent) 32%, transparent), transparent 35%),
-    linear-gradient(116deg, color-mix(in oklch, #020303 90%, var(--transition-accent) 10%) 0%, #050606 52%, #000 100%);
+    radial-gradient(
+      circle at var(--route-x, 50%) var(--route-y, 50%),
+      color-mix(in oklch, white 26%, transparent) 0 4%,
+      color-mix(in oklch, var(--transition-accent) 40%, transparent) 9%,
+      color-mix(in oklch, #041c26 82%, var(--transition-accent) 18%) 26%,
+      color-mix(in oklch, #01080d 92%, var(--transition-accent) 8%) 52%
+    );
   opacity: 0;
+  transform: scale(0.06);
   transform-origin: var(--route-x, 50%) var(--route-y, 50%);
+  filter: url("#water-refraction");
 }
 
-.transition-overlay__tunnel {
-  inset: -18vmax;
+/* 焦散光：從水底往上看的光斑，隨水位上升淡入並緩慢漂移，同一顆濾鏡 */
+.transition-overlay__caustics {
+  inset: -20%;
   z-index: 2;
-  transform-style: preserve-3d;
+  background:
+    repeating-radial-gradient(
+      circle at var(--route-x, 50%) var(--route-y, 50%),
+      transparent 0 3.2rem,
+      color-mix(in oklch, var(--transition-accent) 26%, transparent) 3.4rem 3.7rem,
+      transparent 4.1rem 7.4rem
+    ),
+    conic-gradient(
+      from 210deg at 38% 32%,
+      transparent 0 18%,
+      color-mix(in oklch, white 16%, transparent) 27%,
+      transparent 41%,
+      color-mix(in oklch, var(--transition-accent) 22%, transparent) 58%,
+      transparent 74%
+    );
   opacity: 0;
-}
-
-.transition-overlay__tunnel span {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 1px;
-  height: 150vmax;
-  background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--transition-accent) 60%, white), transparent);
-  box-shadow: 0 0 18px color-mix(in oklch, var(--transition-accent) 36%, transparent);
-  opacity: 0;
-  transform:
-    translate(-50%, -50%)
-    rotate(calc(var(--line-index) * 11.25deg))
-    translateY(-6vmax)
-    scaleY(0.12);
-  transform-origin: 50% 50%;
   mix-blend-mode: screen;
-}
-
-.transition-overlay__runway {
-  inset: 0;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  opacity: 0;
-  transform-style: preserve-3d;
-}
-
-.transition-overlay__runway::before,
-.transition-overlay__runway::after,
-.transition-overlay__runway span {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: block;
-  transform: translate(-50%, -50%);
-}
-
-.transition-overlay__runway::before {
-  width: min(78vw, 74rem);
-  height: min(54vh, 34rem);
-  border: 1px solid color-mix(in oklch, white 38%, transparent);
-  clip-path: polygon(0 42%, 48% 0, 100% 42%, 100% 58%, 48% 100%, 0 58%);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--transition-accent) 28%, transparent),
-    0 0 5rem color-mix(in oklch, var(--transition-accent) 16%, transparent);
-}
-
-.transition-overlay__runway::after {
-  width: 1px;
-  height: 120vh;
-  background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--transition-signal) 80%, white), transparent);
-  box-shadow: 0 0 28px color-mix(in oklch, var(--transition-signal) 50%, transparent);
-}
-
-.transition-overlay__runway span {
-  width: min(112vw, 110rem);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, white 72%, transparent), transparent);
-  transform: translate(-50%, -50%) rotate(var(--speed-rotate, 0deg));
-  opacity: 0.48;
-}
-
-.transition-overlay__runway span:nth-child(1) {
-  --speed-rotate: 0deg;
-}
-
-.transition-overlay__runway span:nth-child(2) {
-  --speed-rotate: 18deg;
-}
-
-.transition-overlay__runway span:nth-child(3) {
-  --speed-rotate: -18deg;
+  filter: url("#water-refraction");
 }
 
 .transition-overlay__speedcopy {
@@ -6230,12 +5800,14 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   gap: 1rem;
   color: color-mix(in oklch, white 32%, transparent);
   font-size: clamp(2.3rem, 7vw, 7rem);
-  font-weight: 950;
+  font-weight: 900;
   line-height: 0.8;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
   white-space: nowrap;
   opacity: 0;
-  transform: skewY(-1.4deg);
+  /* 折射取代原本的 skewY 賽車傾斜：字像漂在水面被水波扭曲 */
+  filter: url("#water-refraction");
 }
 
 .transition-overlay__mark {
@@ -6248,10 +5820,12 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   font-size: clamp(2.2rem, 8vw, 7rem);
   font-weight: 950;
   line-height: 0.8;
+  letter-spacing: 0;
   text-transform: uppercase;
   text-shadow:
     0 0 2rem color-mix(in oklch, var(--transition-accent) 42%, transparent),
     0 1.6rem 5rem color-mix(in oklch, black 74%, transparent);
+  opacity: 0;
   transform: translate(-50%, -50%) scale(0.94);
 }
 
@@ -6268,203 +5842,135 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
 }
 
 .transition-overlay.is-leaving {
-  animation: route-overlay-cover 540ms ease-out both;
+  animation: route-overlay-cover 650ms ease-out both;
 }
 
 .transition-overlay.is-entering {
-  animation: route-overlay-release 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: route-overlay-release 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .transition-overlay.is-leaving .transition-overlay__base {
-  animation: route-speed-base-cover 540ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
+  animation: route-water-flood 650ms cubic-bezier(0.22, 0.86, 0.3, 1) both;
 }
 
 .transition-overlay.is-entering .transition-overlay__base {
-  animation: route-speed-base-release 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: route-water-drain 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.transition-overlay.is-leaving .transition-overlay__tunnel,
-.transition-overlay.is-entering .transition-overlay__tunnel,
-.transition-overlay.is-leaving .transition-overlay__runway,
-.transition-overlay.is-entering .transition-overlay__runway,
+.transition-overlay.is-leaving .transition-overlay__caustics {
+  animation: route-caustics-rise 650ms cubic-bezier(0.22, 0.86, 0.3, 1) both;
+}
+
+.transition-overlay.is-entering .transition-overlay__caustics {
+  animation: route-caustics-fade 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .transition-overlay.is-leaving .transition-overlay__speedcopy,
 .transition-overlay.is-entering .transition-overlay__speedcopy {
   opacity: 1;
 }
 
-.transition-overlay.is-leaving .transition-overlay__tunnel span {
-  animation: route-tunnel-line-cover 540ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-  animation-delay: calc(var(--line-index) * 8ms);
-}
-
-.transition-overlay.is-entering .transition-overlay__tunnel span {
-  animation: route-tunnel-line-release 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--line-index) * 5ms);
-}
-
-.transition-overlay.is-leaving .transition-overlay__runway {
-  animation: route-runway-cover 540ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-}
-
-.transition-overlay.is-entering .transition-overlay__runway {
-  animation: route-runway-release 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
 .transition-overlay.is-leaving .transition-overlay__speedcopy {
-  animation: route-copy-cover 540ms linear both;
+  animation: route-copy-cover 650ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
 }
 
 .transition-overlay.is-entering .transition-overlay__speedcopy {
-  animation: route-copy-release 760ms linear both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__water span {
-  animation: route-water-ripple-cover 540ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-  animation-delay: calc(var(--ripple-index) * 42ms);
-}
-
-.transition-overlay.is-entering .transition-overlay__water span {
-  animation: route-water-ripple-release 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--ripple-index) * 30ms);
+  animation: route-copy-release 950ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
 }
 
 .transition-overlay.is-leaving .transition-overlay__mark {
-  animation: route-mark-cover 420ms ease-out 90ms both;
+  animation: route-mark-cover 520ms ease-out 110ms both;
 }
 
 .transition-overlay.is-entering .transition-overlay__mark {
-  animation: route-mark-release 600ms ease-out both;
+  animation: route-mark-release 700ms ease-out both;
 }
 
-@keyframes route-speed-base-cover {
+/* 水漫上來：從點擊處擴張成整面水 */
+@keyframes route-water-flood {
   0% {
     opacity: 0;
-    filter: blur(1rem) saturate(1.3);
-    transform: scale(1.1);
+    transform: scale(0.06);
+  }
+
+  22% {
+    opacity: 0.86;
   }
 
   100% {
-    opacity: 1;
-    filter: blur(0) saturate(1.05);
-    transform: scale(1);
+    opacity: 0.82;
+    transform: scale(1.9);
   }
 }
 
-@keyframes route-speed-base-release {
-  0% {
-    opacity: 1;
-    filter: blur(0) saturate(1.05);
-    transform: scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(1.1rem) saturate(1.45);
-    transform: scale(1.08);
-  }
-}
-
-@keyframes route-tunnel-line-cover {
-  0% {
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      rotate(calc(var(--line-index) * 11.25deg))
-      translateY(16vmax)
-      scaleY(0.08);
-  }
-
-  48% {
-    opacity: 0.88;
-  }
-
-  100% {
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      rotate(calc(var(--line-index) * 11.25deg))
-      translateY(-20vmax)
-      scaleY(3.2);
-  }
-}
-
-@keyframes route-tunnel-line-release {
-  0% {
-    opacity: 0.8;
-    transform:
-      translate(-50%, -50%)
-      rotate(calc(var(--line-index) * 11.25deg))
-      translateY(-18vmax)
-      scaleY(2.8);
-  }
-
-  100% {
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      rotate(calc(var(--line-index) * 11.25deg))
-      translateY(16vmax)
-      scaleY(0.08);
-  }
-}
-
-@keyframes route-runway-cover {
-  0% {
-    opacity: 0;
-    transform: translateZ(-340px) scale(0.42);
-    filter: blur(0.8rem);
-  }
-
-  56% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0.92;
-    transform: translateZ(180px) scale(1.24);
-    filter: blur(0);
-  }
-}
-
-@keyframes route-runway-release {
+/* 水退去：整面水縮回並散開 */
+@keyframes route-water-drain {
   0% {
     opacity: 0.82;
-    transform: translateZ(180px) scale(1.22);
-    filter: blur(0);
+    transform: scale(1.9);
   }
 
   100% {
     opacity: 0;
-    transform: translateZ(-380px) scale(0.36);
-    filter: blur(1rem);
+    transform: scale(2.4);
   }
 }
 
+/* 第二圈慢半拍，交疊出層次 */
+@keyframes route-caustics-rise {
+  0% {
+    opacity: 0;
+    transform: scale(1.25) rotate(-2deg);
+  }
+
+  40% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0.34;
+    transform: scale(1) rotate(1.5deg);
+  }
+}
+
+@keyframes route-caustics-fade {
+  0% {
+    opacity: 0.34;
+    transform: scale(1) rotate(1.5deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.3) rotate(4deg);
+  }
+}
+
+/* 漂在水面：位移比原本的賽車橫掃小得多，帶一點上下浮沉 */
 @keyframes route-copy-cover {
   0% {
     opacity: 0;
-    translate: 18vw 0;
+    translate: 7vw 1.2rem;
   }
 
-  30% {
-    opacity: 0.7;
+  34% {
+    opacity: 0.62;
   }
 
   100% {
     opacity: 0;
-    translate: -24vw 0;
+    translate: -6vw -0.8rem;
   }
 }
 
 @keyframes route-copy-release {
   0% {
-    opacity: 0.55;
-    translate: -18vw 0;
+    opacity: 0.5;
+    translate: -5vw -0.6rem;
   }
 
   100% {
     opacity: 0;
-    translate: 20vw 0;
+    translate: 6vw 1rem;
   }
 }
 
@@ -6551,10 +6057,6 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   .portfolio-home::after {
     animation: none !important;
     transform: none !important;
-  }
-
-  .portfolio-distortion-ripple {
-    display: none !important;
   }
 }
 
