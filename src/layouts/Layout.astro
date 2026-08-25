@@ -1,17 +1,24 @@
 ---
 import "@/styles/globals.css";
 import { ClientRouter } from "astro:transitions";
+import GoldenGrid from "@/components/GoldenGrid.astro";
 
 interface Props {
     title: string;
     description?: string;
     image?: string;
+    /** 黃金格線的 preset（見 src/lib/goldenGrid.ts 的 GOLDEN_PRESETS）。 */
+    grid?: string;
+    /** 這一頁的重點色，格線與背景動態都會吃這個值。 */
+    accent?: string;
 }
 
 const {
     title,
     description = "Visual designer / Founder of STUDIO SORAI",
     image = "/og-image.png",
+    grid = "minimal",
+    accent = "#5ddcff",
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -120,6 +127,8 @@ const socialImageURL = new URL(image, Astro.url);
             <span></span>
             <span></span>
         </div>
+        <GoldenGrid preset={grid} accent={accent} />
+
         <div id="page-content">
             <slot />
         </div>

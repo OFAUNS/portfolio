@@ -1,0 +1,43 @@
+---
+import { buildGoldenCells, resolvePreset } from "@/lib/goldenGrid";
+
+interface Props {
+    /** GOLDEN_PRESETS 的鍵，決定這一頁的格線個性。 */
+    preset?: string;
+    /** 這一頁的重點色，格線與背景動態都會吃這個值。 */
+    accent?: string;
+}
+
+const { preset: presetName = "minimal", accent = "#5ddcff" } = Astro.props;
+const preset = resolvePreset(presetName);
+const cells = buildGoldenCells(preset);
+
+// 只有第一個 field 方格會裝上水波 canvas：一塊有真的動態，
+// 比好幾塊各自微弱地動更清楚，也不必把 canvas 拆成多份。
+const field = cells.find((cell) => cell.role === "field") ?? cells[cells.length - 1];
+
+// 水波 canvas 是 fixed 全視窗的，剪裁範圍得換算回視窗座標，
+// 所以這裡輸出 0~1 的比例讓 CSS 用 calc 接手。
+const fieldVars = [
+    `--gg-field-x:${(field.x / 100).toFixed(5)}`,
+    `--gg-field-y:${(field.y / 100).toFixed(5)}`,
+    `--gg-field-size:${(field.size / 100).toFixed(5)}`,
+    `--gg-accent:${accent}`,
+].join(";");
+---
+
+<style is:global set:html={`:root{${fieldVars}}`}></style>
+
+<div class="golden-grid" data-preset={presetName} aria-hidden="true">
+    {
+        cells.map((cell) => (
+            <div
+                class:list={["golden-cell", `golden-cell--${cell.role}`]}
+                data-index={cell.index}
+                style={`left:${cell.x}%;top:${cell.y}%;width:${cell.size}%;view-transition-name:${cell.id};`}
+            >
+                <span class="golden-cell__edge" />
+            </div>
+        ))
+    }
+</div>

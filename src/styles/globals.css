@@ -214,11 +214,11 @@ main .portfolio-project.scroll-reveal {
   --reveal-duration: 840ms;
 }
 
-
 /* Page content wrapper */
 #page-content {
   position: relative;
-  z-index: 1;
+  /* 高於 .golden-grid 的 z-index: 1 */
+  z-index: 2;
 }
 
 /* Ambient floating particles */
@@ -370,25 +370,7 @@ html[data-fx-calm="true"] #water-field {
 
 .portfolio-click-lens.is-impacting span:nth-child(3) {
   animation-delay: 90ms;
-}
-
-/* Barba + GSAP modular scale transition */
-.transition-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  overflow: hidden;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateZ(0);
-  perspective: 1200px;
-  contain: paint;
-  will-change: opacity;
-  --transition-accent: var(--route-transition-accent, #d8e6ff);
-}
-
-/* Interactive portfolio homepage */
+}/* Interactive portfolio homepage */
 .portfolio-home {
   isolation: isolate;
   --background: oklch(0.97 0.018 232);
@@ -1093,7 +1075,7 @@ html[data-route-transition] .portfolio-design-lines span {
     repeating-linear-gradient(0deg, color-mix(in oklch, var(--foreground) 5%, transparent) 0 1px, transparent 1px 9px);
   background-size: 170% 170%, 100% 100%;
   opacity: 0.24;
-  animation: case-scan-field 22s linear infinite;
+  animation: case-scan-field 22s ease-in-out infinite alternate;
   mask-image: linear-gradient(180deg, black 0%, transparent 84%);
 }
 
@@ -3669,17 +3651,19 @@ html[data-route-transition] .portfolio-design-lines span {
   }
 }
 
+/* 只動 translate：background-position 會強制全螢幕重繪，量測到單這一條
+   就把作品頁從 72fps 壓到 24fps。translate 走合成器，視覺幾乎相同。 */
 @keyframes case-energy-drift {
   0% {
-    background-position: 45% 42%, 56% 52%, 0 0;
+    translate: -1.1% -0.9%;
   }
 
   50% {
-    background-position: 52% 48%, 48% 58%, 22px -18px;
+    translate: 1.3% 1.1%;
   }
 
   100% {
-    background-position: 58% 54%, 42% 46%, -18px 26px;
+    translate: 2.1% -1.5%;
   }
 }
 
@@ -3730,13 +3714,15 @@ html[data-route-transition] .portfolio-design-lines span {
   }
 }
 
+/* 同上。改成 alternate 往返，位移量就不必對齊重複漸層的週期，
+   也不會在循環接點跳一下。 */
 @keyframes case-scan-field {
   0% {
-    background-position: 0% 0%, 0 0;
+    translate: 0 0;
   }
 
   100% {
-    background-position: 140% 100%, 0 90px;
+    translate: 2.6% 3.2%;
   }
 }
 
@@ -3804,36 +3790,6 @@ html[data-route-transition] .portfolio-design-lines span {
 
   100% {
     opacity: 0;
-  }
-}
-
-/* 浮出水面：從深處被折射得糊掉，逐漸上浮到清晰 */
-@keyframes route-mark-cover {
-  0% {
-    opacity: 0;
-    filter: blur(14px) saturate(1.3);
-    transform: translate(-50%, -50%) scale(0.86);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0) saturate(1);
-    transform: translate(-50%, -50%) scale(0.94);
-  }
-}
-
-/* 沉回水裡 */
-@keyframes route-mark-release {
-  0% {
-    opacity: 1;
-    filter: blur(0) saturate(1);
-    transform: translate(-50%, -50%) scale(0.94);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(16px) saturate(1.35);
-    transform: translate(-50%, -50%) scale(1.06);
   }
 }
 
@@ -5731,162 +5687,7 @@ html[data-route-transition] .portfolio-flow-field span {
     translate: 0.5rem 0.35rem;
     rotate: y -1deg z -0.2deg;
   }
-}
-
-/* Route transition: 半透明疊層，讓底下 canvas 水波在轉場時透出來 */
-.transition-overlay {
-  --transition-accent: var(--route-transition-accent, var(--scene-accent));
-  --transition-signal: #d8ff38;
-  background: transparent;
-  perspective: 900px;
-}
-
-.transition-overlay__base,
-.transition-overlay__caustics,
-.transition-overlay__speedcopy,
-.transition-overlay__mark {
-  position: absolute;
-  pointer-events: none;
-}
-
-/* 水位線：以點擊處為圓心的水面，靠 #water-refraction 的 turbulence 位移
-   把正圓邊緣打成波動的水線。跟 canvas 波場用同一顆濾鏡，是同一套系統。
-   inset 與 scale 都要壓住——被濾鏡處理的面積是 (inset 放大 × scale)²，
-   放大一點點都會讓每幀成本暴增。 */
-.transition-overlay__base {
-  inset: 0;
-  background:
-    radial-gradient(
-      circle at var(--route-x, 50%) var(--route-y, 50%),
-      color-mix(in oklch, white 26%, transparent) 0 4%,
-      color-mix(in oklch, var(--transition-accent) 40%, transparent) 9%,
-      color-mix(in oklch, #041c26 82%, var(--transition-accent) 18%) 26%,
-      color-mix(in oklch, #01080d 92%, var(--transition-accent) 8%) 52%
-    );
-  opacity: 0;
-  transform: scale(0.06);
-  transform-origin: var(--route-x, 50%) var(--route-y, 50%);
-  filter: url("#water-refraction");
-}
-
-/* 焦散光：從水底往上看的光斑，隨水位上升淡入並緩慢漂移，同一顆濾鏡 */
-.transition-overlay__caustics {
-  inset: -20%;
-  z-index: 2;
-  background:
-    repeating-radial-gradient(
-      circle at var(--route-x, 50%) var(--route-y, 50%),
-      transparent 0 3.2rem,
-      color-mix(in oklch, var(--transition-accent) 26%, transparent) 3.4rem 3.7rem,
-      transparent 4.1rem 7.4rem
-    ),
-    conic-gradient(
-      from 210deg at 38% 32%,
-      transparent 0 18%,
-      color-mix(in oklch, white 16%, transparent) 27%,
-      transparent 41%,
-      color-mix(in oklch, var(--transition-accent) 22%, transparent) 58%,
-      transparent 74%
-    );
-  opacity: 0;
-  mix-blend-mode: screen;
-  filter: url("#water-refraction");
-}
-
-.transition-overlay__speedcopy {
-  inset: auto -12vw 8vh -12vw;
-  z-index: 4;
-  display: flex;
-  gap: 1rem;
-  color: color-mix(in oklch, white 32%, transparent);
-  font-size: clamp(2.3rem, 7vw, 7rem);
-  font-weight: 900;
-  line-height: 0.8;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0;
-  /* 折射取代原本的 skewY 賽車傾斜：字像漂在水面被水波扭曲 */
-  filter: url("#water-refraction");
-}
-
-.transition-overlay__mark {
-  z-index: 5;
-  left: 50%;
-  top: 50%;
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: clamp(2.2rem, 8vw, 7rem);
-  font-weight: 950;
-  line-height: 0.8;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  text-shadow:
-    0 0 2rem color-mix(in oklch, var(--transition-accent) 42%, transparent),
-    0 1.6rem 5rem color-mix(in oklch, black 74%, transparent);
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.94);
-}
-
-.transition-overlay__mark span {
-  border: 0;
-  padding: 0;
-}
-
-.transition-overlay.is-leaving,
-.transition-overlay.is-entering {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.transition-overlay.is-leaving {
-  animation: route-overlay-cover 650ms ease-out both;
-}
-
-.transition-overlay.is-entering {
-  animation: route-overlay-release 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__base {
-  animation: route-water-flood 650ms cubic-bezier(0.22, 0.86, 0.3, 1) both;
-}
-
-.transition-overlay.is-entering .transition-overlay__base {
-  animation: route-water-drain 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__caustics {
-  animation: route-caustics-rise 650ms cubic-bezier(0.22, 0.86, 0.3, 1) both;
-}
-
-.transition-overlay.is-entering .transition-overlay__caustics {
-  animation: route-caustics-fade 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__speedcopy,
-.transition-overlay.is-entering .transition-overlay__speedcopy {
-  opacity: 1;
-}
-
-.transition-overlay.is-leaving .transition-overlay__speedcopy {
-  animation: route-copy-cover 650ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
-}
-
-.transition-overlay.is-entering .transition-overlay__speedcopy {
-  animation: route-copy-release 950ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__mark {
-  animation: route-mark-cover 520ms ease-out 110ms both;
-}
-
-.transition-overlay.is-entering .transition-overlay__mark {
-  animation: route-mark-release 700ms ease-out both;
-}
-
-/* 水漫上來：從點擊處擴張成整面水 */
+}/* 水漫上來：從點擊處擴張成整面水 */
 @keyframes route-water-flood {
   0% {
     opacity: 0;
@@ -6049,10 +5850,6 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
     display: none !important;
   }
 
-  .transition-overlay {
-    display: none !important;
-  }
-
   .portfolio-home::before,
   .portfolio-home::after {
     animation: none !important;
@@ -6083,4 +5880,185 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
 
 .prose blockquote {
   @apply mt-6 border-l-2 border-primary pl-6 italic text-muted-foreground;
+}
+
+/* ==========================================================================
+   黃金比例方格系統
+   同一套格線負責兩件事：頁面的結構骨架，以及轉場時的分割單位。
+   方格邊長是 1 : 1/φ : 1/φ² … 的等比遞減（見 src/lib/goldenGrid.ts）。
+   ========================================================================== */
+
+:root {
+  --gg-phi: 1.618033988749895;
+  /* φ 盒子以 cover 的方式蓋滿視窗：視窗比例不會破壞方格的黃金比例 */
+  --gg-w: max(100vw, calc(100vh * var(--gg-phi)));
+  --gg-h: max(100vh, calc(100vw / var(--gg-phi)));
+  --gg-x: calc((100vw - var(--gg-w)) / 2);
+  --gg-y: calc((100vh - var(--gg-h)) / 2);
+  /* GoldenGrid.astro 逐頁覆寫這三個 */
+  --gg-field-x: 0;
+  --gg-field-y: 0;
+  --gg-field-size: 0.382;
+  --gg-accent: #5ddcff;
+}
+
+.golden-grid {
+  position: fixed;
+  left: var(--gg-x);
+  top: var(--gg-y);
+  width: var(--gg-w);
+  height: var(--gg-h);
+  z-index: 1;
+  pointer-events: none;
+  perspective: 1400px;
+  contain: strict;
+}
+
+.golden-cell {
+  position: absolute;
+  aspect-ratio: 1;
+  transform-style: preserve-3d;
+}
+
+.golden-cell__edge {
+  position: absolute;
+  inset: 0;
+  border: 1px solid color-mix(in oklch, var(--gg-accent) 22%, transparent);
+}
+
+/* 最大格是主進程所在，邊界要最實 */
+.golden-cell--stage .golden-cell__edge {
+  border-color: color-mix(in oklch, var(--gg-accent) 34%, transparent);
+}
+
+/* 背景動態格：水波在這裡露出來，所以只留一圈更亮的框 */
+.golden-cell--field .golden-cell__edge {
+  border-color: color-mix(in oklch, var(--gg-accent) 46%, transparent);
+  box-shadow: inset 0 0 60px color-mix(in oklch, var(--gg-accent) 10%, transparent);
+}
+
+/* 小碎格：越小越淡，避免畫面被線切碎 */
+.golden-cell--chip .golden-cell__edge {
+  border-color: color-mix(in oklch, var(--gg-accent) 14%, transparent);
+}
+
+/* 水波只在背景方格裡跑，其餘畫面保持乾淨 */
+#water-field {
+  clip-path: inset(
+    calc(var(--gg-y) + var(--gg-h) * var(--gg-field-y))
+    calc(100vw - var(--gg-x) - var(--gg-w) * (var(--gg-field-x) + var(--gg-field-size)))
+    calc(100vh - var(--gg-y) - var(--gg-h) * var(--gg-field-y) - var(--gg-w) * var(--gg-field-size))
+    calc(var(--gg-x) + var(--gg-w) * var(--gg-field-x))
+  );
+}
+
+/* --------------------------------------------------------------------------
+   轉場：每個方格各自翻面，大格慢、小格快，依序把新頁面拼出來
+   -------------------------------------------------------------------------- */
+
+@keyframes gg-flip-out {
+  to {
+    transform: rotateY(-88deg) scale(0.94);
+    opacity: 0;
+  }
+}
+
+@keyframes gg-flip-in {
+  from {
+    transform: rotateY(88deg) scale(0.94);
+    opacity: 0;
+  }
+}
+
+::view-transition-group(*) {
+  animation-timing-function: cubic-bezier(0.66, 0, 0.28, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.66, 0, 0.28, 1);
+}
+
+::view-transition-old(gg-0) {
+  animation: gg-flip-out 520ms cubic-bezier(0.66, 0, 0.28, 1) 0ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-0) {
+  animation: gg-flip-in 520ms cubic-bezier(0.66, 0, 0.28, 1) 45ms both;
+  transform-origin: 50% 50%;
+}
+::view-transition-old(gg-1) {
+  animation: gg-flip-out 468ms cubic-bezier(0.66, 0, 0.28, 1) 40ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-1) {
+  animation: gg-flip-in 468ms cubic-bezier(0.66, 0, 0.28, 1) 85ms both;
+  transform-origin: 50% 50%;
+}
+::view-transition-old(gg-2) {
+  animation: gg-flip-out 421ms cubic-bezier(0.66, 0, 0.28, 1) 80ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-2) {
+  animation: gg-flip-in 421ms cubic-bezier(0.66, 0, 0.28, 1) 125ms both;
+  transform-origin: 50% 50%;
+}
+::view-transition-old(gg-3) {
+  animation: gg-flip-out 379ms cubic-bezier(0.66, 0, 0.28, 1) 120ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-3) {
+  animation: gg-flip-in 379ms cubic-bezier(0.66, 0, 0.28, 1) 165ms both;
+  transform-origin: 50% 50%;
+}
+::view-transition-old(gg-4) {
+  animation: gg-flip-out 341ms cubic-bezier(0.66, 0, 0.28, 1) 160ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-4) {
+  animation: gg-flip-in 341ms cubic-bezier(0.66, 0, 0.28, 1) 205ms both;
+  transform-origin: 50% 50%;
+}
+::view-transition-old(gg-5) {
+  animation: gg-flip-out 307ms cubic-bezier(0.66, 0, 0.28, 1) 200ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-5) {
+  animation: gg-flip-in 307ms cubic-bezier(0.66, 0, 0.28, 1) 245ms both;
+  transform-origin: 50% 50%;
+}
+::view-transition-old(gg-6) {
+  animation: gg-flip-out 276ms cubic-bezier(0.66, 0, 0.28, 1) 240ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-6) {
+  animation: gg-flip-in 276ms cubic-bezier(0.66, 0, 0.28, 1) 285ms both;
+  transform-origin: 50% 50%;
+}
+::view-transition-old(gg-7) {
+  animation: gg-flip-out 249ms cubic-bezier(0.66, 0, 0.28, 1) 280ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-7) {
+  animation: gg-flip-in 249ms cubic-bezier(0.66, 0, 0.28, 1) 325ms both;
+  transform-origin: 50% 50%;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  .golden-cell__edge {
+    border-color: color-mix(in oklch, var(--gg-accent) 18%, transparent);
+  }
 }
