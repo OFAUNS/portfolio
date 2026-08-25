@@ -5898,6 +5898,8 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
   --gg-y: calc((100vh - var(--gg-h)) / 2);
   --gg-accent: #5ddcff;
   --gg-progress: 5000ms;
+  /* 整套編排共用同一條緩動：弧線、水波、序號、沉降、方格翻面 */
+  --gg-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   /* accent 多半是亮色，直接畫在亮色主題的近白背景上會整條消失。
      線條、弧線、序號一律用這個壓深過的墨色，暗色主題才用原本的 accent。 */
   --gg-ink: color-mix(in oklch, var(--gg-accent) 55%, #06202b 45%);
@@ -5925,33 +5927,39 @@ html:not(.dark) #water-field {
   z-index: 4;
   pointer-events: none;
   perspective: 1600px;
-  animation: gg-grid-settle var(--gg-progress) ease-out both;
+  animation: gg-grid-settle var(--gg-progress) var(--gg-ease) both;
 }
 
 #water-field {
   z-index: 3;
 }
 
-/* 五秒進程期間滿強度，畫完之後降下來，讓內容維持可讀但結構還在 */
+/* 五秒進程期間滿強度；畫完之後往下沉一點、縮一點、淡下來，
+   看起來像退到內容底下。真的把 z-index 降到內容之下不可行——頁面容器
+   多半是不透明的，那等於整片消失（就是先前只有 404 看得到的那個問題）。 */
 @keyframes gg-grid-settle {
   0%,
-  74% {
+  68% {
     opacity: 1;
+    scale: 1;
+    translate: 0 0;
   }
 
   100% {
-    opacity: 0.62;
+    opacity: 0.3;
+    scale: 0.988;
+    translate: 0 1.1%;
   }
 }
 
 @keyframes gg-water-settle {
   0%,
-  74% {
+  68% {
     opacity: 0.9;
   }
 
   100% {
-    opacity: 0.5;
+    opacity: 0.22;
   }
 }
 
@@ -6022,31 +6030,53 @@ html:not(.dark) #water-field {
   letter-spacing: 0.18em;
   color: color-mix(in oklch, var(--gg-ink) 72%, transparent);
   opacity: 0;
-  animation: gg-tick-in 420ms ease-out var(--gg-delay, 0ms) both;
+  animation: gg-tick-in 420ms var(--gg-ease) var(--gg-delay, 0ms) both;
 }
 
-/* --- 逐格點亮的水波：輪到自己時亮起來，之後留著 --- */
+/* --- 逐格點亮的水波：輪到自己時亮起來，之後留著 ---
+   刻意做得很透：這一層會蓋在內容上，實心的漸層球會擋字，而且看起來
+   不像水。改成兩團互相錯開的柔邊光暈，用 translate 緩慢漂移
+   （不能動 background-position，那會強制全螢幕重繪）。 */
 
 .golden-cell__wave {
   opacity: 0;
-  background:
-    radial-gradient(
-      circle at 30% 30%,
-      color-mix(in oklch, var(--gg-ink) 26%, transparent),
-      transparent 62%
-    );
-  animation: gg-wave-in var(--gg-step, 700ms) ease-out var(--gg-delay, 0ms) both;
+  overflow: hidden;
+  background: radial-gradient(
+    130% 130% at 50% 118%,
+    color-mix(in oklch, var(--gg-ink) 13%, transparent),
+    transparent 66%
+  );
+  animation: gg-wave-in var(--gg-step, 700ms) var(--gg-ease) var(--gg-delay, 0ms) both;
 }
 
+/* 漂移的兩團光暈：錯開大小與位置，看起來才像流動而不是呼吸 */
+.golden-cell__wave::before {
+  content: "";
+  position: absolute;
+  inset: -28%;
+  background:
+    radial-gradient(
+      36% 36% at 32% 34%,
+      color-mix(in oklch, var(--gg-ink) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      28% 28% at 68% 62%,
+      color-mix(in oklch, var(--gg-ink) 15%, transparent),
+      transparent 72%
+    );
+  animation: gg-wave-drift 11s ease-in-out var(--gg-delay, 0ms) infinite alternate;
+}
+
+/* 點亮瞬間的一圈漣漪 */
 .golden-cell__wave::after {
   content: "";
   position: absolute;
   inset: 8%;
-  border: 1px solid color-mix(in oklch, var(--gg-ink) 34%, transparent);
+  border: 1px solid color-mix(in oklch, var(--gg-ink) 26%, transparent);
   border-radius: 999px;
   opacity: 0;
-  animation: gg-wave-ring var(--gg-step, 700ms) cubic-bezier(0.2, 0.7, 0.3, 1)
-    var(--gg-delay, 0ms) both;
+  animation: gg-wave-ring var(--gg-step, 700ms) var(--gg-ease) var(--gg-delay, 0ms) both;
 }
 
 @keyframes gg-tick-in {
@@ -6064,32 +6094,44 @@ html:not(.dark) #water-field {
 @keyframes gg-wave-in {
   0% {
     opacity: 0;
-    scale: 0.82;
+    scale: 0.9;
   }
 
-  55% {
-    opacity: 1;
+  60% {
+    opacity: 0.62;
   }
 
   100% {
-    opacity: 0.72;
+    opacity: 0.48;
     scale: 1;
+  }
+}
+
+@keyframes gg-wave-drift {
+  0% {
+    translate: -4% 3%;
+    scale: 1;
+  }
+
+  100% {
+    translate: 5% -4%;
+    scale: 1.09;
   }
 }
 
 @keyframes gg-wave-ring {
   0% {
     opacity: 0;
-    scale: 0.15;
+    scale: 0.2;
   }
 
-  40% {
-    opacity: 0.9;
+  45% {
+    opacity: 0.55;
   }
 
   100% {
     opacity: 0;
-    scale: 1.25;
+    scale: 1.3;
   }
 }
 
@@ -6111,8 +6153,7 @@ html:not(.dark) #water-field {
   filter: drop-shadow(0 0 8px color-mix(in oklch, var(--gg-ink) 45%, transparent));
   stroke-dasharray: var(--arc-len) var(--arc-len);
   stroke-dashoffset: var(--arc-len);
-  animation: gg-arc-draw var(--gg-step, 700ms) cubic-bezier(0.5, 0, 0.5, 1)
-    var(--gg-delay, 0ms) both;
+  animation: gg-arc-draw var(--gg-step, 700ms) var(--gg-ease) var(--gg-delay, 0ms) both;
 }
 
 @keyframes gg-arc-draw {
@@ -6142,85 +6183,85 @@ html:not(.dark) #water-field {
 }
 
 ::view-transition-group(*) {
-  animation-timing-function: cubic-bezier(0.66, 0, 0.28, 1);
+  animation-timing-function: var(--gg-ease);
 }
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 400ms;
-  animation-timing-function: cubic-bezier(0.66, 0, 0.28, 1);
+  animation-timing-function: var(--gg-ease);
 }
 
 ::view-transition-old(gg-0) {
-  animation: gg-flip-out 1100ms cubic-bezier(0.66, 0, 0.28, 1) 0ms both;
+  animation: gg-flip-out 1100ms var(--gg-ease) 0ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-0) {
-  animation: gg-flip-in 1100ms cubic-bezier(0.66, 0, 0.28, 1) 90ms both;
+  animation: gg-flip-in 1100ms var(--gg-ease) 90ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-1) {
-  animation: gg-flip-out 990ms cubic-bezier(0.66, 0, 0.28, 1) 230ms both;
+  animation: gg-flip-out 990ms var(--gg-ease) 230ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-1) {
-  animation: gg-flip-in 990ms cubic-bezier(0.66, 0, 0.28, 1) 320ms both;
+  animation: gg-flip-in 990ms var(--gg-ease) 320ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-2) {
-  animation: gg-flip-out 891ms cubic-bezier(0.66, 0, 0.28, 1) 460ms both;
+  animation: gg-flip-out 891ms var(--gg-ease) 460ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-2) {
-  animation: gg-flip-in 891ms cubic-bezier(0.66, 0, 0.28, 1) 550ms both;
+  animation: gg-flip-in 891ms var(--gg-ease) 550ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-3) {
-  animation: gg-flip-out 802ms cubic-bezier(0.66, 0, 0.28, 1) 690ms both;
+  animation: gg-flip-out 802ms var(--gg-ease) 690ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-3) {
-  animation: gg-flip-in 802ms cubic-bezier(0.66, 0, 0.28, 1) 780ms both;
+  animation: gg-flip-in 802ms var(--gg-ease) 780ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-4) {
-  animation: gg-flip-out 722ms cubic-bezier(0.66, 0, 0.28, 1) 920ms both;
+  animation: gg-flip-out 722ms var(--gg-ease) 920ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-4) {
-  animation: gg-flip-in 722ms cubic-bezier(0.66, 0, 0.28, 1) 1010ms both;
+  animation: gg-flip-in 722ms var(--gg-ease) 1010ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-5) {
-  animation: gg-flip-out 650ms cubic-bezier(0.66, 0, 0.28, 1) 1150ms both;
+  animation: gg-flip-out 650ms var(--gg-ease) 1150ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-5) {
-  animation: gg-flip-in 650ms cubic-bezier(0.66, 0, 0.28, 1) 1240ms both;
+  animation: gg-flip-in 650ms var(--gg-ease) 1240ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-6) {
-  animation: gg-flip-out 585ms cubic-bezier(0.66, 0, 0.28, 1) 1380ms both;
+  animation: gg-flip-out 585ms var(--gg-ease) 1380ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-6) {
-  animation: gg-flip-in 585ms cubic-bezier(0.66, 0, 0.28, 1) 1470ms both;
+  animation: gg-flip-in 585ms var(--gg-ease) 1470ms both;
   transform-origin: 50% 50%;
 }
 ::view-transition-old(gg-7) {
-  animation: gg-flip-out 526ms cubic-bezier(0.66, 0, 0.28, 1) 1610ms both;
+  animation: gg-flip-out 526ms var(--gg-ease) 1610ms both;
   transform-origin: 50% 50%;
 }
 
 ::view-transition-new(gg-7) {
-  animation: gg-flip-in 526ms cubic-bezier(0.66, 0, 0.28, 1) 1700ms both;
+  animation: gg-flip-in 526ms var(--gg-ease) 1700ms both;
   transform-origin: 50% 50%;
 }
 
