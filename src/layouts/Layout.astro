@@ -1,5 +1,6 @@
 ---
 import "@/styles/globals.css";
+import { ClientRouter } from "astro:transitions";
 
 interface Props {
     title: string;
@@ -15,11 +16,6 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = new URL(image, Astro.url);
-const barbaNamespace =
-    Astro.url.pathname === "/"
-        ? "home"
-        : Astro.url.pathname.replace(/^\/|\/$/g, "").replace(/[^a-z0-9]+/gi, "-") ||
-          "page";
 ---
 
 <!doctype html>
@@ -56,6 +52,8 @@ const barbaNamespace =
             href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700;900&display=optional"
             rel="stylesheet"
         />
+        <ClientRouter />
+
         <script is:inline>
             const getThemePreference = () => {
                 if (
@@ -115,32 +113,15 @@ const barbaNamespace =
                 />
             </filter>
         </svg>
-        <canvas id="water-field" aria-hidden="true"></canvas>
+        <canvas id="water-field" aria-hidden="true" transition:persist></canvas>
         <div id="ambient-particles" aria-hidden="true"></div>
         <div class="portfolio-click-lens" aria-hidden="true">
             <span></span>
             <span></span>
             <span></span>
         </div>
-        <div class="transition-overlay" aria-hidden="true">
-            <div class="transition-overlay__base"></div>
-            <div class="transition-overlay__caustics"></div>
-            <div class="transition-overlay__speedcopy">
-                <span>OFAUNS / MOTION / WEB / INTERACTION</span>
-                <span>OFAUNS / MOTION / WEB / INTERACTION</span>
-            </div>
-            <div class="transition-overlay__mark">
-                <span>OFAUNS</span>
-            </div>
-        </div>
-        <div data-barba="wrapper">
-            <div
-                id="page-content"
-                data-barba="container"
-                data-barba-namespace={barbaNamespace}
-            >
-                <slot />
-            </div>
+        <div id="page-content">
+            <slot />
         </div>
         <script src="../scripts/portfolio-interactions.js"></script>
     </body>
