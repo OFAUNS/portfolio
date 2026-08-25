@@ -4012,9 +4012,11 @@ html[data-route-transition] .portfolio-flow-field span {
   --portfolio-paper: #000000;
   --portfolio-panel-mix: #030606;
   --portfolio-depth: #000000;
-  background: #000 !important;
+  /* 保持黑底，但留 28% 讓背景層的黃金格線與霓虹透出來。
+     原本是 #000 不透明，格線在背後等於完全看不到。 */
+  background: color-mix(in oklch, #000 72%, transparent) !important;
   background-image: none !important;
-  background-color: #000 !important;
+  background-color: color-mix(in oklch, #000 72%, transparent) !important;
 }
 
 .dark .portfolio-home::before {
@@ -5909,34 +5911,55 @@ html.dark {
   --gg-ink: var(--gg-accent);
 }
 
-/* screen 混色在近白背景上等於不存在，亮色主題改用 multiply 才看得到水 */
-html:not(.dark) #water-field {
-  mix-blend-mode: multiply;
-}
 
-/* 頁面最外層容器多半是不透明的（例如 .portfolio-home 是整片黑），
-   而 #page-content 的 z-index 是 2。格線與水波若排在它下面，等於整片
-   被蓋住——先前只有 404 看得到就是因為那一頁的容器沒有背景色。
-   所以這兩層都要抬到內容之上，靠 pointer-events: none 保持可點。 */
+/* 格線是背景層（z-index 1，低於 #page-content 的 2）。
+   能這樣放的前提是下面那段把頁面容器的底色改成半透明——不然不透明的
+   容器會把整片格線遮掉，那就是先前「只有 404 看得到」的狀況。 */
 .golden-grid {
   position: fixed;
   left: var(--gg-x);
   top: var(--gg-y);
   width: var(--gg-w);
   height: var(--gg-h);
-  z-index: 4;
+  z-index: 1;
   pointer-events: none;
   perspective: 1600px;
   animation: gg-grid-settle var(--gg-progress) var(--gg-ease) both;
 }
 
-#water-field {
-  z-index: 3;
+/* 讓格線從頁面容器背後透出來。
+   .work-case 只需要把 --case-surface（背景堆疊的最底層純色）改成半透明，
+   上面那幾層裝飾漸層與格紋都保留。
+   .portfolio-home 的底是一層漸層，得整條改寫；原本頂端那一點白／深藍
+   的染色會失去，色調本身不變。 */
+.work-case {
+  background:
+    radial-gradient(
+      circle at 84% 14%,
+      color-mix(in oklch, var(--case-accent) 10%, transparent),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--case-accent) 8%, transparent),
+      transparent 44%
+    ),
+    color-mix(in oklch, var(--case-surface) 72%, transparent);
+  background-size: auto;
 }
 
-/* 五秒進程期間滿強度；畫完之後往下沉一點、縮一點、淡下來，
-   看起來像退到內容底下。真的把 z-index 降到內容之下不可行——頁面容器
-   多半是不透明的，那等於整片消失（就是先前只有 404 看得到的那個問題）。 */
+/* 亮色主題。暗色主題的 .dark .portfolio-home 用了三個 !important 強制
+   純黑，蓋不過去，已直接在那條規則上加透明度。 */
+.portfolio-home {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--background) 64%, transparent) 0%,
+    color-mix(in oklch, var(--background) 76%, transparent) 72%
+  );
+}
+
+/* 進程期間滿強度，畫完之後往下沉一點、退一點。
+   因為已經在背景層、又隔著半透明的頁面容器，不必再壓到幾乎看不見。 */
 @keyframes gg-grid-settle {
   0%,
   68% {
@@ -5946,20 +5969,9 @@ html:not(.dark) #water-field {
   }
 
   100% {
-    opacity: 0.3;
-    scale: 0.988;
-    translate: 0 1.1%;
-  }
-}
-
-@keyframes gg-water-settle {
-  0%,
-  68% {
-    opacity: 0.9;
-  }
-
-  100% {
-    opacity: 0.22;
+    opacity: 0.82;
+    scale: 0.994;
+    translate: 0 0.6%;
   }
 }
 
@@ -5969,8 +5981,7 @@ html:not(.dark) #water-field {
   transform-style: preserve-3d;
 }
 
-.golden-cell__edge,
-.golden-cell__wave {
+.golden-cell__edge {
   position: absolute;
   inset: 0;
 }
@@ -6033,50 +6044,45 @@ html:not(.dark) #water-field {
   animation: gg-tick-in 420ms var(--gg-ease) var(--gg-delay, 0ms) both;
 }
 
-/* --- 逐格點亮的水波：輪到自己時亮起來，之後留著 ---
-   刻意做得很透：這一層會蓋在內容上，實心的漸層球會擋字，而且看起來
-   不像水。改成兩團互相錯開的柔邊光暈，用 translate 緩慢漂移
-   （不能動 background-position，那會強制全螢幕重繪）。 */
+/* --- 逐格點亮的霓虹色塊：像街上各自獨立的招牌 ---
+   分兩層是因為「亮起」與「閃爍」都要動 opacity，寫在同一個元素上
+   後者會整個蓋掉前者：
+   - .golden-cell__neon 只負責輪到自己時亮起來一次
+   - ::before 是色塊本身，跑無限循環的閃爍
+   - ::after 是慢慢漂移的光暈，做街道那種散光
+   位移一律用 translate；動 background-position 會強制全螢幕重繪。 */
 
-.golden-cell__wave {
-  opacity: 0;
+.golden-cell__neon {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  background: radial-gradient(
-    130% 130% at 50% 118%,
-    color-mix(in oklch, var(--gg-ink) 13%, transparent),
-    transparent 66%
-  );
-  animation: gg-wave-in var(--gg-step, 700ms) var(--gg-ease) var(--gg-delay, 0ms) both;
-}
-
-/* 漂移的兩團光暈：錯開大小與位置，看起來才像流動而不是呼吸 */
-.golden-cell__wave::before {
-  content: "";
-  position: absolute;
-  inset: -28%;
-  background:
-    radial-gradient(
-      36% 36% at 32% 34%,
-      color-mix(in oklch, var(--gg-ink) 22%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      28% 28% at 68% 62%,
-      color-mix(in oklch, var(--gg-ink) 15%, transparent),
-      transparent 72%
-    );
-  animation: gg-wave-drift 11s ease-in-out var(--gg-delay, 0ms) infinite alternate;
-}
-
-/* 點亮瞬間的一圈漣漪 */
-.golden-cell__wave::after {
-  content: "";
-  position: absolute;
-  inset: 8%;
-  border: 1px solid color-mix(in oklch, var(--gg-ink) 26%, transparent);
-  border-radius: 999px;
   opacity: 0;
-  animation: gg-wave-ring var(--gg-step, 700ms) var(--gg-ease) var(--gg-delay, 0ms) both;
+  animation: gg-neon-on var(--gg-step, 700ms) var(--gg-ease) var(--gg-delay, 0ms) both;
+}
+
+.golden-cell__neon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    var(--neon-angle, 0deg),
+    color-mix(in oklch, var(--neon-a, #ff2d95) 58%, transparent) 0%,
+    color-mix(in oklch, var(--neon-b, #00e5ff) 40%, transparent) 58%,
+    transparent 94%
+  );
+  animation: gg-neon-flicker var(--neon-cycle, 4s) linear var(--neon-offset, 0s) infinite;
+}
+
+.golden-cell__neon::after {
+  content: "";
+  position: absolute;
+  inset: -22%;
+  background: radial-gradient(
+    42% 42% at 32% 68%,
+    color-mix(in oklch, var(--neon-b, #00e5ff) 38%, transparent),
+    transparent 70%
+  );
+  animation: gg-neon-drift 13s ease-in-out var(--neon-offset, 0s) infinite alternate;
 }
 
 @keyframes gg-tick-in {
@@ -6091,47 +6097,87 @@ html:not(.dark) #water-field {
   }
 }
 
-@keyframes gg-wave-in {
+@keyframes gg-neon-on {
   0% {
     opacity: 0;
-    scale: 0.9;
-  }
-
-  60% {
-    opacity: 0.62;
+    scale: 0.94;
   }
 
   100% {
-    opacity: 0.48;
+    opacity: 1;
     scale: 1;
   }
 }
 
-@keyframes gg-wave-drift {
+/* 霓虹燈管不會規律地閃：大部分時間亮著，偶爾掉一下、偶爾連續抽兩下。
+   關鍵是節點之間距離不等，等距的閃爍看起來像螢幕壞掉。 */
+@keyframes gg-neon-flicker {
   0% {
-    translate: -4% 3%;
+    opacity: 0.92;
+  }
+
+  18% {
+    opacity: 0.92;
+  }
+
+  19% {
+    opacity: 0.26;
+  }
+
+  20% {
+    opacity: 0.9;
+  }
+
+  20.6% {
+    opacity: 0.32;
+  }
+
+  21.4% {
+    opacity: 0.96;
+  }
+
+  42% {
+    opacity: 0.92;
+  }
+
+  43% {
+    opacity: 0.38;
+  }
+
+  43.8% {
+    opacity: 0.88;
+  }
+
+  71% {
+    opacity: 0.9;
+  }
+
+  71.6% {
+    opacity: 0.2;
+  }
+
+  72.4% {
+    opacity: 0.58;
+  }
+
+  73% {
+    opacity: 0.93;
+  }
+
+  100% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes gg-neon-drift {
+  0% {
+    translate: -5% 4%;
     scale: 1;
   }
 
   100% {
-    translate: 5% -4%;
-    scale: 1.09;
-  }
-}
-
-@keyframes gg-wave-ring {
-  0% {
-    opacity: 0;
-    scale: 0.2;
-  }
-
-  45% {
-    opacity: 0.55;
-  }
-
-  100% {
-    opacity: 0;
-    scale: 1.3;
+    translate: 6% -5%;
+    scale: 1.1;
   }
 }
 
@@ -6271,16 +6317,19 @@ html:not(.dark) #water-field {
     animation: none !important;
   }
 
-  .golden-cell__wave,
-  .golden-cell__wave::after,
+  .golden-cell__neon,
+  .golden-cell__neon::before,
+  .golden-cell__neon::after,
   .golden-cell__tick,
-  .golden-spiral__arc {
+  .golden-spiral__arc,
+  .golden-grid {
     animation: none !important;
     opacity: 1;
     stroke-dashoffset: 0;
   }
 
-  #water-field {
-    animation: none !important;
+  /* 閃爍在 reduced-motion 下要完全停住，停在亮著的狀態 */
+  .golden-cell__neon::before {
+    opacity: 0.55;
   }
 }
