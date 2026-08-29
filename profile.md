@@ -120,7 +120,7 @@
 ### 8. 標案自動化工作流
 - 分類：AI-System｜客戶：Independent｜日期：2026-08-01
 - 角色：Workflow Design, AI Agent, System Integration
-- 縮圖／圖說：/ai-system/bid-thumb.svg（架構圖）、/ai-system/bid-scoring.svg（三維評分閘門）※目前為 SVG 佔位示意圖，待實際系統畫面替換
+- 縮圖／圖說：/work/bid-automation/bid-thumb.svg（架構圖）、/work/bid-automation/bid-scoring.svg（三維評分閘門）※目前為 SVG 佔位示意圖，待實際系統畫面替換
 - 製作團隊：OFAUNS（Workflow Design / AI Agent / System Integration）
 - 描述：以 n8n 與 LLM 串成的政府標案流水線，分成六段：機會獵尋（排程掃描政府電子採購網）、RFP 解析（需求書拆成結構化條件）、組織記憶比對（過往得標／落標實績）、三維評分（契合度／效益／成本風險）、人類決策點（賽局策略與差異化定位由人注入）、提案產出（A4／標楷體 12pt／1.5 倍行高的 Word 初稿）。
 - 設計主張：機器負責篩掉不值得投的案子，投哪一案仍是人的決定；刻意不做「自動投標」。落標案件同樣回寫記憶庫，讓評分基準隨實際結果收斂。
@@ -128,7 +128,7 @@
 ### 9. AI 資源整合 App
 - 分類：AI-System｜客戶：Independent｜日期：2026-07-15
 - 角色：Application Design, System Architecture, UI Design
-- 縮圖／圖說：/ai-system/hub-thumb.svg（架構圖）、/ai-system/hub-ui.svg（介面線框）※目前為 SVG 佔位示意圖，待實際 App 畫面替換
+- 縮圖／圖說：/work/ai-resource-hub/hub-thumb.svg（架構圖）、/work/ai-resource-hub/hub-ui.svg（介面線框）※目前為 SVG 佔位示意圖，待實際 App 畫面替換
 - 製作團隊：OFAUNS（Application Design / System Architecture / UI Design）
 - 描述：把分散的模型供應商、提示詞庫、工具與外掛（MCP／本機腳本）、知識來源，全部往中間一層統一調度層註冊，由該層集中處理路由、憑證與用量計量。提示詞可版本化回溯；成本在入口即時顯示，超過門檻當下提示。
 - 設計取捨：統一調度層是明確單點，壞掉會全停；換來的是上層流程完全不需處理供應商差異，以及一個說得出「有哪些資源、各花多少」的地方。個人與小團隊規模划算，再大就要另外處理該層可用性。
@@ -136,7 +136,7 @@
 ### 10. VR 教育遊戲資料整合監控版
 - 分類：AI-System｜客戶：Independent｜日期：2026-06-20
 - 角色：Data Integration, Dashboard Design, Learning Analytics
-- 縮圖／圖說：/ai-system/vr-thumb.svg（資料流架構圖）、/ai-system/vr-dashboard.svg（教師監控台線框）※目前為 SVG 佔位示意圖，待實際監控台畫面替換
+- 縮圖／圖說：/work/vr-learning-telemetry/vr-thumb.svg（資料流架構圖）、/work/vr-learning-telemetry/vr-dashboard.svg（教師監控台線框）※目前為 SVG 佔位示意圖，待實際監控台畫面替換
 - 製作團隊：OFAUNS（Data Integration / Dashboard Design / Learning Analytics）
 - 描述：處理「學生戴上頭盔後教師失去觀察權」的盲區。資料流四段：VR 遊戲端以事件（非快照）送出關卡進度／互動／停留時間／錯誤次數；事件收集層統一格式並處理裝置離線暫存與補傳；資料整合層跨場次、跨班級合併計算學習指標；教師監控台呈現即時進度牆、異常警示與單人歷程回放。
 - 設計主張：進度牆一列一位學生、色塊代表已通過關卡，讓「誰落後」一眼可見；警示門檻依關卡難度個別設定，避免把本來就難的關誤報成學習障礙。
