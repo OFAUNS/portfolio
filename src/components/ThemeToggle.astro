@@ -76,17 +76,75 @@ const baseClass =
             });
         };
 
-        const setTheme = (theme) => {
+        const applyTheme = (theme) => {
             document.documentElement.classList.toggle("dark", theme === "dark");
             localStorage.setItem("theme", theme);
             window.dispatchEvent(new CustomEvent("portfolio:theme-change"));
             updateButtons();
         };
 
+        /**
+         * 深淺切換走 View Transition：新主題從按下的那顆按鈕圓形擴散開來。
+         * 擴散半徑取按鈕到四個角的最遠距離，才不會有一角來不及被蓋到。
+         */
+        const setTheme = (theme, origin) => {
+            const root = document.documentElement;
+            const reduceMotion = window.matchMedia(
+                "(prefers-reduced-motion: reduce)",
+            ).matches;
+
+            if (typeof document.startViewTransition !== "function" || reduceMotion) {
+                applyTheme(theme);
+                return;
+            }
+
+            // 這個旗標讓 CSS 把換頁用的方格翻面整組關掉——主題切換時方格
+            // 位置沒有變，翻面會很突兀；同時把方格的 view-transition-name
+            // 拿掉，讓它們併進 root 一起被圓形擴散帶到，而不是各自瞬間跳色。
+            root.dataset.themeSwitching = "true";
+
+            const transition = document.startViewTransition(() => applyTheme(theme));
+
+            transition.ready
+                .then(() => {
+                    const x = origin ? origin.x : window.innerWidth / 2;
+                    const y = origin ? origin.y : window.innerHeight / 2;
+                    const radius = Math.hypot(
+                        Math.max(x, window.innerWidth - x),
+                        Math.max(y, window.innerHeight - y),
+                    );
+
+                    root.animate(
+                        {
+                            clipPath: [
+                                `circle(0px at ${x}px ${y}px)`,
+                                `circle(${radius}px at ${x}px ${y}px)`,
+                            ],
+                        },
+                        {
+                            duration: 620,
+                            easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+                            pseudoElement: "::view-transition-new(root)",
+                        },
+                    );
+                })
+                .catch(() => {});
+
+            transition.finished
+                .catch(() => {})
+                .finally(() => {
+                    delete root.dataset.themeSwitching;
+                });
+        };
+
         document.addEventListener("click", (event) => {
             const button = event.target.closest("[data-theme-toggle]");
             if (!button) return;
-            setTheme(getTheme() === "dark" ? "light" : "dark");
+            const rect = button.getBoundingClientRect();
+            setTheme(getTheme() === "dark" ? "light" : "dark", {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
+            });
         });
 
         window.addEventListener("storage", updateButtons);

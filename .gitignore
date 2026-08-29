@@ -22,3 +22,6 @@ node_modules/
 
 # VS CODE
 .vscode/
+
+# windows-specific files
+desktop.ini

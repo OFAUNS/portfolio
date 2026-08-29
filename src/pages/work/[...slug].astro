@@ -67,113 +67,20 @@ const embedUrl = isYouTubeUrl(rawVideoUrl) ? getEmbedUrl(rawVideoUrl) : undefine
 const displayYear = new Date(entry.data.date).getFullYear();
 const mediaLabel = embedUrl || directVideoUrl ? "Featured Motion" : "Featured Image";
 const caseStyle = `--case-accent: ${presentation.accent}; --case-accent-2: ${presentation.accent2};`;
-const themeVariant =
-    presentation.layout === "projection"
-        ? "projection"
-        : presentation.layout === "product" || presentation.layout === "system"
-          ? "code"
-          : presentation.layout === "installation"
-            ? "sensor"
-            : "edit";
-const themeCopy = {
-    projection: {
-        eyebrow: "Projection Console",
-        title: "多平面投影校正台",
-        status: "Plane mapping / light pass / calibration",
-        log: "INIT PROJECTOR_01|SCAN PLANE_A 16:9|MAP EDGE POINTS|SYNC AE OUTPUT|RUN LUMA PASS",
-    },
-    code: {
-        eyebrow: presentation.layout === "product" ? "AI Runtime" : "Web Runtime",
-        title:
-            presentation.layout === "product"
-                ? "AI 鷹架遊戲終端"
-                : "救災網站後端終端",
-        status:
-            presentation.layout === "product"
-                ? "LLM role scaffold / cryptography puzzle"
-                : "PHP route / MySQL upload pipeline",
-        log:
-            presentation.layout === "product"
-                ? "boot ai_peer.js|mentor.role=guided|judge.feedback=locked|cipher.caesar.shift=3|session.flow=active"
-                : "php artisan route:list|mysql INSERT rescue_report|jquery upload ok|storm_feed sync|dashboard render",
-    },
-    sensor: {
-        eyebrow: "TouchDesigner Patch",
-        title: "身體感測與殘影畫布",
-        status: "depth mask / feedback trail / projector out",
-        log: "KINECT CHOP ACTIVE|DEPTH TOP > THRESHOLD|BODY MATTE LOCKED|FEEDBACK TOP DECAY 0.82|PARTICLE SOP TRAIL|PROJECTOR OUT 1920x1080",
-    },
-    edit: {
-        eyebrow:
-            presentation.layout === "film"
-                ? "Film Edit Suite"
-                : presentation.layout === "motion"
-                  ? "After Effects Graph"
-                  : "Animation Timeline",
-        title:
-            presentation.layout === "film"
-                ? "廣告分鏡剪輯台"
-                : presentation.layout === "motion"
-                  ? "圖形動畫時間軸"
-                  : "3D 動畫剪輯時間軸",
-        status:
-            presentation.layout === "film"
-                ? "shot board / color pass / sound cue"
-                : presentation.layout === "motion"
-                  ? "shape layer / keyframe loop / graph editor"
-                  : "camera path / light cue / scene render",
-        log:
-            presentation.layout === "film"
-                ? "IMPORT FOOD_CLOSEUP|CUT LED_STAGE|GRADE WARM HIGHLIGHT|ADD POETRY TITLE|EXPORT AD_MASTER"
-                : presentation.layout === "motion"
-                  ? "CREATE CIRCLE SHAPE|EASE KEYFRAME|OFFSET LOOP|PRECOMP MOTION|RENDER TEST"
-                  : "LOAD BLENDER SCENE|SET CAMERA PATH|BAKE LIGHT MEMORY|COMPOSE GLASS COLOR|RENDER FINAL",
-    },
-}[themeVariant];
 ---
 
 <Layout
     title={`OFAUNS Portfolio - ${entry.data.title}`}
     description={entry.data.description}
     image={entry.data.thumbnail}
+    grid="case"
+    accent={presentation.accent}
 >
     <article
         class={`work-case case-layout-${presentation.layout}`}
         style={caseStyle}
         data-layout={presentation.layout}
     >
-        <div
-            class="case-background-interface"
-            data-dynamic-interface
-            data-log-stream={`${themeCopy.eyebrow}|${themeCopy.status}|${presentation.modeLabel}|${presentation.contentLabel}`}
-            aria-hidden="true"
-        >
-            <div class="case-pointer-aura">
-                <span></span>
-                <span></span>
-            </div>
-            <div class="case-flow-field">
-                <span class="case-flow-ribbon case-flow-ribbon-a"></span>
-                <span class="case-flow-ribbon case-flow-ribbon-b"></span>
-                <span class="case-flow-ribbon case-flow-ribbon-c"></span>
-                <span class="case-flow-ribbon case-flow-ribbon-d"></span>
-            </div>
-            <div class="case-flow-depth">
-                {Array.from({ length: 5 }).map((_, index) => (
-                    <span
-                        style={`--depth-top: ${12 + index * 16}%; --depth-left: ${14 + index * 17}%; --depth-delay: ${index * -1.4}s;`}
-                    ></span>
-                ))}
-            </div>
-            <div class="case-flow-orbits">
-                {Array.from({ length: 14 }).map((_, index) => (
-                    <span
-                        style={`--spark-angle: ${index * 25.7}deg; --spark-distance: ${3.2 + index * 0.72}rem;`}
-                    ></span>
-                ))}
-            </div>
-        </div>
-
         <header class="case-nav">
             <a href="/" class="case-back-link" aria-label="Back to works">
                 <span class="case-back-icon" aria-hidden="true">
@@ -263,193 +170,6 @@ const themeCopy = {
                 </div>
             </section>
 
-            <section
-                class={`case-theme-interface theme-interface-${themeVariant}`}
-                data-dynamic-interface
-                data-theme-interface={themeVariant}
-                data-log-stream={themeCopy.log}
-                aria-label={`${themeCopy.title} interface`}
-            >
-                <div class="theme-interface-head">
-                    <div>
-                        <p>{themeCopy.eyebrow}</p>
-                        <h2>{themeCopy.title}</h2>
-                    </div>
-                    <div class="theme-interface-status">
-                        <span class="theme-status-light"></span>
-                        <span>{themeCopy.status}</span>
-                    </div>
-                </div>
-
-                {
-                    themeVariant === "projection" && (
-                        <div class="theme-projection-stage">
-                            <div class="projection-source">
-                                <span>PROJECTOR_01</span>
-                                <div class="projection-lens"></div>
-                                <div class="projection-beam projection-beam-a"></div>
-                                <div class="projection-beam projection-beam-b"></div>
-                            </div>
-                            <div class="projection-plane projection-plane-a">
-                                <span>PLANE A</span>
-                                <i></i>
-                            </div>
-                            <div class="projection-plane projection-plane-b">
-                                <span>PLANE B</span>
-                                <i></i>
-                            </div>
-                            <div class="projection-plane projection-plane-c">
-                                <span>PLANE C</span>
-                                <i></i>
-                            </div>
-                            <div class="projection-reticle"></div>
-                            <div class="theme-terminal-stream" data-dynamic>
-                                CALIBRATING
-                            </div>
-                        </div>
-                    )
-                }
-
-                {
-                    themeVariant === "code" && (
-                        <div class="theme-code-system">
-                            <div class="theme-code-editor">
-                                <div class="theme-window-bar">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <strong>
-                                        {presentation.layout === "product"
-                                            ? "ai_scaffold.ts"
-                                            : "rescue_api.php"}
-                                    </strong>
-                                </div>
-                                <ol>
-                                    {presentation.layout === "product" ? (
-                                        <>
-                                            <li><code>const roles = ["peer", "mentor", "judge"];</code></li>
-                                            <li><code>cipher.lock("caesar", puzzle.shift);</code></li>
-                                            <li><code>ai.reply(&#123; hintOnly: true, anxiety: "low" &#125;);</code></li>
-                                            <li><code>flow.save("classroom", player.memory);</code></li>
-                                            <li><code>renderPhoneQuest(scene, scaffold);</code></li>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <li><code>$report = RescueReport::fromUpload($form);</code></li>
-                                            <li><code>$db-&gt;insert("typhoon_cases", $report);</code></li>
-                                            <li><code>syncShelterMap($city, $severity);</code></li>
-                                            <li><code>renderDashboard("storm-feed");</code></li>
-                                            <li><code>echo json_encode(["status" =&gt; "ready"]);</code></li>
-                                        </>
-                                    )}
-                                </ol>
-                            </div>
-                            <div class="theme-terminal-panel">
-                                <div class="theme-window-bar">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <strong>terminal</strong>
-                                </div>
-                                <p class="theme-terminal-prefix">$ run project --live</p>
-                                <p class="theme-terminal-stream" data-dynamic>BOOTING</p>
-                                <div class="theme-terminal-meter">
-                                    <span></span>
-                                </div>
-                            </div>
-                        </div>
-                    )
-                }
-
-                {
-                    themeVariant === "sensor" && (
-                        <div class="theme-sensor-patch">
-                            <div class="sensor-viewport">
-                                <span class="sensor-body"></span>
-                                <span class="sensor-trace sensor-trace-a"></span>
-                                <span class="sensor-trace sensor-trace-b"></span>
-                                <span class="sensor-trace sensor-trace-c"></span>
-                                <span class="sensor-joint sensor-joint-head"></span>
-                                <span class="sensor-joint sensor-joint-hand-a"></span>
-                                <span class="sensor-joint sensor-joint-hand-b"></span>
-                                <span class="sensor-joint sensor-joint-foot-a"></span>
-                                <span class="sensor-joint sensor-joint-foot-b"></span>
-                            </div>
-                            <div class="sensor-output-canvas">
-                                <span></span>
-                                <i></i>
-                            </div>
-                            <div class="sensor-node sensor-node-a">
-                                <span>01</span>
-                                <strong>Depth Camera</strong>
-                                <small>Kinect CHOP / body joints</small>
-                            </div>
-                            <div class="sensor-node sensor-node-b">
-                                <span>02</span>
-                                <strong>Body Matte TOP</strong>
-                                <small>threshold + silhouette mask</small>
-                            </div>
-                            <div class="sensor-node sensor-node-c">
-                                <span>03</span>
-                                <strong>Feedback Buffer</strong>
-                                <small>decay trail / time memory</small>
-                            </div>
-                            <div class="sensor-node sensor-node-d">
-                                <span>04</span>
-                                <strong>Particle SOP</strong>
-                                <small>trace instancing</small>
-                            </div>
-                            <div class="sensor-node sensor-node-e">
-                                <span>05</span>
-                                <strong>Projector OUT</strong>
-                                <small>canvas composite</small>
-                            </div>
-                            <svg class="sensor-links" viewBox="0 0 100 100" aria-hidden="true">
-                                <path d="M22 42 C31 23, 42 20, 53 25" />
-                                <path d="M53 25 C65 28, 68 42, 76 42" />
-                                <path d="M56 50 C66 54, 68 66, 77 72" />
-                                <path d="M38 67 C47 72, 57 76, 72 76" />
-                                <path d="M77 72 C84 68, 88 55, 91 45" />
-                            </svg>
-                            <div class="theme-terminal-stream" data-dynamic>
-                                READING SENSOR
-                            </div>
-                        </div>
-                    )
-                }
-
-                {
-                    themeVariant === "edit" && (
-                        <div class="theme-edit-suite">
-                            <div class="edit-preview">
-                                <div class="edit-preview-frame">
-                                    <span class="edit-safe-area"></span>
-                                    <span class="edit-focus-dot"></span>
-                                </div>
-                                <div class="theme-terminal-stream" data-dynamic>
-                                    LOADING SHOT
-                                </div>
-                            </div>
-                            <div class="edit-timeline">
-                                {["Video", "Light", "Graph", "Audio"].map((track, index) => (
-                                    <div
-                                        class="edit-track"
-                                        style={`--track-width: ${38 + index * 11}%; --track-offset: ${index * 5}%; --track-b-offset: ${52 - index * 7}%;`}
-                                    >
-                                        <span>{track}</span>
-                                        <i></i>
-                                        <b></b>
-                                    </div>
-                                ))}
-                                <div class="edit-playhead">
-                                    <span></span>
-                                </div>
-                            </div>
-                        </div>
-                    )
-                }
-            </section>
-
             <section class="case-overview">
                 <aside class="case-facts" aria-label="Project facts">
                     <div class="case-fact">
@@ -509,26 +229,10 @@ const themeCopy = {
                                 <section
                                     class="case-focus-card"
                                     style={`--feature-index: ${index}`}
-                                    data-dynamic-interface
-                                    data-log-stream={`MODULE ${String(index + 1).padStart(2, "0")}|${item.title}|${presentation.modeLabel}`}
                                 >
                                     <span>{String(index + 1).padStart(2, "0")}</span>
                                     <h2>{item.title}</h2>
                                     <p>{item.text}</p>
-                                    <div class="case-feature-module" aria-hidden="true">
-                                        <div class="case-feature-topline">
-                                            <span>MODULE {String(index + 1).padStart(2, "0")}</span>
-                                            <strong data-dynamic>{item.title}</strong>
-                                        </div>
-                                        <div class="case-feature-meter">
-                                            <i></i>
-                                        </div>
-                                        <div class="case-feature-signal">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                    </div>
                                 </section>
                             ))
                         }

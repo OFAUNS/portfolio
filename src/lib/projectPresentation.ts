@@ -6,7 +6,11 @@ export type ProjectPresentation = {
         | "film"
         | "product"
         | "installation"
-        | "system";
+        | "system"
+        | "workflow"
+        | "hub"
+        | "telemetry"
+        | "dialogue";
     accent: string;
     accent2: string;
     kicker: string;
@@ -245,6 +249,126 @@ const presentations: Record<string, ProjectPresentation> = {
             },
         ],
     },
+    workflow: {
+        layout: "workflow",
+        accent: "#22d3ee",
+        accent2: "#a3e635",
+        kicker: "Bid Automation Pipeline",
+        modeLabel: "Workflow Case",
+        mediaTreatment: "browser",
+        imageFit: "contain",
+        summary: "把政府標案的獵尋、解析、評分與提案初稿串成一條 n8n 自動化流水線。",
+        narrative:
+            "流程型作品的重點是「哪一段交給機器、哪一段留給人」，因此頁面用流水線分段與決策閘門呈現，讓自動化的邊界比視覺效果更早被看見。",
+        galleryTitle: "流水線分段與決策閘門",
+        contentLabel: "Pipeline Notes",
+        homeIntro: "用流水線圖解呈現標案獵尋、RFP 解析、三維評分到提案產出的自動化邊界。",
+        focus: [
+            {
+                title: "自動化邊界",
+                text: "機器負責篩掉不值得投的案子，投哪一案仍然是人的決定，這條線在頁面上被明確畫出來。",
+            },
+            {
+                title: "三維評分",
+                text: "契合度、效益與成本風險被拆成可檢驗的分數，而不是一句「這案子看起來不錯」。",
+            },
+            {
+                title: "組織記憶",
+                text: "得標與落標結果都回寫記憶庫，讓評分基準隨實際結果收斂，而非停在初版規則。",
+            },
+        ],
+    },
+    hub: {
+        layout: "hub",
+        accent: "#818cf8",
+        accent2: "#f0abfc",
+        kicker: "AI Resource Hub",
+        modeLabel: "Application Case",
+        mediaTreatment: "browser",
+        imageFit: "contain",
+        summary: "把分散的模型、提示詞、工具與知識來源收斂成單一入口與統一調度層。",
+        narrative:
+            "整合型應用要先講清楚「整合前有多亂」，頁面因此以中心調度層搭配輻射資源節點呈現，再帶出介面上實際怎麼被使用。",
+        galleryTitle: "調度架構與介面配置",
+        contentLabel: "System Map",
+        homeIntro: "用中心調度層與資源節點圖，說明多來源 AI 資源如何收斂成一個入口。",
+        focus: [
+            {
+                title: "統一調度層",
+                text: "路由、憑證與用量集中在同一層，換供應商不必改動上層的任何流程。",
+            },
+            {
+                title: "資源可版本化",
+                text: "提示詞與工作流被當成可回溯的資產管理，而不是散在各處的一次性文字。",
+            },
+            {
+                title: "成本可見",
+                text: "用量與支出在入口就被看見，超過門檻直接提示，不必等月底對帳才發現。",
+            },
+        ],
+    },
+    dialogue: {
+        layout: "dialogue",
+        accent: "#ff2fd0",
+        accent2: "#22e3ff",
+        kicker: "Interactive Installation",
+        modeLabel: "Dialogue Field",
+        mediaTreatment: "wide",
+        imageFit: "cover",
+        summary: "兩人被一道布幕隔開，只能靠聲音溝通；語意越接近，畫面越清晰、雜訊越低。",
+        narrative:
+            "這件作品談的是理解與誤解之間的落差，所以頁面本身也被一道垂直的布幕切成兩側——內容沿著中線左右交錯，標題帶著尚未對齊的殘影，直到讀者往下讀才收攏。",
+        galleryTitle: "資訊失真與重組",
+        contentLabel: "Dialogue Field",
+        homeIntro: "用一道貫穿版面的布幕與未對齊的殘影，把「以為聽懂了」變成看得見的東西。",
+        external: {
+            label: "Watch Film",
+            url: "https://youtu.be/qFBwV248EZ4",
+        },
+        focus: [
+            {
+                title: "失真是機制",
+                text: "接收端一旦產生偏誤，文字就被部分遮蔽、聲音同步模糊化——干擾不是效果，是把誤解顯影出來的手段。",
+            },
+            {
+                title: "理解是過程",
+                text: "語意逐漸趨近時畫面才慢慢變清晰、雜訊才減少。清晰度是溝通累積出來的結果，不是一開始就給的。",
+            },
+            {
+                title: "結果不給結論",
+                text: "溝通失敗時系統把兩人的內容分開總結並列，用對比把落差攤開，讓體驗者自己看見斷點在哪裡。",
+            },
+        ],
+    },
+    telemetry: {
+        layout: "telemetry",
+        accent: "#fbbf24",
+        accent2: "#22d3ee",
+        kicker: "VR Learning Telemetry",
+        modeLabel: "Monitoring Case",
+        mediaTreatment: "browser",
+        imageFit: "contain",
+        summary: "收集 VR 教育遊戲中的學習行為事件，整合成教師端可即時判讀的監控指標。",
+        narrative:
+            "監控型作品的價值在於「補上原本看不到的東西」，所以頁面先建立觀察盲區的問題感，再用資料流與監控台畫面說明它如何被填補。",
+        galleryTitle: "資料流與教師監控台",
+        contentLabel: "Telemetry Map",
+        homeIntro: "用資料流與監控台配置，說明頭戴裝置內的學習行為如何變成教師端指標。",
+        focus: [
+            {
+                title: "觀察盲區",
+                text: "學生戴上頭盔後教師就失去觀察權，這件作品處理的是這個具體缺口。",
+            },
+            {
+                title: "事件整合",
+                text: "跨場次、跨班級的事件被統一格式與合併計算，斷線資料也會補傳後歸位。",
+            },
+            {
+                title: "可調門檻",
+                text: "警示門檻依關卡難度個別設定，避免把本來就難的關誤報成學習障礙。",
+            },
+        ],
+    },
 };
 
 export function getProjectPresentation(project: WorkLike): ProjectPresentation {
@@ -252,8 +376,24 @@ export function getProjectPresentation(project: WorkLike): ProjectPresentation {
     const title = project.data.title.toLowerCase();
     const genre = project.data.genre?.toLowerCase() || "";
 
+    if (key.includes("bid") || title.includes("標案")) {
+        return presentations.workflow;
+    }
+
+    if (key.includes("hub") || title.includes("資源整合")) {
+        return presentations.hub;
+    }
+
+    if (key.includes("telemetry") || title.includes("監控")) {
+        return presentations.telemetry;
+    }
+
     if (key.includes("game-design") || genre.includes("game")) {
         return presentations.product;
+    }
+
+    if (key.includes("listen-and-speak")) {
+        return presentations.dialogue;
     }
 
     if (key.includes("interaction") || genre.includes("interaction")) {

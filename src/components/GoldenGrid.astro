@@ -1,0 +1,104 @@
+---
+import {
+    buildGoldenCells,
+    buildGoldenSpiral,
+    resolvePreset,
+    SPIRAL_VIEWBOX,
+} from "@/lib/goldenGrid";
+
+interface Props {
+    /** GOLDEN_PRESETS 的鍵，決定這一頁的格線個性。 */
+    preset?: string;
+    /** 這一頁的重點色，格線、弧線與水波都會吃這個值。 */
+    accent?: string;
+}
+
+const { preset: presetName = "minimal", accent = "#5ddcff" } = Astro.props;
+const preset = resolvePreset(presetName);
+const cells = buildGoldenCells(preset);
+const arcs = buildGoldenSpiral(cells);
+
+/** 整段進程的長度。弧線在這個時間內畫完，方格也依序點亮。 */
+const PROGRESS_MS = 5000;
+
+// 每段的時長必須正比於它的弧長，否則筆速會暴跌：方格邊長是等比遞減的，
+// 最外圈弧長 1571px、最內圈只有 88px，若每段都給一樣的時間，筆速會從
+// 2.199 掉到 0.123 px/ms（差 17.9 倍），看起來就像畫到後面卡住。
+const totalArcLength = arcs.reduce((sum, arc) => sum + arc.length, 0) || 1;
+let elapsed = 0;
+const schedule = arcs.map((arc) => {
+    const duration = (arc.length / totalArcLength) * PROGRESS_MS;
+    const entry = { delay: elapsed, duration };
+    elapsed += duration;
+    return entry;
+});
+
+// 方格數與弧段數理論上相同；真的對不上時退回平均分配，不要讓版面壞掉。
+const fallbackStep = PROGRESS_MS / Math.max(cells.length, 1);
+const timingFor = (index: number) =>
+    schedule[index] || { delay: index * fallbackStep, duration: fallbackStep };
+
+// 霓虹色盤。方格是背景層，色塊要夠鮮豔才透得出來；相鄰格取不同色相，
+// 看起來才像街上各自獨立的招牌，而不是同一片光。
+const NEON = [
+    "#ff2d95",
+    "#00e5ff",
+    "#b8ff2e",
+    "#ffb020",
+    "#a855f7",
+    "#ff5470",
+    "#14e0c0",
+    "#ff7a18",
+];
+
+const pageStyle = `:root{--gg-accent:${accent};--gg-progress:${PROGRESS_MS}ms}`;
+---
+
+<style is:global set:html={pageStyle}></style>
+
+<div class="golden-grid" data-preset={presetName} aria-hidden="true">
+    {
+        cells.map((cell) => (
+            <div
+                class:list={["golden-cell", `golden-cell--${cell.role}`]}
+                data-index={cell.index}
+                style={[
+                    `left:${cell.x}%`,
+                    `top:${cell.y}%`,
+                    `width:${cell.size}%`,
+                    `--gg-delay:${timingFor(cell.index).delay.toFixed(0)}ms`,
+                    `--gg-step:${timingFor(cell.index).duration.toFixed(0)}ms`,
+                    `--neon-a:${NEON[cell.index % NEON.length]}`,
+                    `--neon-b:${NEON[(cell.index + 3) % NEON.length]}`,
+                    `--neon-angle:${(cell.index * 47) % 360}deg`,
+                    // 每格的閃爍週期都不一樣，而且用負延遲錯開起點，
+                    // 否則整面會同步閃，看起來像螢幕壞掉而不是霓虹燈
+                    `--neon-cycle:${(3.4 + cell.index * 0.63).toFixed(2)}s`,
+                    `--neon-offset:${(-cell.index * 1.17).toFixed(2)}s`,
+                    `view-transition-name:${cell.id}`,
+                ].join(";")}
+            >
+                <span class="golden-cell__edge" />
+                <span class="golden-cell__neon" />
+                <span class="golden-cell__tick">{String(cell.index + 1).padStart(2, "0")}</span>
+            </div>
+        ))
+    }
+
+    <svg
+        class="golden-spiral"
+        viewBox={`0 0 ${SPIRAL_VIEWBOX.w} ${SPIRAL_VIEWBOX.h}`}
+        preserveAspectRatio="none"
+        fill="none"
+    >
+        {
+            arcs.map((arc) => (
+                <path
+                    class="golden-spiral__arc"
+                    d={arc.d}
+                    style={`--arc-len:${arc.length.toFixed(1)};--gg-delay:${timingFor(arc.index).delay.toFixed(0)}ms;--gg-step:${timingFor(arc.index).duration.toFixed(0)}ms;`}
+                />
+            ))
+        }
+    </svg>
+</div>

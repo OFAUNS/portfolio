@@ -84,7 +84,13 @@ const featuredSceneProjects = genreSortedPortfolio.slice(0, 7).map((project) => 
 });
 ---
 
-<Layout title="OFAUNS Portfolio" description={PROFILE.role} image="/og-image.png">
+<Layout
+    title="OFAUNS Portfolio"
+    description={PROFILE.role}
+    image="/og-image.png"
+    grid="home"
+    accent={SCENE_COLORS[0]}
+>
     {
         /* =========================================
         LAYOUT 1: Centered / Original

@@ -1,15 +1,4 @@
-/* 
-  To change the theme, uncomment one of the lines below and comment out the current one.
-  Make sure only one theme is active at a time.
-*/
-/* @import "./themes/caffeine.css"; */
-/* @import "./themes/catppuccin.css"; */
-/* @import "./themes/claude.css"; */
 @import "./themes/code.css";
-/* @import "./themes/desert.css"; */
-/* @import "./themes/spotify.css"; */
-/* @import "./themes/starbuck.css"; */
-/* @import "./themes/sunset.css"; */
 
 @tailwind base;
 @tailwind components;
@@ -19,6 +8,14 @@
   :root {
     --radius: 0rem;
     --font-sans: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+
+    /* 版面邊界：所有 shell 共用同一組 gutter 與最大寬度 */
+    --page-gutter: clamp(1.25rem, 4vw, 4.5rem);
+    --page-max: 88rem;
+
+    /* 水波與轉場共用的主色。必須定義在 :root，
+       water-field.js 的 readAccent() 是對 documentElement 讀這個值。 */
+    --scene-accent: #5ddcff;
   }
 }
 
@@ -217,14 +214,36 @@ main .portfolio-project.scroll-reveal {
   --reveal-duration: 840ms;
 }
 
-
 /* Page content wrapper */
 #page-content {
   position: relative;
-  z-index: 1;
+  /* 高於 .golden-grid 的 z-index: 1 */
+  z-index: 2;
 }
 
 /* Ambient floating particles */
+#water-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  filter: url("#water-refraction");
+}
+
+html[data-fx-calm="true"] #water-field {
+  opacity: 0.3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #water-field {
+    display: none;
+  }
+}
+
 #ambient-particles {
   position: fixed;
   inset: 0;
@@ -351,338 +370,7 @@ main .portfolio-project.scroll-reveal {
 
 .portfolio-click-lens.is-impacting span:nth-child(3) {
   animation-delay: 90ms;
-}
-
-/* Barba + GSAP modular scale transition */
-.transition-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  overflow: hidden;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateZ(0);
-  perspective: 1200px;
-  contain: paint;
-  will-change: opacity;
-  --transition-accent: var(--route-transition-accent, #d8e6ff);
-}
-
-.transition-overlay__base,
-.transition-overlay__water,
-.transition-overlay__pieces,
-.transition-overlay__triangles,
-.transition-overlay__frame,
-.transition-overlay__mark {
-  position: absolute;
-  pointer-events: none;
-}
-
-.transition-overlay__base {
-  inset: 0;
-  background:
-    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, white 18%, transparent), transparent 16%),
-    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, var(--transition-accent) 34%, transparent), transparent 44%),
-    linear-gradient(130deg, color-mix(in oklch, #061225 90%, var(--transition-accent) 10%) 0%, #020609 62%, #000 100%);
-  opacity: 0;
-  transform: scale(1.04);
-  transform-origin: var(--route-x, 50%) var(--route-y, 50%);
-  contain: paint;
-  will-change: opacity, transform;
-}
-
-.transition-overlay__water {
-  inset: 0;
-  z-index: 2;
-  overflow: hidden;
-  contain: paint;
-}
-
-.transition-overlay__water span {
-  position: absolute;
-  left: var(--route-x, 50%);
-  top: var(--route-y, 50%);
-  width: max(34vmax, 24rem);
-  aspect-ratio: 1;
-  border: 1px solid color-mix(in oklch, white 28%, transparent);
-  border-radius: 50% !important;
-  background:
-    radial-gradient(circle, transparent 0 44%, color-mix(in oklch, white 20%, transparent) 45% 45.8%, transparent 47% 100%),
-    radial-gradient(circle, color-mix(in oklch, var(--transition-accent) 22%, transparent), transparent 58%);
-  box-shadow:
-    0 0 48px color-mix(in oklch, var(--transition-accent) 16%, transparent),
-    inset 0 0 44px color-mix(in oklch, white 8%, transparent);
-  opacity: 0;
-  mix-blend-mode: screen;
-  transform: translate(-50%, -50%) scale(0.12);
-  backface-visibility: hidden;
-  contain: paint;
-  will-change: opacity, transform, filter;
-}
-
-.transition-overlay__base::before,
-.transition-overlay__base::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-
-.transition-overlay__base::before {
-  background:
-    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, white 12%, transparent), transparent 28%),
-    radial-gradient(circle at calc(var(--route-x, 50%) + 16%) calc(var(--route-y, 50%) - 12%), color-mix(in oklch, var(--transition-accent) 14%, transparent), transparent 34%);
-  opacity: 0.48;
-}
-
-.transition-overlay__base::after {
-  background:
-    linear-gradient(90deg, transparent 0 17%, color-mix(in oklch, white 12%, transparent) 17% 17.1%, transparent 17.1% 100%),
-    linear-gradient(0deg, transparent 0 62%, color-mix(in oklch, var(--transition-accent) 22%, transparent) 62% 62.12%, transparent 62.12% 100%);
-  opacity: 0.78;
-}
-
-.transition-overlay__pieces {
-  inset: -1px;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  transform-style: preserve-3d;
-}
-
-.transition-overlay__triangles {
-  inset: -14vmax;
-  transform-style: preserve-3d;
-}
-
-.transition-overlay__triangle {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: block;
-  width: clamp(16rem, 28vw, 34rem);
-  aspect-ratio: 1;
-  clip-path: var(--triangle-shape);
-  background:
-    linear-gradient(135deg, color-mix(in oklch, white 18%, transparent), transparent 42%),
-    linear-gradient(160deg, color-mix(in oklch, var(--transition-accent) 24%, #0b1830), color-mix(in oklch, #020609 86%, transparent));
-  border: 1px solid color-mix(in oklch, white 14%, transparent);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--transition-accent) 18%, transparent),
-    0 28px 90px color-mix(in oklch, #000 55%, transparent);
-  mix-blend-mode: screen;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  will-change: transform, opacity;
-}
-
-.transition-overlay__triangle:nth-child(2n) {
-  width: clamp(12rem, 22vw, 28rem);
-  background:
-    linear-gradient(45deg, color-mix(in oklch, var(--transition-accent) 20%, transparent), transparent 52%),
-    linear-gradient(180deg, color-mix(in oklch, white 7%, #061225), #010306);
-}
-
-.transition-overlay__triangle:nth-child(1) {
-  left: 18%;
-  top: 18%;
-}
-
-.transition-overlay__triangle:nth-child(2) {
-  left: 42%;
-  top: 14%;
-}
-
-.transition-overlay__triangle:nth-child(3) {
-  left: 72%;
-  top: 22%;
-}
-
-.transition-overlay__triangle:nth-child(4) {
-  left: 16%;
-  top: 58%;
-}
-
-.transition-overlay__triangle:nth-child(5) {
-  left: 72%;
-  top: 62%;
-}
-
-.transition-overlay__triangle:nth-child(6) {
-  left: 34%;
-  top: 78%;
-}
-
-.transition-overlay__triangle:nth-child(7) {
-  left: 56%;
-  top: 82%;
-}
-
-.transition-overlay__triangle:nth-child(8) {
-  left: 86%;
-  top: 48%;
-}
-
-.transition-overlay__triangle:nth-child(3n) {
-  width: clamp(18rem, 34vw, 42rem);
-  mix-blend-mode: normal;
-  opacity: 0;
-}
-
-.transition-overlay__piece {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, color-mix(in oklch, white 7%, transparent), transparent 45%),
-    linear-gradient(160deg, color-mix(in oklch, var(--transition-accent) 15%, #081426) 0%, #020609 74%);
-  border: 1px solid color-mix(in oklch, white 9%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in oklch, white 11%, transparent),
-    0 24px 80px color-mix(in oklch, var(--transition-accent) 9%, transparent);
-  transform-origin: center;
-  will-change: transform, opacity;
-}
-
-.transition-overlay__piece::before,
-.transition-overlay__piece::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-
-.transition-overlay__piece::before {
-  background:
-    linear-gradient(135deg, transparent 0 48%, color-mix(in oklch, white 11%, transparent) 48% 48.4%, transparent 48.4% 100%),
-    repeating-linear-gradient(90deg, color-mix(in oklch, white 5%, transparent) 0 1px, transparent 1px 18px);
-  opacity: 0.72;
-}
-
-.transition-overlay__piece::after {
-  inset: 12%;
-  border: 1px solid color-mix(in oklch, var(--transition-accent) 18%, transparent);
-  opacity: 0.54;
-}
-
-.transition-overlay__piece:nth-child(3n) {
-  background:
-    linear-gradient(45deg, color-mix(in oklch, var(--transition-accent) 18%, transparent), transparent 50%),
-    linear-gradient(150deg, #0a172a 0%, #020609 72%);
-}
-
-.transition-overlay__piece:nth-child(4n) {
-  background:
-    linear-gradient(120deg, color-mix(in oklch, white 9%, transparent), transparent 40%),
-    linear-gradient(180deg, color-mix(in oklch, #0d1b33 88%, var(--transition-accent) 12%), #010306);
-}
-
-.transition-overlay__frame {
-  inset: 50% auto auto 50%;
-  width: min(62vw, 46rem);
-  height: min(44vh, 24rem);
-  border: 1px solid color-mix(in oklch, white 42%, transparent);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--transition-accent) 22%, transparent),
-    0 0 0 1px color-mix(in oklch, #020609 86%, transparent),
-    0 34px 110px color-mix(in oklch, var(--transition-accent) 13%, transparent);
-  transform: translate(-50%, -50%);
-  mix-blend-mode: screen;
-}
-
-.transition-overlay__frame::before,
-.transition-overlay__frame::after {
-  content: "";
-  position: absolute;
-  background: color-mix(in oklch, white 62%, transparent);
-}
-
-.transition-overlay__frame::before {
-  left: 50%;
-  top: -12vh;
-  bottom: -12vh;
-  width: 1px;
-}
-
-.transition-overlay__frame::after {
-  left: -8vw;
-  right: -8vw;
-  top: 50%;
-  height: 1px;
-}
-
-.transition-overlay__mark {
-  left: 50%;
-  top: 50%;
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: clamp(2rem, 7vw, 6.5rem);
-  font-weight: 950;
-  letter-spacing: 0;
-  line-height: 0.85;
-  text-transform: uppercase;
-  text-shadow: 0 22px 62px color-mix(in oklch, #000 70%, transparent);
-  transform: translate(-50%, -50%);
-}
-
-.transition-overlay__mark span {
-  display: block;
-  border-top: 1px solid color-mix(in oklch, white 36%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, white 28%, transparent);
-  padding: 0.18em 0.12em 0.22em;
-}
-
-.transition-overlay.is-leaving,
-.transition-overlay.is-entering {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.transition-overlay.is-leaving {
-  animation: route-overlay-cover 420ms ease-out both;
-}
-
-.transition-overlay.is-entering {
-  animation: route-overlay-release 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay__piece,
-.transition-overlay__triangle,
-.transition-overlay__frame,
-.transition-overlay__mark {
-  opacity: 0;
-}
-
-.transition-overlay.is-leaving .transition-overlay__base {
-  animation: route-water-backdrop-cover 420ms ease-out both;
-}
-
-.transition-overlay.is-entering .transition-overlay__base {
-  animation: route-water-backdrop-release 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__water span {
-  animation: route-water-ripple-cover 560ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-  animation-delay: calc(var(--ripple-index) * 54ms);
-}
-
-.transition-overlay.is-entering .transition-overlay__water span {
-  animation: route-water-ripple-release 660ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--ripple-index) * 38ms);
-}
-
-.transition-overlay.is-leaving .transition-overlay__frame,
-.transition-overlay.is-leaving .transition-overlay__mark {
-  animation: route-mark-cover 420ms ease-out 120ms both;
-}
-
-.transition-overlay.is-entering .transition-overlay__frame,
-.transition-overlay.is-entering .transition-overlay__mark {
-  animation: route-mark-release 520ms ease-out both;
-}
-
-/* Interactive portfolio homepage */
+}/* Interactive portfolio homepage */
 .portfolio-home {
   isolation: isolate;
   --background: oklch(0.97 0.018 232);
@@ -1331,17 +1019,8 @@ html[data-route-transition] .portfolio-design-lines span {
   align-items: stretch;
 }
 
-.portfolio-project--product .portfolio-project-thumb {
-  aspect-ratio: 4 / 5;
-}
-
-.portfolio-project--system .portfolio-project-thumb {
-  aspect-ratio: 16 / 10;
-}
-
-.portfolio-project--motion .portfolio-project-thumb {
-  aspect-ratio: 1 / 1;
-}
+/* 圖片比例改由欄寬決定（見 .portfolio-project 的 nth-child 節奏），
+   不再依作品類型各給一種比例——那會讓 span 與比例兩套節奏互相打架。 */
 
 /* Adaptive case-study pages */
 .work-case {
@@ -1396,276 +1075,8 @@ html[data-route-transition] .portfolio-design-lines span {
     repeating-linear-gradient(0deg, color-mix(in oklch, var(--foreground) 5%, transparent) 0 1px, transparent 1px 9px);
   background-size: 170% 170%, 100% 100%;
   opacity: 0.24;
-  animation: case-scan-field 22s linear infinite;
+  animation: case-scan-field 22s ease-in-out infinite alternate;
   mask-image: linear-gradient(180deg, black 0%, transparent 84%);
-}
-
-.case-background-interface {
-  --interface-progress: 0%;
-  --interface-wave: 50%;
-  --interface-pulse: 0.5;
-  --flow-boost: 0;
-  --scroll-boost: 0;
-  --flow-alpha: 0.5;
-  --flow-grid-alpha: 0.24;
-  --flow-field-alpha: 0.72;
-  --flow-spark-alpha: 0.38;
-  --flow-readout-alpha: 0.42;
-  --flow-saturate: 1;
-  --flow-scale: 1;
-  --flow-drift-x: 0px;
-  --flow-drift-y: 0px;
-  --flow-field-x: 0px;
-  --flow-field-y: 0px;
-  --flow-ribbon-a: 0px;
-  --flow-ribbon-b: 0px;
-  --flow-ribbon-c: 0px;
-  --flow-ribbon-d: 0px;
-  --flow-spark-distance: 0rem;
-  --flow-spark-scale: 0.72;
-  --flow-readout-y: 0rem;
-  --flow-aura-alpha: 0.22;
-  --flow-aura-scale: 1;
-  --flow-depth-alpha: 0.34;
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.82;
-  mix-blend-mode: screen;
-  overflow: hidden;
-}
-
-.case-background-interface::before,
-.case-background-interface::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-
-.case-background-interface::before {
-  inset: -18% -8%;
-  background:
-    radial-gradient(circle at var(--case-pointer-x) var(--case-pointer-y), color-mix(in oklch, var(--case-accent-2) 42%, transparent), transparent 18rem),
-    radial-gradient(circle at calc(100% - var(--case-pointer-x)) calc(var(--case-pointer-y) + 18%), color-mix(in oklch, var(--case-accent) 28%, transparent), transparent 24rem),
-    conic-gradient(from var(--interface-angle, 0deg) at 62% 38%, transparent 0 14%, color-mix(in oklch, var(--case-accent) 28%, transparent) 20%, transparent 32%, color-mix(in oklch, var(--case-accent-2) 24%, transparent) 38%, transparent 52%);
-  opacity: var(--flow-alpha);
-  filter: blur(0.25rem) saturate(var(--flow-saturate));
-  transform: translate3d(var(--flow-drift-x), var(--flow-drift-y), 0) scale(var(--flow-scale));
-  animation: case-energy-drift 12s ease-in-out infinite alternate;
-}
-
-.case-background-interface::after {
-  inset: 0;
-  background:
-    linear-gradient(90deg, transparent 0 calc(var(--case-pointer-x) - 1px), color-mix(in oklch, var(--case-accent-2) 30%, transparent) var(--case-pointer-x), transparent calc(var(--case-pointer-x) + 1px)),
-    linear-gradient(0deg, transparent 0 calc(var(--case-pointer-y) - 1px), color-mix(in oklch, var(--case-accent) 24%, transparent) var(--case-pointer-y), transparent calc(var(--case-pointer-y) + 1px)),
-    repeating-linear-gradient(105deg, transparent 0 5.4rem, color-mix(in oklch, var(--case-accent) 13%, transparent) 5.4rem 5.5rem, transparent 5.5rem 9rem);
-  opacity: var(--flow-grid-alpha);
-  transform: translateX(var(--interface-shift-soft, 0px));
-  mask-image: linear-gradient(180deg, black 0%, black 64%, transparent 94%);
-}
-
-.case-flow-field,
-.case-flow-depth,
-.case-flow-orbits,
-.case-pointer-aura,
-.case-flow-readout {
-  position: absolute;
-  pointer-events: none;
-}
-
-.case-pointer-aura {
-  left: var(--case-pointer-x);
-  top: var(--case-pointer-y);
-  z-index: 2;
-  width: clamp(12rem, 22vw, 24rem);
-  aspect-ratio: 1 / 1;
-  opacity: var(--flow-aura-alpha);
-  transform: translate(-50%, -50%) scale(var(--flow-aura-scale));
-  transition: opacity 70ms ease-out, transform 95ms cubic-bezier(0.2, 0.9, 0.25, 1.15);
-}
-
-.case-pointer-aura span {
-  position: absolute;
-  inset: 0;
-  border: 1px solid color-mix(in oklch, var(--case-accent-2) 42%, transparent);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, color-mix(in oklch, var(--case-accent-2) 20%, transparent) 0 12%, transparent 36%),
-    conic-gradient(from var(--interface-angle, 0deg), transparent 0 18%, color-mix(in oklch, var(--case-accent) 34%, transparent) 22%, transparent 32%, color-mix(in oklch, var(--case-accent-2) 30%, transparent) 44%, transparent 62%);
-  box-shadow:
-    0 0 42px color-mix(in oklch, var(--case-accent-2) 24%, transparent),
-    inset 0 0 42px color-mix(in oklch, var(--case-accent) 14%, transparent);
-  animation: case-aura-pulse 1.8s ease-in-out infinite;
-}
-
-.case-pointer-aura span:nth-child(2) {
-  inset: 18%;
-  animation-delay: -0.72s;
-  animation-duration: 1.2s;
-}
-
-.case-flow-field {
-  inset: 4% -10% auto auto;
-  width: min(78vw, 72rem);
-  height: min(64vh, 44rem);
-  opacity: var(--flow-field-alpha);
-  transform: translate3d(var(--flow-field-x), var(--flow-field-y), 0);
-}
-
-.case-flow-ribbon {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: clamp(5rem, 13vw, 12rem);
-  border-radius: 999px;
-  background:
-    linear-gradient(90deg, transparent 0%, color-mix(in oklch, var(--case-accent) 28%, transparent) 18%, color-mix(in oklch, var(--case-accent-2) 56%, transparent) 48%, color-mix(in oklch, white 34%, transparent) 50%, color-mix(in oklch, var(--case-accent) 28%, transparent) 62%, transparent 100%);
-  filter: blur(0.45rem);
-  opacity: 0.78;
-  transform-origin: center;
-  animation: case-flow-ribbon 8.5s ease-in-out infinite alternate;
-}
-
-.case-flow-ribbon-a {
-  top: 6%;
-  transform: rotate(-12deg) translateX(var(--flow-ribbon-a));
-}
-
-.case-flow-ribbon-b {
-  top: 34%;
-  height: clamp(3rem, 8vw, 7rem);
-  opacity: 0.64;
-  transform: rotate(9deg) translateX(var(--flow-ribbon-b));
-  animation-delay: -2.4s;
-}
-
-.case-flow-ribbon-c {
-  top: 58%;
-  height: clamp(4rem, 10vw, 9rem);
-  opacity: 0.56;
-  transform: rotate(-4deg) translateX(var(--flow-ribbon-c));
-  animation-delay: -4.8s;
-}
-
-.case-flow-ribbon-d {
-  top: 76%;
-  height: clamp(2.6rem, 7vw, 6rem);
-  opacity: 0.6;
-  transform: rotate(16deg) translateX(var(--flow-ribbon-d));
-  animation-delay: -6.2s;
-}
-
-.case-flow-depth {
-  inset: 0;
-  opacity: var(--flow-depth-alpha);
-}
-
-.case-flow-depth span {
-  position: absolute;
-  left: var(--depth-left);
-  top: var(--depth-top);
-  width: clamp(16rem, 32vw, 34rem);
-  height: clamp(4rem, 9vw, 10rem);
-  border: 1px solid color-mix(in oklch, var(--case-accent) 26%, transparent);
-  background:
-    linear-gradient(90deg, transparent, color-mix(in oklch, var(--case-accent) 24%, transparent), color-mix(in oklch, var(--case-accent-2) 28%, transparent), transparent),
-    repeating-linear-gradient(90deg, color-mix(in oklch, white 12%, transparent) 0 1px, transparent 1px 18px);
-  filter: blur(0.25rem);
-  transform: rotate(-18deg) translate3d(var(--flow-field-x), var(--flow-field-y), 0);
-  animation: case-depth-stream 7s ease-in-out infinite alternate;
-  animation-delay: var(--depth-delay);
-}
-
-.case-flow-orbits {
-  inset: 0;
-}
-
-.case-flow-orbits span {
-  position: absolute;
-  left: var(--case-pointer-x);
-  top: var(--case-pointer-y);
-  width: clamp(0.35rem, 0.7vw, 0.7rem);
-  height: clamp(0.35rem, 0.7vw, 0.7rem);
-  background: color-mix(in oklch, var(--case-accent-2) 76%, white);
-  box-shadow:
-    0 0 18px color-mix(in oklch, var(--case-accent-2) 66%, transparent),
-    0 0 44px color-mix(in oklch, var(--case-accent) 35%, transparent);
-  opacity: var(--flow-spark-alpha);
-  transform:
-    translate(-50%, -50%)
-    rotate(var(--spark-angle))
-    rotate(var(--interface-angle, 0deg))
-    translateX(calc(var(--spark-distance) + var(--flow-spark-distance)))
-    scale(var(--flow-spark-scale));
-  transition: opacity 70ms ease-out, transform 95ms cubic-bezier(0.2, 0.9, 0.25, 1.1);
-}
-
-.case-flow-readout {
-  right: max(1rem, 4vw);
-  bottom: clamp(5rem, 12vh, 9rem);
-  display: grid;
-  gap: 0.5rem;
-  width: min(22rem, 32vw);
-  border-left: 1px solid color-mix(in oklch, var(--case-accent-2) 42%, transparent);
-  padding-left: 0.9rem;
-  opacity: var(--flow-readout-alpha);
-  transform: translateY(var(--flow-readout-y));
-}
-
-.case-flow-readout strong {
-  min-width: 0;
-  overflow: hidden;
-  color: color-mix(in oklch, var(--case-accent-2) 76%, white);
-  font-size: 0.68rem;
-  font-weight: 950;
-  letter-spacing: 0.14em;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.case-flow-readout i {
-  display: block;
-  width: var(--interface-progress);
-  height: 0.2rem;
-  background: linear-gradient(90deg, transparent, var(--case-accent), var(--case-accent-2));
-  box-shadow: 0 0 18px color-mix(in oklch, var(--case-accent-2) 58%, transparent);
-}
-
-.case-is-scrolling .case-flow-ribbon {
-  filter: blur(0.25rem) saturate(1.5);
-  opacity: 0.86;
-}
-
-.case-is-scrolling .case-pointer-aura {
-  opacity: 0.55;
-  transform: translate(-50%, -50%) scale(1.28);
-}
-
-.case-is-scrolling .case-flow-depth {
-  opacity: 0.52;
-}
-
-.case-impacting .case-background-interface {
-  z-index: 50;
-  opacity: 1;
-}
-
-.case-impacting .case-pointer-aura {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1.95);
-}
-
-.case-impacting .case-flow-orbits span {
-  opacity: 1;
-  filter: saturate(2.1);
-}
-
-.case-impacting .case-flow-readout i {
-  height: 0.32rem;
-  box-shadow: 0 0 30px color-mix(in oklch, var(--case-accent-2) 72%, transparent);
 }
 
 .case-is-scrolling .case-media-frame,
@@ -1683,7 +1094,7 @@ html[data-route-transition] .portfolio-design-lines span {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  width: min(100% - 2rem, 92rem);
+  width: min(100% - var(--page-gutter) * 2, var(--page-max));
   margin-inline: auto;
   padding-block: clamp(1rem, 2.5vw, 1.75rem);
 }
@@ -1691,7 +1102,7 @@ html[data-route-transition] .portfolio-design-lines span {
 .case-shell {
   position: relative;
   z-index: 1;
-  width: min(100% - 2rem, 92rem);
+  width: min(100% - var(--page-gutter) * 2, var(--page-max));
   margin-inline: auto;
   padding-block: clamp(1.5rem, 4vw, 4rem) clamp(4rem, 8vw, 7rem);
 }
@@ -1756,10 +1167,13 @@ html[data-route-transition] .portfolio-design-lines span {
   min-width: 0;
   max-width: min(19ch, 100%);
   color: var(--foreground);
-  font-size: clamp(3rem, 8vw, 8.5rem);
-  font-weight: 950;
-  line-height: 0.98;
-  letter-spacing: 0;
+  /* 上限收到 6.5rem：8.5rem 時四行中文標題會超出視窗底部被裁掉 */
+  font-size: clamp(3rem, 6.2vw, 6.5rem);
+  /* 900 是 Noto Sans TC 的實際最重字重，950 會觸發合成假粗體 */
+  font-weight: 900;
+  /* 中文字面全滿，行高低於 1 會讓上下行相黏 */
+  line-height: 1.06;
+  letter-spacing: -0.01em;
   overflow-wrap: anywhere;
   text-wrap: balance;
   text-transform: uppercase;
@@ -1988,151 +1402,6 @@ html[data-route-transition] .portfolio-design-lines span {
   aspect-ratio: 1 / 1;
 }
 
-.case-theme-interface {
-  --interface-progress: 0%;
-  --interface-wave: 50%;
-  --interface-pulse: 0.5;
-  position: relative;
-  display: grid;
-  gap: clamp(1rem, 2vw, 1.4rem);
-  margin-top: clamp(2.5rem, 6vw, 6rem);
-  border: 1px solid color-mix(in oklch, var(--case-accent) 34%, var(--border));
-  background:
-    radial-gradient(circle at var(--case-pointer-x, 50%) var(--case-pointer-y, 34%), color-mix(in oklch, var(--case-accent) 14%, transparent), transparent 24rem),
-    linear-gradient(135deg, color-mix(in oklch, var(--case-accent) 8%, transparent), transparent 42%),
-    color-mix(in oklch, var(--background) 76%, #04070d 24%);
-  padding: clamp(1rem, 2.5vw, 1.5rem);
-  overflow: hidden;
-  box-shadow: 0 28px 90px color-mix(in oklch, var(--case-accent) 13%, transparent);
-}
-
-.case-theme-interface::before,
-.case-theme-interface::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.case-theme-interface::before {
-  background:
-    linear-gradient(90deg, transparent 0 calc(var(--interface-progress) - 1px), color-mix(in oklch, var(--case-accent-2) 28%, transparent) var(--interface-progress), transparent calc(var(--interface-progress) + 1px)),
-    repeating-linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 0 1px, transparent 1px 42px),
-    repeating-linear-gradient(0deg, color-mix(in oklch, white 5%, transparent) 0 1px, transparent 1px 42px);
-  opacity: 0.34;
-  mix-blend-mode: screen;
-}
-
-.case-theme-interface::after {
-  background: linear-gradient(110deg, transparent 0 38%, color-mix(in oklch, white 14%, transparent) 50%, transparent 62%);
-  opacity: var(--interface-sheen-alpha, 0.18);
-  transform: translateX(calc(var(--interface-progress) - 50%));
-  mix-blend-mode: screen;
-}
-
-.case-theme-interface:hover,
-.case-theme-interface:focus-within {
-  border-color: color-mix(in oklch, var(--case-accent-2) 58%, var(--border));
-  box-shadow:
-    0 0 0 1px color-mix(in oklch, var(--case-accent-2) 42%, transparent),
-    0 42px 140px color-mix(in oklch, var(--case-accent) 30%, transparent),
-    0 0 86px color-mix(in oklch, var(--case-accent-2) 22%, transparent),
-    inset 0 0 64px color-mix(in oklch, var(--case-accent-2) 14%, transparent);
-  transform: translateY(-0.22rem);
-}
-
-.case-theme-interface:hover::after,
-.case-theme-interface:focus-within::after {
-  opacity: 0.48;
-}
-
-.theme-interface-head {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.theme-interface-head p,
-.theme-interface-status {
-  color: color-mix(in oklch, var(--case-accent) 76%, var(--foreground));
-  font-size: 0.68rem;
-  font-weight: 950;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.theme-interface-head h2 {
-  margin-top: 0.35rem;
-  font-size: clamp(1.5rem, 3vw, 3rem);
-  font-weight: 950;
-  line-height: 0.98;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.theme-interface-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: end;
-  gap: 0.55rem;
-  max-width: min(100%, 30rem);
-  color: var(--muted-foreground);
-  text-align: right;
-}
-
-.theme-status-light {
-  width: 0.55rem;
-  height: 0.55rem;
-  flex: 0 0 auto;
-  background: var(--case-accent);
-  box-shadow: 0 0 18px var(--case-accent);
-  animation: theme-status-pulse 1.2s ease-in-out infinite;
-}
-
-.theme-terminal-stream {
-  position: relative;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.6rem;
-  color: color-mix(in oklch, var(--case-accent-2) 72%, var(--foreground));
-  font-family: "Space Grotesk", "Noto Sans TC", monospace !important;
-  font-size: 0.74rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.theme-terminal-stream::after {
-  content: "";
-  width: 0.5rem;
-  height: 1em;
-  margin-left: 0.35rem;
-  background: currentColor;
-  animation: theme-cursor-blink 0.8s steps(1) infinite;
-}
-
-.theme-projection-stage,
-.theme-code-system,
-.theme-sensor-patch,
-.theme-edit-suite {
-  position: relative;
-  z-index: 1;
-  min-height: clamp(20rem, 38vw, 33rem);
-  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
-  background:
-    radial-gradient(circle at var(--interface-wave) 35%, color-mix(in oklch, var(--case-accent) 16%, transparent), transparent 32%),
-    color-mix(in oklch, var(--background) 72%, #02050b 28%);
-  overflow: hidden;
-}
-
-.theme-projection-stage {
-  perspective: 1200px;
-}
-
 .projection-source {
   position: absolute;
   left: clamp(1rem, 4vw, 4rem);
@@ -2268,147 +1537,6 @@ html[data-route-transition] .portfolio-design-lines span {
   right: -0.8rem;
   top: 50%;
   height: 1px;
-}
-
-.theme-projection-stage .theme-terminal-stream,
-.theme-sensor-patch .theme-terminal-stream {
-  position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-}
-
-.theme-code-system {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(18rem, 0.7fr);
-  gap: 1px;
-  background: color-mix(in oklch, var(--foreground) 12%, transparent);
-}
-
-.theme-code-editor,
-.theme-terminal-panel {
-  min-width: 0;
-  background:
-    linear-gradient(135deg, color-mix(in oklch, var(--case-accent) 7%, transparent), transparent 46%),
-    #03060c;
-}
-
-.theme-window-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  border-bottom: 1px solid color-mix(in oklch, white 12%, transparent);
-  padding: 0.75rem;
-  color: var(--muted-foreground);
-  font-size: 0.65rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.theme-window-bar span {
-  width: 0.55rem;
-  height: 0.55rem;
-  background: color-mix(in oklch, var(--case-accent) 54%, white);
-}
-
-.theme-window-bar span:nth-child(2) {
-  background: color-mix(in oklch, var(--case-accent-2) 64%, white);
-}
-
-.theme-window-bar span:nth-child(3) {
-  background: color-mix(in oklch, white 44%, transparent);
-}
-
-.theme-window-bar strong {
-  margin-left: 0.35rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.theme-code-editor ol {
-  display: grid;
-  gap: 0.2rem;
-  margin: 0;
-  padding: clamp(1rem, 2vw, 1.25rem) clamp(0.75rem, 1.5vw, 1rem);
-  counter-reset: code-line;
-  list-style: none;
-}
-
-.theme-code-editor li {
-  position: relative;
-  display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  gap: 0.8rem;
-  min-width: 0;
-  color: color-mix(in oklch, var(--case-accent-2) 70%, white);
-  font-family: "Space Grotesk", "Noto Sans TC", monospace !important;
-  font-size: clamp(0.78rem, 1.4vw, 0.96rem);
-  line-height: 1.8;
-}
-
-.theme-code-editor li::before {
-  counter-increment: code-line;
-  content: counter(code-line, decimal-leading-zero);
-  color: color-mix(in oklch, var(--muted-foreground) 68%, transparent);
-  text-align: right;
-}
-
-.theme-code-editor li code {
-  display: block;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.theme-code-editor li:nth-child(2n) code {
-  color: color-mix(in oklch, var(--case-accent) 66%, white);
-}
-
-.theme-terminal-panel {
-  display: grid;
-  align-content: start;
-}
-
-.theme-terminal-prefix {
-  margin: 0;
-  padding: 1rem 1rem 0.6rem;
-  color: color-mix(in oklch, white 68%, transparent);
-  font-family: "Space Grotesk", "Noto Sans TC", monospace !important;
-  font-size: 0.78rem;
-}
-
-.theme-terminal-panel .theme-terminal-stream {
-  padding: 0 1rem 1rem;
-}
-
-.theme-terminal-meter {
-  margin: 0.5rem 1rem 1rem;
-  height: 0.5rem;
-  border: 1px solid color-mix(in oklch, var(--case-accent) 36%, transparent);
-  background: color-mix(in oklch, white 8%, transparent);
-}
-
-.theme-terminal-meter span {
-  display: block;
-  width: var(--interface-progress);
-  height: 100%;
-  background: linear-gradient(90deg, var(--case-accent), var(--case-accent-2));
-  box-shadow: 0 0 18px color-mix(in oklch, var(--case-accent) 58%, transparent);
-}
-
-.theme-sensor-patch {
-  min-height: clamp(25rem, 46vw, 38rem);
-}
-
-.sensor-patch-grid {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, transparent 0 calc(var(--interface-progress) - 1px), color-mix(in oklch, var(--case-accent-2) 22%, transparent) var(--interface-progress), transparent calc(var(--interface-progress) + 1px)),
-    repeating-linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 0 1px, transparent 1px 3rem),
-    repeating-linear-gradient(0deg, color-mix(in oklch, white 5%, transparent) 0 1px, transparent 1px 3rem);
-  opacity: 0.42;
-  pointer-events: none;
 }
 
 .sensor-viewport {
@@ -2628,13 +1756,6 @@ html[data-route-transition] .portfolio-design-lines span {
   stroke-dasharray: 6 4;
   stroke-dashoffset: var(--interface-dash-offset, 0px);
   opacity: 0.7;
-}
-
-.theme-edit-suite {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 1px;
-  background: color-mix(in oklch, var(--foreground) 12%, transparent);
 }
 
 .edit-preview,
@@ -2924,59 +2045,6 @@ html[data-route-transition] .portfolio-design-lines span {
   line-height: 1.75;
 }
 
-.case-feature-module {
-  display: grid;
-  gap: 0.65rem;
-  align-self: end;
-  margin-top: 0.35rem;
-  border: 1px solid color-mix(in oklch, var(--case-accent) 26%, transparent);
-  background:
-    linear-gradient(90deg, transparent 0 calc(var(--interface-progress) - 1px), color-mix(in oklch, var(--case-accent-2) 28%, transparent) var(--interface-progress), transparent calc(var(--interface-progress) + 1px)),
-    color-mix(in oklch, #02050b 62%, var(--case-panel) 38%);
-  padding: 0.75rem;
-  box-shadow: inset 0 0 20px color-mix(in oklch, var(--case-accent) 8%, transparent);
-  transition: border-color 260ms ease, box-shadow 260ms ease, transform 260ms ease;
-}
-
-.case-focus-card:hover .case-feature-module,
-.case-focus-card:focus-within .case-feature-module {
-  border-color: color-mix(in oklch, var(--case-accent-2) 46%, transparent);
-  box-shadow:
-    inset 0 0 32px color-mix(in oklch, var(--case-accent-2) 18%, transparent),
-    0 0 42px color-mix(in oklch, var(--case-accent) 22%, transparent);
-  transform: translateY(-0.28rem) scale(1.015);
-}
-
-.case-feature-topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-.case-feature-topline span,
-.case-feature-topline strong {
-  min-width: 0;
-  overflow: hidden;
-  font-size: 0.58rem;
-  font-weight: 950;
-  letter-spacing: 0.12em;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.case-feature-topline span {
-  color: color-mix(in oklch, var(--case-accent) 78%, white);
-}
-
-.case-feature-topline strong {
-  color: color-mix(in oklch, var(--case-accent-2) 80%, white);
-  text-align: right;
-}
-
 .case-feature-meter {
   height: 0.38rem;
   border: 1px solid color-mix(in oklch, var(--case-accent) 30%, transparent);
@@ -3023,10 +2091,11 @@ html[data-route-transition] .portfolio-design-lines span {
 
 .case-section-heading h2 {
   max-width: 18ch;
-  font-size: clamp(2rem, 5vw, 5.5rem);
-  font-weight: 950;
-  line-height: 0.95;
-  letter-spacing: 0;
+  font-size: clamp(2rem, 4.4vw, 4.6rem);
+  /* 與 .case-title 同一套中文大標規則：900 字重、行高 > 1、負追蹤 */
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
@@ -3238,6 +2307,15 @@ html[data-route-transition] .portfolio-design-lines span {
   aspect-ratio: 1 / 1;
 }
 
+.case-layout-workflow .work-case-body img,
+.case-layout-hub .work-case-body img,
+.case-layout-telemetry .work-case-body img {
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: color-mix(in oklch, var(--background) 92%, var(--case-accent) 8%);
+  padding: clamp(0.5rem, 1.4vw, 1rem);
+}
+
 .case-credits {
   display: grid;
   grid-template-columns: minmax(10rem, 0.24fr) minmax(0, 1fr);
@@ -3288,6 +2366,78 @@ html[data-route-transition] .portfolio-design-lines span {
   font-size: 0.8rem;
 }
 
+/* About 頁：沿用 case 頁的玻璃面板配方，不另立一套視覺 */
+.about-panel-list {
+  display: grid;
+  gap: 1px;
+  margin-top: clamp(1.4rem, 4vw, 3rem);
+  background: color-mix(in oklch, var(--foreground) 12%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+}
+
+.about-panel {
+  display: grid;
+  gap: 0.4rem;
+  background: color-mix(in oklch, var(--case-panel) 92%, transparent);
+  padding: clamp(1rem, 2.4vw, 1.6rem);
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.about-panel > span {
+  color: color-mix(in oklch, var(--case-accent) 76%, var(--foreground));
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.about-panel > strong {
+  color: var(--foreground);
+  font-size: clamp(1rem, 1.6vw, 1.22rem);
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.about-panel-cn {
+  color: color-mix(in oklch, var(--foreground) 70%, transparent);
+  font-weight: 500;
+}
+
+.about-panel-org {
+  color: color-mix(in oklch, var(--case-accent) 70%, var(--foreground));
+  font-weight: 700;
+}
+
+.about-panel ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+
+.about-panel--link:hover,
+.about-panel--link:focus-visible {
+  background: color-mix(in oklch, var(--case-accent) 12%, var(--case-panel));
+}
+
+.about-panel--link:hover > strong,
+.about-panel--link:focus-visible > strong {
+  color: color-mix(in oklch, var(--case-accent) 82%, white);
+}
+
+.about-skill-groups {
+  display: grid;
+  gap: clamp(1.4rem, 3vw, 2.2rem);
+  margin-top: clamp(1.4rem, 4vw, 3rem);
+}
+
+.about-skill-group {
+  display: grid;
+  gap: 0.75rem;
+}
+
 .case-layout-film {
   --case-surface: color-mix(in oklch, var(--background) 84%, #170b03 16%);
 }
@@ -3314,21 +2464,25 @@ html[data-route-transition] .portfolio-design-lines span {
   max-width: 13ch;
 }
 
+.case-layout-workflow {
+  --case-surface: color-mix(in oklch, var(--background) 84%, #03161a 16%);
+}
+
+.case-layout-hub {
+  --case-surface: color-mix(in oklch, var(--background) 84%, #0d0a1e 16%);
+}
+
+.case-layout-telemetry {
+  --case-surface: color-mix(in oklch, var(--background) 84%, #191202 16%);
+}
+
+.case-layout-workflow .case-title,
+.case-layout-hub .case-title,
+.case-layout-telemetry .case-title {
+  max-width: 13ch;
+}
+
 @media (max-width: 1023px) {
-  .case-background-interface {
-    opacity: 0.52;
-  }
-
-  .case-flow-field {
-    inset: 7rem -44vw auto auto;
-    width: 118vw;
-    height: 48vh;
-  }
-
-  .case-flow-readout {
-    right: 1rem;
-    width: min(18rem, 54vw);
-  }
 
   .case-hero,
   .case-overview,
@@ -3390,26 +2544,6 @@ html[data-route-transition] .portfolio-design-lines span {
   .case-media-surface iframe,
   .work-case-body img {
     max-width: 100%;
-  }
-
-  .theme-interface-head,
-  .theme-interface-status {
-    align-items: start;
-    flex-direction: column;
-    justify-content: start;
-    text-align: left;
-  }
-
-  .theme-code-system,
-  .theme-edit-suite {
-    grid-template-columns: 1fr;
-  }
-
-  .theme-projection-stage,
-  .theme-code-system,
-  .theme-sensor-patch,
-  .theme-edit-suite {
-    min-height: 30rem;
   }
 
   .projection-source {
@@ -3480,13 +2614,13 @@ html[data-route-transition] .portfolio-design-lines span {
 @media (max-width: 640px) {
   .case-nav,
   .case-footer {
-    width: min(100% - 1.25rem, 92rem);
-    max-width: calc(100vw - 1.25rem);
+    width: min(100% - var(--page-gutter) * 2, var(--page-max));
+    max-width: calc(100vw - var(--page-gutter) * 2);
   }
 
   .case-shell {
-    width: min(100% - 1.25rem, 92rem);
-    max-width: calc(100vw - 1.25rem);
+    width: min(100% - var(--page-gutter) * 2, var(--page-max));
+    max-width: calc(100vw - var(--page-gutter) * 2);
     overflow-x: clip;
   }
 
@@ -3520,20 +2654,6 @@ html[data-route-transition] .portfolio-design-lines span {
     white-space: normal;
     word-break: normal;
     overflow-wrap: anywhere;
-  }
-
-  .case-background-interface {
-    opacity: 0.36;
-  }
-
-  .case-flow-field {
-    inset: 6rem -76vw auto auto;
-    width: 170vw;
-    height: 30rem;
-  }
-
-  .case-flow-readout {
-    display: none;
   }
 
   .case-media-topline {
@@ -3620,20 +2740,6 @@ html[data-route-transition] .portfolio-design-lines span {
     object-fit: contain;
   }
 
-  .theme-projection-stage,
-  .theme-code-system,
-  .theme-sensor-patch,
-  .theme-edit-suite {
-    min-height: auto;
-  }
-
-  .theme-sensor-patch {
-    display: grid;
-    align-content: start;
-    gap: 0.75rem;
-    padding: 0.75rem;
-  }
-
   .sensor-viewport,
   .sensor-output-canvas,
   .sensor-node,
@@ -3686,35 +2792,6 @@ html[data-route-transition] .portfolio-design-lines span {
 
   .portfolio-scene-readout {
     display: none;
-  }
-}
-
-@keyframes portfolio-wave-grid {
-  0% {
-    background-position: 48% 46%, 0 0, 0 0, 0 0;
-    transform: translate3d(0, 0, 0) skewX(-0.35deg) scale(1);
-  }
-
-  50% {
-    background-position: 52% 50%, 42px 18px, -28px 34px, 0 0;
-    transform: translate3d(-0.6vw, 0.4vh, 0) skewX(0.45deg) scale(1.015);
-  }
-
-  100% {
-    background-position: 55% 54%, 86px 42px, -64px 78px, 0 0;
-    transform: translate3d(0.7vw, -0.35vh, 0) skewX(-0.2deg) scale(1.026);
-  }
-}
-
-@keyframes portfolio-wave-grid-major {
-  0% {
-    background-position: 50% 48%, 0 0, 0 0;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  100% {
-    background-position: 46% 54%, -92px 48px, 54px -76px;
-    transform: translate3d(0.45vw, 0.6vh, 0) scale(1.018);
   }
 }
 
@@ -3869,74 +2946,18 @@ html[data-route-transition] .portfolio-design-lines span {
   }
 }
 
-@keyframes case-energy-drift {
-  0% {
-    background-position: 45% 42%, 56% 52%, 0 0;
-  }
+/* 只動 translate：background-position 會強制全螢幕重繪，量測到單這一條
+   就把作品頁從 72fps 壓到 24fps。translate 走合成器，視覺幾乎相同。 */
 
-  50% {
-    background-position: 52% 48%, 48% 58%, 22px -18px;
-  }
-
-  100% {
-    background-position: 58% 54%, 42% 46%, -18px 26px;
-  }
-}
-
-@keyframes case-flow-ribbon {
-  0% {
-    translate: -2.5vw -0.8vh;
-    filter: blur(0.55rem) saturate(1);
-  }
-
-  50% {
-    translate: 1.5vw 1.1vh;
-    filter: blur(0.28rem) saturate(1.28);
-  }
-
-  100% {
-    translate: 3vw -0.35vh;
-    filter: blur(0.7rem) saturate(1.1);
-  }
-}
-
-@keyframes case-aura-pulse {
-  0%,
-  100% {
-    opacity: 0.62;
-    scale: 0.82;
-  }
-
-  50% {
-    opacity: 1;
-    scale: 1.08;
-  }
-}
-
-@keyframes case-depth-stream {
-  0% {
-    translate: -4vw -1vh;
-    opacity: 0.45;
-  }
-
-  55% {
-    translate: 2vw 0.6vh;
-    opacity: 0.88;
-  }
-
-  100% {
-    translate: 5vw 1.2vh;
-    opacity: 0.55;
-  }
-}
-
+/* 同上。改成 alternate 往返，位移量就不必對齊重複漸層的週期，
+   也不會在循環接點跳一下。 */
 @keyframes case-scan-field {
   0% {
-    background-position: 0% 0%, 0 0;
+    translate: 0 0;
   }
 
   100% {
-    background-position: 140% 100%, 0 90px;
+    translate: 2.6% 3.2%;
   }
 }
 
@@ -3962,195 +2983,7 @@ html[data-route-transition] .portfolio-design-lines span {
   }
 }
 
-@keyframes theme-status-pulse {
-  0%,
-  100% {
-    opacity: 0.48;
-    transform: scale(0.78);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes theme-cursor-blink {
-  0%,
-  48% {
-    opacity: 1;
-  }
-
-  49%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes route-overlay-cover {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes route-overlay-release {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes route-water-backdrop-cover {
-  0% {
-    opacity: 0;
-    filter: blur(12px) saturate(1.25);
-    transform: scale(1.06);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0) saturate(1.05);
-    transform: scale(1);
-  }
-}
-
-@keyframes route-water-backdrop-release {
-  0% {
-    opacity: 1;
-    filter: blur(0) saturate(1.05);
-    transform: scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(14px) saturate(1.35);
-    transform: scale(1.05);
-  }
-}
-
-@keyframes route-water-ripple-cover {
-  0% {
-    opacity: 0;
-    filter: blur(0.4rem) saturate(1.5);
-    transform: translate(-50%, -50%) scale(0.1);
-  }
-
-  48% {
-    opacity: 0.78;
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(0.08rem) saturate(1.1);
-    transform: translate(-50%, -50%) scale(2.55);
-  }
-}
-
-@keyframes route-water-ripple-release {
-  0% {
-    opacity: 0.62;
-    filter: blur(0.08rem) saturate(1.2);
-    transform: translate(-50%, -50%) scale(2.2);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(0.7rem) saturate(1.55);
-    transform: translate(-50%, -50%) scale(0.22);
-  }
-}
-
-@keyframes route-piece-cover {
-  0% {
-    opacity: 0;
-    filter: blur(10px);
-    transform: translate3d(var(--enter-x), var(--enter-y), 0) rotate(var(--enter-rotate)) scale(0.82);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
-  }
-}
-
-@keyframes route-piece-release {
-  0% {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(12px);
-    transform: translate3d(var(--exit-x), var(--exit-y), 0) rotate(var(--exit-rotate)) scale(0.78);
-  }
-}
-
-@keyframes route-triangle-cover {
-  0% {
-    opacity: 0;
-    filter: blur(10px);
-    transform: translate(calc(-50% + var(--enter-x)), calc(-50% + var(--enter-y))) rotate(var(--enter-rotate)) scale(0.68);
-  }
-
-  100% {
-    opacity: 0.78;
-    filter: blur(0);
-    transform: translate(-50%, -50%) rotate(0deg) scale(1);
-  }
-}
-
-@keyframes route-triangle-release {
-  0% {
-    opacity: 0.78;
-    filter: blur(0);
-    transform: translate(-50%, -50%) rotate(0deg) scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(12px);
-    transform: translate(calc(-50% + var(--exit-x)), calc(-50% + var(--exit-y))) rotate(var(--exit-rotate)) scale(0.72);
-  }
-}
-
-@keyframes route-mark-cover {
-  0% {
-    opacity: 0;
-    filter: blur(8px);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0);
-  }
-}
-
-@keyframes route-mark-release {
-  0% {
-    opacity: 1;
-    filter: blur(0);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(10px);
-  }
-}
-
 /* Visual cleanup: remove decorative grid backgrounds while keeping layout grids. */
-.transition-overlay__base::before,
-.transition-overlay__base::after,
-.transition-overlay__piece::before,
 .portfolio-home::after,
 .portfolio-map::before,
 .portfolio-design-lines,
@@ -4210,10 +3043,6 @@ html[data-route-transition] .portfolio-flow-field span {
   opacity: 0.42;
 }
 
-.case-flow-depth span {
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--case-accent) 24%, transparent), color-mix(in oklch, var(--case-accent-2) 28%, transparent), transparent);
-}
-
 .case-media-surface {
   background: #05070d;
 }
@@ -4221,11 +3050,6 @@ html[data-route-transition] .portfolio-flow-field span {
 .case-media-surface::after,
 .case-image-frame::after {
   background: linear-gradient(115deg, transparent 0 42%, color-mix(in oklch, white 18%, transparent) 50%, transparent 58%);
-}
-
-.case-theme-interface::before {
-  background: linear-gradient(135deg, color-mix(in oklch, var(--case-accent) 9%, transparent), transparent 56%);
-  opacity: 0.2;
 }
 
 .projection-plane {
@@ -4335,61 +3159,6 @@ html[data-route-transition] .portfolio-flow-field span {
   pointer-events: none;
 }
 
-.portfolio-distortion-ripple {
-  position: fixed;
-  left: var(--auto-ripple-x, 50%);
-  top: var(--auto-ripple-y, 50%);
-  z-index: 1;
-  display: block;
-  width: var(--auto-ripple-size, 28rem);
-  aspect-ratio: 1;
-  border-radius: 9999px !important;
-  clip-path: circle(49% at 50% 50%);
-  -webkit-mask-image: radial-gradient(circle, black 0 58%, rgb(0 0 0 / 0.72) 68%, transparent 82%);
-  mask-image: radial-gradient(circle, black 0 58%, rgb(0 0 0 / 0.72) 68%, transparent 82%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  overflow: hidden;
-  pointer-events: none;
-  background:
-    radial-gradient(circle, transparent 0 28%, color-mix(in oklch, white 28%, transparent) 31%, transparent 35%),
-    radial-gradient(circle, transparent 0 43%, color-mix(in oklch, var(--portfolio-cyan) 30%, transparent) 46%, transparent 54%),
-    radial-gradient(circle, color-mix(in oklch, white 10%, transparent) 0%, transparent 64%);
-  box-shadow:
-    inset 0 0 1.2rem color-mix(in oklch, white 18%, transparent),
-    inset 0 0 4rem color-mix(in oklch, var(--portfolio-cyan) 18%, transparent),
-    0 0 4.8rem color-mix(in oklch, var(--portfolio-cyan) 12%, transparent);
-  -webkit-backdrop-filter: blur(5px) saturate(1.24) contrast(1.08);
-  backdrop-filter: url("#portfolio-ripple-distortion") blur(5px) saturate(1.24) contrast(1.08);
-  mix-blend-mode: normal;
-  opacity: 0;
-  transform: translate3d(-50%, -50%, 0) scale(0.42) rotate(var(--auto-ripple-rotate, 0deg));
-  animation: portfolio-distortion-ripple-spread var(--auto-ripple-duration, 2.9s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity, filter, backdrop-filter;
-}
-
-.portfolio-distortion-ripple--pointer {
-  z-index: 1;
-}
-
-.dark .portfolio-distortion-ripple {
-  background:
-    radial-gradient(circle, transparent 0 28%, color-mix(in oklch, white 20%, transparent) 31%, transparent 35%),
-    radial-gradient(circle, transparent 0 43%, color-mix(in oklch, var(--portfolio-cyan) 36%, transparent) 46%, transparent 54%),
-    radial-gradient(circle, color-mix(in oklch, white 8%, transparent) 0%, transparent 64%);
-  box-shadow:
-    inset 0 0 1.4rem color-mix(in oklch, white 16%, transparent),
-    inset 0 0 4.4rem color-mix(in oklch, var(--portfolio-cyan) 22%, transparent),
-    0 0 5.4rem color-mix(in oklch, var(--portfolio-cyan) 18%, transparent);
-  mix-blend-mode: screen;
-}
-
-html[data-fx-calm="true"] .portfolio-distortion-ripple {
-  display: none !important;
-}
-
 .portfolio-theme-toggle {
   position: fixed;
   top: clamp(0.85rem, 2vw, 1.4rem);
@@ -4424,9 +3193,11 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   --portfolio-paper: #000000;
   --portfolio-panel-mix: #030606;
   --portfolio-depth: #000000;
-  background: #000 !important;
+  /* 保持黑底，但留 28% 讓背景層的黃金格線與霓虹透出來。
+     原本是 #000 不透明，格線在背後等於完全看不到。 */
+  background: color-mix(in oklch, #000 72%, transparent) !important;
   background-image: none !important;
-  background-color: #000 !important;
+  background-color: color-mix(in oklch, #000 72%, transparent) !important;
 }
 
 .dark .portfolio-home::before {
@@ -4473,8 +3244,8 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
 }
 
 .portfolio-shell--cinematic {
-  width: min(100% - 2rem, 104rem);
-  max-width: calc(100vw - 2rem);
+  width: min(100% - var(--page-gutter) * 2, var(--page-max));
+  max-width: calc(100vw - var(--page-gutter) * 2);
   margin: 0 auto;
   letter-spacing: 0;
   overflow-x: clip;
@@ -4676,8 +3447,10 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   max-width: 9ch;
   color: var(--portfolio-ink);
   font-size: 5.6rem;
-  font-weight: 950;
-  line-height: 0.78;
+  font-weight: 900;
+  line-height: 0.82;
+  /* 展示級字必須負追蹤，預設的 normal 在 5.6rem 下字間過鬆 */
+  letter-spacing: -0.03em;
   text-transform: uppercase;
   text-shadow:
     0 0.08em 0 color-mix(in oklch, white 62%, transparent),
@@ -5394,7 +4167,7 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1.1rem;
+  gap: 1.75rem;
 }
 
 .portfolio-project {
@@ -5412,6 +4185,8 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   backdrop-filter: blur(18px) saturate(1.12);
 }
 
+/* 兩種比例的節奏：寬卡走 16/9、窄卡走 4/5，
+   跟欄寬綁在一起才讀得出是刻意的錯落而不是壞掉。 */
 .portfolio-project:nth-child(4n + 1) {
   grid-column: span 7;
 }
@@ -5428,6 +4203,16 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
 .portfolio-project:nth-child(4n) {
   grid-column: span 7;
   margin-top: -1.5rem;
+}
+
+.portfolio-project:nth-child(4n + 1) .portfolio-project-thumb,
+.portfolio-project:nth-child(4n) .portfolio-project-thumb {
+  aspect-ratio: 16 / 9;
+}
+
+.portfolio-project:nth-child(4n + 2) .portfolio-project-thumb,
+.portfolio-project:nth-child(4n + 3) .portfolio-project-thumb {
+  aspect-ratio: 4 / 5;
 }
 
 .portfolio-project:hover {
@@ -5578,8 +4363,8 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
 
 @media (max-width: 1023px) {
   .portfolio-shell--cinematic {
-    width: min(100% - 1rem, 58rem);
-    max-width: calc(100vw - 1rem);
+    width: min(100% - var(--page-gutter) * 2, 58rem);
+    max-width: calc(100vw - var(--page-gutter) * 2);
   }
 
   .portfolio-topbar {
@@ -5770,8 +4555,8 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   }
 
   .portfolio-shell--cinematic {
-    width: calc(100% - 1rem);
-    max-width: calc(100vw - 1rem);
+    width: calc(100% - var(--page-gutter) * 2);
+    max-width: calc(100vw - var(--page-gutter) * 2);
   }
 
   .portfolio-race-hero {
@@ -5949,31 +4734,6 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
   }
 }
 
-@keyframes portfolio-distortion-ripple-spread {
-  0% {
-    opacity: 0;
-    filter: blur(0.18rem);
-    transform: translate3d(-50%, -50%, 0) scale(0.42) rotate(var(--auto-ripple-rotate, 0deg));
-  }
-
-  18% {
-    opacity: var(--auto-ripple-opacity, 0.5);
-    filter: blur(0.24rem) saturate(1.14);
-  }
-
-  52% {
-    opacity: calc(var(--auto-ripple-opacity, 0.5) * 0.76);
-    filter: blur(0.34rem) saturate(1.18);
-    transform: translate3d(-50%, -50%, 0) scale(1.34) rotate(calc(var(--auto-ripple-rotate, 0deg) + 5deg));
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(0.62rem);
-    transform: translate3d(-50%, -50%, 0) scale(1.68) rotate(calc(var(--auto-ripple-rotate, 0deg) + 10deg));
-  }
-}
-
 @keyframes portfolio-marquee-left {
   0% {
     translate: -2rem 0;
@@ -6110,363 +4870,13 @@ html[data-fx-calm="true"] .portfolio-distortion-ripple {
     translate: 0.5rem 0.35rem;
     rotate: y -1deg z -0.2deg;
   }
-}
+}/* 水漫上來：從點擊處擴張成整面水 */
 
-/* Route transition: speed-tunnel pass */
-.transition-overlay {
-  --transition-accent: var(--route-transition-accent, #76f7ff);
-  --transition-signal: #d8ff38;
-  background: transparent;
-  perspective: 900px;
-}
+/* 水退去：整面水縮回並散開 */
 
-.transition-overlay__base,
-.transition-overlay__tunnel,
-.transition-overlay__runway,
-.transition-overlay__speedcopy,
-.transition-overlay__water,
-.transition-overlay__mark {
-  position: absolute;
-  pointer-events: none;
-}
+/* 第二圈慢半拍，交疊出層次 */
 
-.transition-overlay__base {
-  inset: 0;
-  background:
-    radial-gradient(circle at var(--route-x, 50%) var(--route-y, 50%), color-mix(in oklch, white 20%, transparent), transparent 15%),
-    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--transition-accent) 32%, transparent), transparent 35%),
-    linear-gradient(116deg, color-mix(in oklch, #020303 90%, var(--transition-accent) 10%) 0%, #050606 52%, #000 100%);
-  opacity: 0;
-  transform-origin: var(--route-x, 50%) var(--route-y, 50%);
-}
-
-.transition-overlay__tunnel {
-  inset: -18vmax;
-  z-index: 2;
-  transform-style: preserve-3d;
-  opacity: 0;
-}
-
-.transition-overlay__tunnel span {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 1px;
-  height: 150vmax;
-  background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--transition-accent) 60%, white), transparent);
-  box-shadow: 0 0 18px color-mix(in oklch, var(--transition-accent) 36%, transparent);
-  opacity: 0;
-  transform:
-    translate(-50%, -50%)
-    rotate(calc(var(--line-index) * 11.25deg))
-    translateY(-6vmax)
-    scaleY(0.12);
-  transform-origin: 50% 50%;
-  mix-blend-mode: screen;
-}
-
-.transition-overlay__runway {
-  inset: 0;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  opacity: 0;
-  transform-style: preserve-3d;
-}
-
-.transition-overlay__runway::before,
-.transition-overlay__runway::after,
-.transition-overlay__runway span {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: block;
-  transform: translate(-50%, -50%);
-}
-
-.transition-overlay__runway::before {
-  width: min(78vw, 74rem);
-  height: min(54vh, 34rem);
-  border: 1px solid color-mix(in oklch, white 38%, transparent);
-  clip-path: polygon(0 42%, 48% 0, 100% 42%, 100% 58%, 48% 100%, 0 58%);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--transition-accent) 28%, transparent),
-    0 0 5rem color-mix(in oklch, var(--transition-accent) 16%, transparent);
-}
-
-.transition-overlay__runway::after {
-  width: 1px;
-  height: 120vh;
-  background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--transition-signal) 80%, white), transparent);
-  box-shadow: 0 0 28px color-mix(in oklch, var(--transition-signal) 50%, transparent);
-}
-
-.transition-overlay__runway span {
-  width: min(112vw, 110rem);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, white 72%, transparent), transparent);
-  transform: translate(-50%, -50%) rotate(var(--speed-rotate, 0deg));
-  opacity: 0.48;
-}
-
-.transition-overlay__runway span:nth-child(1) {
-  --speed-rotate: 0deg;
-}
-
-.transition-overlay__runway span:nth-child(2) {
-  --speed-rotate: 18deg;
-}
-
-.transition-overlay__runway span:nth-child(3) {
-  --speed-rotate: -18deg;
-}
-
-.transition-overlay__speedcopy {
-  inset: auto -12vw 8vh -12vw;
-  z-index: 4;
-  display: flex;
-  gap: 1rem;
-  color: color-mix(in oklch, white 32%, transparent);
-  font-size: clamp(2.3rem, 7vw, 7rem);
-  font-weight: 950;
-  line-height: 0.8;
-  text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0;
-  transform: skewY(-1.4deg);
-}
-
-.transition-overlay__mark {
-  z-index: 5;
-  left: 50%;
-  top: 50%;
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: clamp(2.2rem, 8vw, 7rem);
-  font-weight: 950;
-  line-height: 0.8;
-  text-transform: uppercase;
-  text-shadow:
-    0 0 2rem color-mix(in oklch, var(--transition-accent) 42%, transparent),
-    0 1.6rem 5rem color-mix(in oklch, black 74%, transparent);
-  transform: translate(-50%, -50%) scale(0.94);
-}
-
-.transition-overlay__mark span {
-  border: 0;
-  padding: 0;
-}
-
-.transition-overlay.is-leaving,
-.transition-overlay.is-entering {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.transition-overlay.is-leaving {
-  animation: route-overlay-cover 540ms ease-out both;
-}
-
-.transition-overlay.is-entering {
-  animation: route-overlay-release 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__base {
-  animation: route-speed-base-cover 540ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-}
-
-.transition-overlay.is-entering .transition-overlay__base {
-  animation: route-speed-base-release 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__tunnel,
-.transition-overlay.is-entering .transition-overlay__tunnel,
-.transition-overlay.is-leaving .transition-overlay__runway,
-.transition-overlay.is-entering .transition-overlay__runway,
-.transition-overlay.is-leaving .transition-overlay__speedcopy,
-.transition-overlay.is-entering .transition-overlay__speedcopy {
-  opacity: 1;
-}
-
-.transition-overlay.is-leaving .transition-overlay__tunnel span {
-  animation: route-tunnel-line-cover 540ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-  animation-delay: calc(var(--line-index) * 8ms);
-}
-
-.transition-overlay.is-entering .transition-overlay__tunnel span {
-  animation: route-tunnel-line-release 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--line-index) * 5ms);
-}
-
-.transition-overlay.is-leaving .transition-overlay__runway {
-  animation: route-runway-cover 540ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-}
-
-.transition-overlay.is-entering .transition-overlay__runway {
-  animation: route-runway-release 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__speedcopy {
-  animation: route-copy-cover 540ms linear both;
-}
-
-.transition-overlay.is-entering .transition-overlay__speedcopy {
-  animation: route-copy-release 760ms linear both;
-}
-
-.transition-overlay.is-leaving .transition-overlay__water span {
-  animation: route-water-ripple-cover 540ms cubic-bezier(0.12, 0.82, 0.2, 1) both;
-  animation-delay: calc(var(--ripple-index) * 42ms);
-}
-
-.transition-overlay.is-entering .transition-overlay__water span {
-  animation: route-water-ripple-release 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--ripple-index) * 30ms);
-}
-
-.transition-overlay.is-leaving .transition-overlay__mark {
-  animation: route-mark-cover 420ms ease-out 90ms both;
-}
-
-.transition-overlay.is-entering .transition-overlay__mark {
-  animation: route-mark-release 600ms ease-out both;
-}
-
-@keyframes route-speed-base-cover {
-  0% {
-    opacity: 0;
-    filter: blur(1rem) saturate(1.3);
-    transform: scale(1.1);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0) saturate(1.05);
-    transform: scale(1);
-  }
-}
-
-@keyframes route-speed-base-release {
-  0% {
-    opacity: 1;
-    filter: blur(0) saturate(1.05);
-    transform: scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    filter: blur(1.1rem) saturate(1.45);
-    transform: scale(1.08);
-  }
-}
-
-@keyframes route-tunnel-line-cover {
-  0% {
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      rotate(calc(var(--line-index) * 11.25deg))
-      translateY(16vmax)
-      scaleY(0.08);
-  }
-
-  48% {
-    opacity: 0.88;
-  }
-
-  100% {
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      rotate(calc(var(--line-index) * 11.25deg))
-      translateY(-20vmax)
-      scaleY(3.2);
-  }
-}
-
-@keyframes route-tunnel-line-release {
-  0% {
-    opacity: 0.8;
-    transform:
-      translate(-50%, -50%)
-      rotate(calc(var(--line-index) * 11.25deg))
-      translateY(-18vmax)
-      scaleY(2.8);
-  }
-
-  100% {
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      rotate(calc(var(--line-index) * 11.25deg))
-      translateY(16vmax)
-      scaleY(0.08);
-  }
-}
-
-@keyframes route-runway-cover {
-  0% {
-    opacity: 0;
-    transform: translateZ(-340px) scale(0.42);
-    filter: blur(0.8rem);
-  }
-
-  56% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0.92;
-    transform: translateZ(180px) scale(1.24);
-    filter: blur(0);
-  }
-}
-
-@keyframes route-runway-release {
-  0% {
-    opacity: 0.82;
-    transform: translateZ(180px) scale(1.22);
-    filter: blur(0);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateZ(-380px) scale(0.36);
-    filter: blur(1rem);
-  }
-}
-
-@keyframes route-copy-cover {
-  0% {
-    opacity: 0;
-    translate: 18vw 0;
-  }
-
-  30% {
-    opacity: 0.7;
-  }
-
-  100% {
-    opacity: 0;
-    translate: -24vw 0;
-  }
-}
-
-@keyframes route-copy-release {
-  0% {
-    opacity: 0.55;
-    translate: -18vw 0;
-  }
-
-  100% {
-    opacity: 0;
-    translate: 20vw 0;
-  }
-}
+/* 漂在水面：位移比原本的賽車橫掃小得多，帶一點上下浮沉 */
 
 html[data-fx-calm="true"] #ambient-particles .particle,
 html[data-fx-calm="true"] .portfolio-click-lens,
@@ -6543,18 +4953,10 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
     display: none !important;
   }
 
-  .transition-overlay {
-    display: none !important;
-  }
-
   .portfolio-home::before,
   .portfolio-home::after {
     animation: none !important;
     transform: none !important;
-  }
-
-  .portfolio-distortion-ripple {
-    display: none !important;
   }
 }
 
@@ -6581,4 +4983,836 @@ html[data-input-mode="keyboard"] .portfolio-project:focus-visible::after {
 
 .prose blockquote {
   @apply mt-6 border-l-2 border-primary pl-6 italic text-muted-foreground;
+}
+
+/* ==========================================================================
+   黃金比例方格系統
+   同一套格線負責兩件事：頁面的結構骨架，以及轉場時的分割單位。
+   方格邊長是 1 : 1/φ : 1/φ² … 的等比遞減（見 src/lib/goldenGrid.ts）。
+   螺旋弧線是主進程：五秒鐘依序畫完，方格的水波也跟著逐格點亮。
+   ========================================================================== */
+
+:root {
+  --gg-phi: 1.618033988749895;
+  /* φ 盒子以 cover 的方式蓋滿視窗：視窗比例不會破壞方格的黃金比例 */
+  --gg-w: max(100vw, calc(100vh * var(--gg-phi)));
+  --gg-h: max(100vh, calc(100vw / var(--gg-phi)));
+  --gg-x: calc((100vw - var(--gg-w)) / 2);
+  --gg-y: calc((100vh - var(--gg-h)) / 2);
+  --gg-accent: #5ddcff;
+  --gg-progress: 5000ms;
+  /* 整套編排共用同一條緩動：弧線、水波、序號、沉降、方格翻面 */
+  --gg-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* accent 多半是亮色，直接畫在亮色主題的近白背景上會整條消失。
+     線條、弧線、序號一律用這個壓深過的墨色，暗色主題才用原本的 accent。 */
+  --gg-ink: color-mix(in oklch, var(--gg-accent) 55%, #06202b 45%);
+}
+
+html.dark {
+  --gg-ink: var(--gg-accent);
+}
+
+/* 格線是背景層（z-index 1，低於 #page-content 的 2）。
+   能這樣放的前提是下面那段把頁面容器的底色改成半透明——不然不透明的
+   容器會把整片格線遮掉，那就是先前「只有 404 看得到」的狀況。 */
+.golden-grid {
+  position: fixed;
+  left: var(--gg-x);
+  top: var(--gg-y);
+  width: var(--gg-w);
+  height: var(--gg-h);
+  z-index: 1;
+  pointer-events: none;
+  perspective: 1600px;
+  animation: gg-grid-settle var(--gg-progress) var(--gg-ease) both;
+}
+
+/* 讓格線從頁面容器背後透出來。
+   .work-case 只需要把 --case-surface（背景堆疊的最底層純色）改成半透明，
+   上面那幾層裝飾漸層與格紋都保留。
+   .portfolio-home 的底是一層漸層，得整條改寫；原本頂端那一點白／深藍
+   的染色會失去，色調本身不變。 */
+.work-case {
+  background:
+    radial-gradient(
+      circle at 84% 14%,
+      color-mix(in oklch, var(--case-accent) 10%, transparent),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--case-accent) 8%, transparent),
+      transparent 44%
+    ),
+    color-mix(in oklch, var(--case-surface) 72%, transparent);
+  background-size: auto;
+}
+
+/* 亮色主題。暗色主題的 .dark .portfolio-home 用了三個 !important 強制
+   純黑，蓋不過去，已直接在那條規則上加透明度。 */
+.portfolio-home {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--background) 64%, transparent) 0%,
+    color-mix(in oklch, var(--background) 76%, transparent) 72%
+  );
+}
+
+/* 進程期間滿強度，畫完之後往下沉一點、退一點。
+   因為已經在背景層、又隔著半透明的頁面容器，不必再壓到幾乎看不見。 */
+/* 原本前 68% 完全不動、最後 32% 一次降完，那個轉折點就是突兀感的來源。
+   改成從 34% 起就開始緩慢下沉，中間補一個節點讓曲線更貼近等速衰減。 */
+@keyframes gg-grid-settle {
+  0%,
+  34% {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+
+  62% {
+    opacity: 0.94;
+    scale: 0.998;
+    translate: 0 0.2%;
+  }
+
+  100% {
+    opacity: 0.82;
+    scale: 0.994;
+    translate: 0 0.6%;
+  }
+}
+
+.golden-cell {
+  position: absolute;
+  aspect-ratio: 1;
+  transform-style: preserve-3d;
+}
+
+.golden-cell__edge {
+  position: absolute;
+  inset: 0;
+}
+
+/* --- 格線本體：實線 + 角標，強度拉到看得見為止 --- */
+
+.golden-cell__edge {
+  border: 1.5px solid color-mix(in oklch, var(--gg-ink) 58%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--gg-ink) 10%, transparent),
+    0 0 22px color-mix(in oklch, var(--gg-ink) 12%, transparent);
+}
+
+/* 角標：四個角各露一小段更亮的線，讓方格的「被畫出來」更明確 */
+.golden-cell__edge::before,
+.golden-cell__edge::after {
+  content: "";
+  position: absolute;
+  width: 14%;
+  height: 14%;
+  border: 2.5px solid var(--gg-ink);
+}
+
+.golden-cell__edge::before {
+  top: -1.5px;
+  left: -1.5px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.golden-cell__edge::after {
+  right: -1.5px;
+  bottom: -1.5px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.golden-cell--stage .golden-cell__edge {
+  border-color: color-mix(in oklch, var(--gg-ink) 78%, transparent);
+}
+
+.golden-cell--field .golden-cell__edge {
+  border-color: color-mix(in oklch, var(--gg-ink) 68%, transparent);
+}
+
+.golden-cell--chip .golden-cell__edge {
+  border-color: color-mix(in oklch, var(--gg-ink) 46%, transparent);
+}
+
+/* 序號：標示這一格在螺旋上的順序 */
+.golden-cell__tick {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.6rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.6rem, 0.9vw, 0.85rem);
+  letter-spacing: 0.18em;
+  color: color-mix(in oklch, var(--gg-ink) 72%, transparent);
+  opacity: 0;
+  animation: gg-tick-in 420ms var(--gg-ease) var(--gg-delay, 0ms) both;
+}
+
+/* --- 逐格點亮的霓虹色塊：像街上各自獨立的招牌 ---
+   分兩層是因為「亮起」與「閃爍」都要動 opacity，寫在同一個元素上
+   後者會整個蓋掉前者：
+   - .golden-cell__neon 只負責輪到自己時亮起來一次
+   - ::before 是色塊本身，跑無限循環的閃爍
+   - ::after 是慢慢漂移的光暈，做街道那種散光
+   位移一律用 translate；動 background-position 會強制全螢幕重繪。 */
+
+.golden-cell__neon {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  animation: gg-neon-on var(--gg-step, 700ms) var(--gg-ease) var(--gg-delay, 0ms) both;
+}
+
+.golden-cell__neon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    var(--neon-angle, 0deg),
+    color-mix(in oklch, var(--neon-a, #ff2d95) 58%, transparent) 0%,
+    color-mix(in oklch, var(--neon-b, #00e5ff) 40%, transparent) 58%,
+    transparent 94%
+  );
+  animation: gg-neon-flicker var(--neon-cycle, 4s) linear var(--neon-offset, 0s) infinite;
+}
+
+.golden-cell__neon::after {
+  content: "";
+  position: absolute;
+  inset: -22%;
+  background: radial-gradient(
+    42% 42% at 32% 68%,
+    color-mix(in oklch, var(--neon-b, #00e5ff) 38%, transparent),
+    transparent 70%
+  );
+  animation: gg-neon-drift 13s ease-in-out var(--neon-offset, 0s) infinite alternate;
+}
+
+@keyframes gg-tick-in {
+  from {
+    opacity: 0;
+    translate: 0 -0.4rem;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes gg-neon-on {
+  0% {
+    opacity: 0;
+    scale: 0.94;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* 霓虹燈管不會規律地閃：大部分時間亮著，偶爾掉一下、偶爾連續抽兩下。
+   關鍵是節點之間距離不等，等距的閃爍看起來像螢幕壞掉。 */
+@keyframes gg-neon-flicker {
+  0% {
+    opacity: 0.92;
+  }
+
+  18% {
+    opacity: 0.92;
+  }
+
+  19% {
+    opacity: 0.26;
+  }
+
+  20% {
+    opacity: 0.9;
+  }
+
+  20.6% {
+    opacity: 0.32;
+  }
+
+  21.4% {
+    opacity: 0.96;
+  }
+
+  42% {
+    opacity: 0.92;
+  }
+
+  43% {
+    opacity: 0.38;
+  }
+
+  43.8% {
+    opacity: 0.88;
+  }
+
+  71% {
+    opacity: 0.9;
+  }
+
+  71.6% {
+    opacity: 0.2;
+  }
+
+  72.4% {
+    opacity: 0.58;
+  }
+
+  73% {
+    opacity: 0.93;
+  }
+
+  100% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes gg-neon-drift {
+  0% {
+    translate: -5% 4%;
+    scale: 1;
+  }
+
+  100% {
+    translate: 6% -5%;
+    scale: 1.1;
+  }
+}
+
+/* --- 主進程：黃金螺旋在五秒內畫完 --- */
+
+.golden-spiral {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.golden-spiral__arc {
+  stroke: var(--gg-ink);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  fill: none;
+  filter: drop-shadow(0 0 8px color-mix(in oklch, var(--gg-ink) 45%, transparent));
+  stroke-dasharray: var(--arc-len) var(--arc-len);
+  stroke-dashoffset: var(--arc-len);
+  /* 這裡刻意用 linear 而不是 --gg-ease：螺旋是七段各自獨立的動畫接起來的，
+     --gg-ease 的終點斜率是 0（控制點 0.36,1），每段結尾筆速會完全歸零，
+     5 秒內就會出現七次「衝出去再煞停」。段與段之間要連續，只能等速。 */
+  animation: gg-arc-draw var(--gg-step, 700ms) linear var(--gg-delay, 0ms) both;
+}
+
+@keyframes gg-arc-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   轉場：每個方格各自翻面，大格慢、小格快，依序把新頁面拼出來。
+   內容本身（root）只用 400ms 交還，方格的蒙太奇繼續在上層跑，
+   所以畫面很快就能讀、能點，不會被整段動畫鎖住。
+   -------------------------------------------------------------------------- */
+
+::view-transition-group(*) {
+  animation-timing-function: var(--gg-ease);
+}
+
+@keyframes gg-flip-out {
+  to {
+    transform: rotateY(-88deg) scale(0.94);
+    opacity: 0;
+  }
+}
+
+@keyframes gg-flip-in {
+  from {
+    transform: rotateY(88deg) scale(0.94);
+    opacity: 0;
+  }
+}
+
+::view-transition-old(gg-0) {
+  animation: gg-flip-out 1100ms var(--gg-ease) 0ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-0) {
+  animation: gg-flip-in 1100ms var(--gg-ease) 90ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-1) {
+  animation: gg-flip-out 990ms var(--gg-ease) 230ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-1) {
+  animation: gg-flip-in 990ms var(--gg-ease) 320ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-2) {
+  animation: gg-flip-out 891ms var(--gg-ease) 460ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-2) {
+  animation: gg-flip-in 891ms var(--gg-ease) 550ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-3) {
+  animation: gg-flip-out 802ms var(--gg-ease) 690ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-3) {
+  animation: gg-flip-in 802ms var(--gg-ease) 780ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-4) {
+  animation: gg-flip-out 722ms var(--gg-ease) 920ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-4) {
+  animation: gg-flip-in 722ms var(--gg-ease) 1010ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-5) {
+  animation: gg-flip-out 650ms var(--gg-ease) 1150ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-5) {
+  animation: gg-flip-in 650ms var(--gg-ease) 1240ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-6) {
+  animation: gg-flip-out 585ms var(--gg-ease) 1380ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-6) {
+  animation: gg-flip-in 585ms var(--gg-ease) 1470ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-7) {
+  animation: gg-flip-out 526ms var(--gg-ease) 1610ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-7) {
+  animation: gg-flip-in 526ms var(--gg-ease) 1700ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 400ms;
+  animation-timing-function: var(--gg-ease);
+}
+
+/* --------------------------------------------------------------------------
+   深淺主題切換：借用同一套 View Transition，但走完全不同的演出。
+   換頁是方格翻面的蒙太奇，主題切換是從按鈕圓形擴散——兩者不能混在一起，
+   所以切換期間把換頁的動畫整組關掉，只留 JS 直接掛在
+   ::view-transition-new(root) 上的 clip-path 擴散（WAAPI 不受
+   `animation: none` 影響）。
+   -------------------------------------------------------------------------- */
+
+html[data-theme-switching]::view-transition-group(*),
+html[data-theme-switching]::view-transition-old(*),
+html[data-theme-switching]::view-transition-new(*) {
+  animation: none !important;
+}
+
+html[data-theme-switching]::view-transition-old(root) {
+  z-index: 0;
+}
+
+/* 新主題疊在舊主題上被圓形裁切露出，所以必須整片不透明 */
+html[data-theme-switching]::view-transition-new(root) {
+  z-index: 1;
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+/* 方格在切換期間讓出 view-transition-name，併進 root 一起被擴散帶到，
+   否則它們會自成一組、瞬間跳色，跟擴散的邊界對不上 */
+html[data-theme-switching] .golden-cell {
+  view-transition-name: none !important;
+}
+
+/* 換頁：方格翻面照舊，另外疊一顆從點擊處擴散的圓形。
+   只中和 root 自己的預設淡入淡出——不然淡入會跟 clip-path 擴散打架，
+   邊界糊掉。方格的 view-transition-name 必須留著，否則就沒有方格可翻。
+   這裡刻意不設 z-index：root 群組本來就排在方格群組下面，動了會把
+   擴散壓到方格上面。 */
+html[data-page-wipe]::view-transition-old(root),
+html[data-page-wipe]::view-transition-new(root) {
+  animation: none;
+}
+
+html[data-page-wipe]::view-transition-new(root) {
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  .golden-cell__neon,
+  .golden-cell__neon::before,
+  .golden-cell__neon::after,
+  .golden-cell__tick,
+  .golden-spiral__arc,
+  .golden-grid {
+    animation: none !important;
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+
+  /* 閃爍在 reduced-motion 下要完全停住，停在亮著的狀態 */
+  .golden-cell__neon::before {
+    opacity: 0.55;
+  }
+}
+
+/* ==========================================================================
+   聽說 Listen & Speak 專屬版面（.case-layout-dialogue）
+   作品談的是理解與誤解之間的落差，所以版面本身也被一道布幕切成兩側：
+   文字沿著中線左右分立、圖片橫跨中線、標題帶著尚未對齊的殘影。
+   只有 .case-nav 的返回鍵維持全站一致，其餘完全另做一套。
+   ========================================================================== */
+
+.case-layout-dialogue {
+  --ls-mag: #ff2fd0;
+  --ls-cyan: #22e3ff;
+  --case-surface: color-mix(in oklch, var(--background) 78%, #12001a 22%);
+}
+
+/* --- 布幕：貫穿內容區的中線 --- */
+.case-layout-dialogue .case-shell {
+  position: relative;
+}
+
+.case-layout-dialogue .case-shell::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklch, var(--ls-mag) 42%, transparent) 18%,
+    color-mix(in oklch, var(--ls-cyan) 42%, transparent) 72%,
+    transparent 100%
+  );
+}
+
+/* --- 標題：兩個還沒對齊的自己 --- */
+.case-layout-dialogue .case-title {
+  text-shadow:
+    var(--ls-split, 0.055em) 0 0 color-mix(in oklch, var(--ls-mag) 62%, transparent),
+    calc(var(--ls-split, 0.055em) * -1) 0 0
+      color-mix(in oklch, var(--ls-cyan) 62%, transparent);
+  animation: ls-converge 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s both;
+}
+
+@keyframes ls-converge {
+  0% {
+    --ls-split: 0.14em;
+  }
+
+  100% {
+    --ls-split: 0.03em;
+  }
+}
+
+@property --ls-split {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0.055em;
+}
+
+/* --- 入圍標記 --- */
+.ls-awards {
+  margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+  padding: clamp(0.9rem, 2vw, 1.2rem) clamp(1.1rem, 3vw, 1.8rem);
+  border: 1px solid color-mix(in oklch, var(--ls-mag) 38%, transparent);
+  border-radius: 2px;
+  background: color-mix(in oklch, var(--ls-mag) 7%, transparent);
+}
+
+.ls-awards p {
+  margin: 0 0 0.6rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.72rem, 1.1vw, 0.85rem);
+  letter-spacing: 0.24em;
+  color: var(--ls-mag);
+}
+
+.ls-award-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+}
+
+.ls-award-list span {
+  font-size: clamp(0.86rem, 1.3vw, 1rem);
+  color: color-mix(in oklch, var(--foreground) 82%, transparent);
+}
+
+.ls-award-list span::before {
+  content: "▸ ";
+  color: var(--ls-cyan);
+}
+
+/* --- 內文沿中線左右分立，圖片橫跨中線 --- */
+.case-layout-dialogue .work-case-body > h2,
+.case-layout-dialogue .work-case-body > p,
+.case-layout-dialogue .work-case-body > blockquote {
+  max-width: 46ch;
+}
+
+.case-layout-dialogue .work-case-body > h2:nth-of-type(even),
+.case-layout-dialogue .work-case-body > h2:nth-of-type(even) ~ p {
+  margin-inline-start: auto;
+}
+
+.case-layout-dialogue .work-case-body > h2 {
+  border-inline-start: 2px solid var(--ls-cyan);
+  padding-inline-start: 0.9rem;
+}
+
+.case-layout-dialogue .work-case-body > h2:nth-of-type(even) {
+  border-inline-start: 0;
+  border-inline-end: 2px solid var(--ls-mag);
+  padding-inline: 0 0.9rem;
+  text-align: end;
+}
+
+.case-layout-dialogue .work-case-body img {
+  max-width: none;
+  width: 100%;
+}
+
+/* --- 結果：成功併攏，失敗並排 --- */
+.ls-result {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.2rem, 4vw, 3rem);
+  margin: clamp(2rem, 5vw, 3.5rem) 0;
+}
+
+.ls-result-panel {
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+
+.ls-result-panel h3 {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+.ls-result-panel p {
+  max-width: none;
+  margin: 0 0 0.7rem;
+}
+
+.ls-result-panel--pass {
+  border-color: color-mix(in oklch, var(--ls-cyan) 45%, transparent);
+  background: color-mix(in oklch, var(--ls-cyan) 8%, transparent);
+}
+
+.ls-result-panel--pass h3 {
+  color: var(--ls-cyan);
+}
+
+.ls-result-panel--fail {
+  border-color: color-mix(in oklch, var(--ls-mag) 45%, transparent);
+  background: color-mix(in oklch, var(--ls-mag) 8%, transparent);
+}
+
+.ls-result-panel--fail h3 {
+  color: var(--ls-mag);
+}
+
+/* 失敗那一格用錯位的雙重邊界，呼應「兩份分開的摘要」 */
+.ls-result-panel--fail {
+  position: relative;
+}
+
+.ls-result-panel--fail::after {
+  content: "";
+  position: absolute;
+  inset: 0.4rem -0.4rem -0.4rem 0.4rem;
+  border: 1px solid color-mix(in oklch, var(--ls-mag) 22%, transparent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* --- 收尾提問 --- */
+.ls-question {
+  max-width: none !important;
+  margin: clamp(2rem, 5vw, 3rem) 0;
+  text-align: center;
+  font-size: clamp(1.3rem, 3.4vw, 2.4rem);
+  line-height: 1.4;
+  color: color-mix(in oklch, var(--foreground) 92%, transparent);
+  text-shadow:
+    0.03em 0 0 color-mix(in oklch, var(--ls-mag) 46%, transparent),
+    -0.03em 0 0 color-mix(in oklch, var(--ls-cyan) 46%, transparent);
+}
+
+@media (max-width: 860px) {
+  .case-layout-dialogue .case-shell::before {
+    display: none;
+  }
+
+  .case-layout-dialogue .work-case-body > h2,
+  .case-layout-dialogue .work-case-body > p,
+  .case-layout-dialogue .work-case-body > blockquote {
+    max-width: none;
+  }
+
+  .case-layout-dialogue .work-case-body > h2:nth-of-type(even),
+  .case-layout-dialogue .work-case-body > h2:nth-of-type(even) ~ p {
+    margin-inline-start: 0;
+  }
+
+  .case-layout-dialogue .work-case-body > h2:nth-of-type(even) {
+    border-inline-start: 2px solid var(--ls-mag);
+    border-inline-end: 0;
+    padding-inline: 0.9rem 0;
+    text-align: start;
+  }
+
+  .ls-result {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-layout-dialogue .case-title {
+    animation: none;
+  }
+}
+
+/* --- 聽說：圖片完整呈現 ---
+   全站作品頁的內文圖片預設是 16/9 + object-fit: cover，會把圖裁掉一半。
+   這一件的圖多半是完整構圖（字標、海報、結果畫面），裁掉就沒有意義了，
+   所以整組覆寫。基礎規則的選擇器帶 :has() 比這裡更specific，只能用 important。 */
+.case-layout-dialogue .work-case-body img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: min(86vh, 58rem);
+  padding: 0 !important;
+  background: color-mix(in oklch, var(--background) 90%, #12001a 10%);
+}
+
+/* 結果兩欄裡的截圖跟著欄寬走 */
+.ls-result-panel img {
+  max-height: none;
+  margin: 1rem 0 0;
+}
+
+/* --- 貫穿頁面的「聽」與「說」 ---
+   布幕把畫面切成兩側，這兩個字就是兩側各自的身分：
+   左邊是接收的人，右邊是說話的人。固定在視窗上，捲動時一直都在。 */
+.ls-sides {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: clamp(0.5rem, 3vw, 4rem);
+  overflow: hidden;
+}
+
+.ls-side {
+  font-size: clamp(9rem, 34vh, 26rem);
+  font-weight: 900;
+  line-height: 0.8;
+  color: transparent;
+  user-select: none;
+  -webkit-text-stroke: 1px color-mix(in oklch, var(--foreground) 26%, transparent);
+  opacity: 0.5;
+}
+
+/* 兩個字各自帶一半的色偏——還沒對齊的兩個人 */
+.ls-side--listen {
+  text-shadow: 0.02em 0 0 color-mix(in oklch, var(--ls-cyan) 30%, transparent);
+}
+
+.ls-side--speak {
+  text-shadow: -0.02em 0 0 color-mix(in oklch, var(--ls-mag) 30%, transparent);
+}
+
+/* 內容必須壓在兩個字之上 */
+.case-layout-dialogue .case-shell,
+.case-layout-dialogue .case-nav {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- 說 ≠ 理解 / 聽 ≠ 接收 --- */
+.ls-axiom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2rem;
+  margin: 0 0 clamp(1.4rem, 4vw, 2.4rem) !important;
+  max-width: none !important;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  letter-spacing: 0.08em;
+}
+
+.ls-axiom span:first-child {
+  color: var(--ls-mag);
+}
+
+.ls-axiom span:last-child {
+  color: var(--ls-cyan);
+}
+
+@media (max-width: 860px) {
+  .ls-side {
+    font-size: clamp(6rem, 22vh, 12rem);
+    opacity: 0.32;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-side {
+    text-shadow: none;
+  }
 }
