@@ -5870,3 +5870,472 @@ html[data-page-wipe]::view-transition-new(root) {
     text-shadow: none;
   }
 }
+
+/* ==========================================================================
+   風視颱情 專屬版面（.case-layout-system）
+   這件作品的重點是資料的路徑，不是畫面本身，所以版面照著路徑排：
+   先把三種來源疊成剖面，再用左右分欄逐段對照介面，
+   最後用一條閉合的回路把「回報 → 儲存 → 審核 → 回到索引」收起來。
+   ========================================================================== */
+
+.case-layout-system {
+  --sys-live: #60a5fa;
+  --sys-static: #94a3b8;
+  --sys-ugc: #34d399;
+  --case-surface: color-mix(in oklch, var(--background) 84%, #04141b 16%);
+}
+
+/* --- 三種來源疊成剖面 --- */
+.sys-strata {
+  display: grid;
+  gap: 2px;
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  border-inline-start: 2px solid color-mix(in oklch, var(--sys-static) 40%, transparent);
+}
+
+.sys-stratum {
+  position: relative;
+  padding: clamp(1rem, 2.4vw, 1.6rem) clamp(1.1rem, 3vw, 2rem);
+  background: color-mix(in oklch, var(--tier, var(--sys-static)) 7%, transparent);
+  border-inline-start: 4px solid var(--tier, var(--sys-static));
+}
+
+.sys-stratum--live {
+  --tier: var(--sys-live);
+}
+
+.sys-stratum--static {
+  --tier: var(--sys-static);
+}
+
+.sys-stratum--ugc {
+  --tier: var(--sys-ugc);
+}
+
+.sys-stratum__tag {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  letter-spacing: 0.26em;
+  color: var(--tier);
+}
+
+.sys-stratum h3 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.05rem, 1.9vw, 1.35rem);
+}
+
+.sys-stratum p {
+  margin: 0;
+  max-width: none;
+}
+
+/* --- 說明與畫面左右對照 --- */
+.sys-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.2rem, 3.6vw, 3rem);
+  align-items: start;
+  margin: clamp(2rem, 5vw, 3.4rem) 0;
+}
+
+.sys-row--flip .sys-row__text {
+  order: 2;
+}
+
+.sys-row__text > h2 {
+  margin-top: 0;
+  padding-inline-start: 0.9rem;
+  border-inline-start: 2px solid var(--sys-ugc);
+}
+
+.sys-row__text p {
+  max-width: none;
+}
+
+.sys-row__media {
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1.1rem);
+}
+
+.sys-row__media img {
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* --- 閉合的回路 --- */
+.sys-loop {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: clamp(0.7rem, 2vw, 1.2rem);
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0 clamp(2.4rem, 5vw, 3.4rem);
+  position: relative;
+}
+
+.sys-node {
+  padding: clamp(0.9rem, 2.2vw, 1.3rem);
+  border: 1px solid color-mix(in oklch, var(--sys-ugc) 32%, var(--border));
+  background: color-mix(in oklch, var(--sys-ugc) 5%, transparent);
+}
+
+.sys-node span {
+  display: block;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  color: var(--sys-ugc);
+}
+
+.sys-node strong {
+  display: block;
+  margin: 0.35rem 0 0.5rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+}
+
+.sys-node p {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.82rem, 1.3vw, 0.92rem);
+  line-height: 1.7;
+}
+
+/* 審核那一關是刻意停下來的，用虛線邊界跟其他節點區分 */
+.sys-node--gate {
+  border-style: dashed;
+  border-color: color-mix(in oklch, var(--sys-live) 55%, transparent);
+  background: color-mix(in oklch, var(--sys-live) 7%, transparent);
+}
+
+.sys-node--gate span,
+.sys-node--gate strong {
+  color: var(--sys-live);
+}
+
+/* 回路的閉合：最後一格自己指回第一格。
+   節點會依容器寬度換行，所以不用跨欄的線去畫閉合——換行後那條線一定是錯的。 */
+.sys-node:last-child {
+  border-color: color-mix(in oklch, var(--sys-ugc) 60%, transparent);
+}
+
+.sys-node:last-child::after {
+  content: "↺ 回到 01";
+  display: block;
+  margin-top: 0.7rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  color: var(--sys-ugc);
+}
+
+/* --- 圖片一律完整呈現 ---
+   全站預設 16/9 + cover 會把截圖裁掉，這件作品每一張都是網站畫面或架構圖，
+   裁掉就看不出在講什麼。基礎規則帶 :has() 比這裡 specific，只能用 important。 */
+.case-layout-system .work-case-body img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: min(86vh, 58rem);
+  padding: 0 !important;
+  background: color-mix(in oklch, var(--background) 92%, #04141b 8%);
+}
+
+.case-layout-system .work-case-body > p:has(img) {
+  max-width: none;
+}
+
+.case-layout-system .work-case-body > blockquote {
+  max-width: none;
+}
+
+@media (max-width: 860px) {
+  .sys-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sys-row--flip .sys-row__text {
+    order: 0;
+  }
+
+  .sys-node:last-child::after {
+    margin-top: 0.5rem;
+  }
+}
+
+/* ==========================================================================
+   密碼學學習遊戲 專屬版面（.case-layout-product）
+   作品的結構是一條線：四關逐漸揭露真相、密碼技術同步加難，
+   而第一關可略過的謎題決定第四關的結局。
+   所以版面沿著一條貫穿的流線往下走，並把那個分歧點畫出來。
+   ========================================================================== */
+
+.case-layout-product {
+  --cg-peer: #5ddcff;
+  --cg-mentor: #b8ff70;
+  --cg-grader: #ffb35d;
+  --case-surface: color-mix(in oklch, var(--background) 84%, #030f18 16%);
+}
+
+/* --- 論文標記 --- */
+.cg-paper {
+  margin: 0 0 clamp(1.4rem, 4vw, 2.2rem);
+  padding: clamp(0.8rem, 2vw, 1.1rem) clamp(1.1rem, 3vw, 1.7rem);
+  border: 1px solid color-mix(in oklch, var(--cg-peer) 38%, transparent);
+  background: color-mix(in oklch, var(--cg-peer) 7%, transparent);
+}
+
+.cg-paper p {
+  margin: 0;
+  max-width: none;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.74rem, 1.1vw, 0.86rem);
+  letter-spacing: 0.16em;
+  color: var(--cg-peer);
+}
+
+/* --- 技術棧 --- */
+.cg-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: clamp(0.6rem, 1.8vw, 1rem);
+  margin: clamp(1.6rem, 4vw, 2.4rem) 0;
+}
+
+.cg-stack__item {
+  padding: clamp(0.9rem, 2.2vw, 1.2rem);
+  border: 1px solid color-mix(in oklch, var(--cg-peer) 22%, var(--border));
+}
+
+.cg-stack__item span {
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  color: color-mix(in oklch, var(--foreground) 52%, transparent);
+}
+
+.cg-stack__item strong {
+  display: block;
+  margin: 0.3rem 0 0.2rem;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  color: var(--cg-peer);
+}
+
+.cg-stack__item p {
+  margin: 0;
+  max-width: none;
+  font-size: 0.85rem;
+}
+
+/* --- 三重角色 --- */
+.cg-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: clamp(0.7rem, 2vw, 1.2rem);
+  margin: clamp(1.4rem, 3.5vw, 2.2rem) 0;
+}
+
+.cg-role {
+  padding: clamp(1rem, 2.4vw, 1.4rem);
+  border-top: 3px solid var(--role, var(--cg-peer));
+  background: color-mix(in oklch, var(--role, var(--cg-peer)) 6%, transparent);
+}
+
+.cg-role--peer {
+  --role: var(--cg-peer);
+}
+
+.cg-role--mentor {
+  --role: var(--cg-mentor);
+}
+
+.cg-role--grader {
+  --role: var(--cg-grader);
+}
+
+.cg-role span {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 900;
+  color: var(--role);
+}
+
+.cg-role p {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.85rem, 1.35vw, 0.95rem);
+  line-height: 1.75;
+}
+
+/* --- 關卡流線：左側一條線貫穿四關 --- */
+.cg-track {
+  position: relative;
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding-inline-start: clamp(1.6rem, 4vw, 2.8rem);
+}
+
+.cg-track::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.9rem;
+  inset-inline-start: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--cg-peer) 0%,
+    var(--cg-mentor) 62%,
+    var(--cg-grader) 100%
+  );
+}
+
+.cg-stage {
+  position: relative;
+  margin-bottom: clamp(2rem, 5vw, 3.2rem);
+}
+
+/* 節點：坐在流線上 */
+.cg-stage::before {
+  content: "";
+  position: absolute;
+  top: 0.85rem;
+  inset-inline-start: calc(clamp(1.6rem, 4vw, 2.8rem) * -1 - 5px);
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--cg-peer);
+  background: var(--background);
+}
+
+.cg-stage--final::before {
+  border-color: var(--cg-grader);
+  background: var(--cg-grader);
+}
+
+.cg-stage__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
+}
+
+.cg-stage__no {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  color: var(--cg-peer);
+}
+
+.cg-stage__head h3 {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+}
+
+.cg-stage__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-inline-start: auto;
+}
+
+.cg-stage__tags span {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid color-mix(in oklch, var(--cg-mentor) 40%, transparent);
+  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
+  color: var(--cg-mentor);
+}
+
+.cg-stage--final .cg-stage__tags span {
+  border-color: color-mix(in oklch, var(--cg-grader) 45%, transparent);
+  color: var(--cg-grader);
+}
+
+.cg-stage__body p {
+  max-width: none;
+}
+
+/* --- 結局分歧 --- */
+.cg-branch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem clamp(1rem, 3vw, 2.4rem);
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding: clamp(1rem, 2.6vw, 1.5rem);
+  border: 1px dashed color-mix(in oklch, var(--cg-grader) 50%, transparent);
+  text-align: center;
+}
+
+.cg-branch span {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.78rem, 1.2vw, 0.9rem);
+  letter-spacing: 0.16em;
+  color: var(--cg-grader);
+}
+
+.cg-branch em {
+  font-style: normal;
+  font-size: clamp(0.9rem, 1.7vw, 1.15rem);
+}
+
+/* --- 圖組 --- */
+.cg-shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: clamp(0.5rem, 1.4vw, 0.9rem);
+  margin: clamp(1rem, 2.6vw, 1.6rem) 0;
+}
+
+.cg-shots--pair {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.cg-shots p {
+  margin: 0;
+}
+
+/* --- 圖片完整呈現 ---
+   遊戲截圖是直式手機畫面，被裁掉就看不到謎題本身。 */
+.case-layout-product .work-case-body img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: min(80vh, 46rem);
+  padding: 0 !important;
+  background: color-mix(in oklch, var(--background) 92%, #030f18 8%);
+}
+
+.case-layout-product .work-case-body > p:has(img),
+.case-layout-product .work-case-body > blockquote {
+  max-width: none;
+}
+
+/* --- 研究結果 --- */
+.cg-findings {
+  margin: clamp(1.4rem, 3.5vw, 2.2rem) 0;
+}
+
+.cg-findings blockquote {
+  margin: 0;
+  padding: clamp(1.1rem, 3vw, 1.8rem);
+  border-inline-start: 3px solid var(--cg-mentor);
+  background: color-mix(in oklch, var(--cg-mentor) 6%, transparent);
+}
+
+.cg-findings blockquote p {
+  max-width: none;
+  line-height: 1.9;
+}
+
+@media (max-width: 720px) {
+  .cg-stage__tags {
+    margin-inline-start: 0;
+  }
+
+  .cg-shots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
