@@ -9,7 +9,8 @@ export type ProjectPresentation = {
         | "system"
         | "workflow"
         | "hub"
-        | "telemetry";
+        | "telemetry"
+        | "dialogue";
     accent: string;
     accent2: string;
     kicker: string;
@@ -306,6 +307,39 @@ const presentations: Record<string, ProjectPresentation> = {
             },
         ],
     },
+    dialogue: {
+        layout: "dialogue",
+        accent: "#ff2fd0",
+        accent2: "#22e3ff",
+        kicker: "Interactive Installation",
+        modeLabel: "Dialogue Field",
+        mediaTreatment: "wide",
+        imageFit: "cover",
+        summary: "兩人被一道布幕隔開，只能靠聲音溝通；語意越接近，畫面越清晰、雜訊越低。",
+        narrative:
+            "這件作品談的是理解與誤解之間的落差，所以頁面本身也被一道垂直的布幕切成兩側——內容沿著中線左右交錯，標題帶著尚未對齊的殘影，直到讀者往下讀才收攏。",
+        galleryTitle: "資訊失真與重組",
+        contentLabel: "Dialogue Field",
+        homeIntro: "用一道貫穿版面的布幕與未對齊的殘影，把「以為聽懂了」變成看得見的東西。",
+        external: {
+            label: "Watch Film",
+            url: "https://youtu.be/qFBwV248EZ4",
+        },
+        focus: [
+            {
+                title: "失真是機制",
+                text: "接收端一旦產生偏誤，文字就被部分遮蔽、聲音同步模糊化——干擾不是效果，是把誤解顯影出來的手段。",
+            },
+            {
+                title: "理解是過程",
+                text: "語意逐漸趨近時畫面才慢慢變清晰、雜訊才減少。清晰度是溝通累積出來的結果，不是一開始就給的。",
+            },
+            {
+                title: "結果不給結論",
+                text: "溝通失敗時系統把兩人的內容分開總結並列，用對比把落差攤開，讓體驗者自己看見斷點在哪裡。",
+            },
+        ],
+    },
     telemetry: {
         layout: "telemetry",
         accent: "#fbbf24",
@@ -356,6 +390,10 @@ export function getProjectPresentation(project: WorkLike): ProjectPresentation {
 
     if (key.includes("game-design") || genre.includes("game")) {
         return presentations.product;
+    }
+
+    if (key.includes("listen-and-speak")) {
+        return presentations.dialogue;
     }
 
     if (key.includes("interaction") || genre.includes("interaction")) {

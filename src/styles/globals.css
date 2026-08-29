@@ -5497,3 +5497,228 @@ html[data-page-wipe]::view-transition-new(root) {
     opacity: 0.55;
   }
 }
+
+/* ==========================================================================
+   聽說 Listen & Speak 專屬版面（.case-layout-dialogue）
+   作品談的是理解與誤解之間的落差，所以版面本身也被一道布幕切成兩側：
+   文字沿著中線左右分立、圖片橫跨中線、標題帶著尚未對齊的殘影。
+   只有 .case-nav 的返回鍵維持全站一致，其餘完全另做一套。
+   ========================================================================== */
+
+.case-layout-dialogue {
+  --ls-mag: #ff2fd0;
+  --ls-cyan: #22e3ff;
+  --case-surface: color-mix(in oklch, var(--background) 78%, #12001a 22%);
+}
+
+/* --- 布幕：貫穿內容區的中線 --- */
+.case-layout-dialogue .case-shell {
+  position: relative;
+}
+
+.case-layout-dialogue .case-shell::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklch, var(--ls-mag) 42%, transparent) 18%,
+    color-mix(in oklch, var(--ls-cyan) 42%, transparent) 72%,
+    transparent 100%
+  );
+}
+
+/* --- 標題：兩個還沒對齊的自己 --- */
+.case-layout-dialogue .case-title {
+  text-shadow:
+    var(--ls-split, 0.055em) 0 0 color-mix(in oklch, var(--ls-mag) 62%, transparent),
+    calc(var(--ls-split, 0.055em) * -1) 0 0
+      color-mix(in oklch, var(--ls-cyan) 62%, transparent);
+  animation: ls-converge 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s both;
+}
+
+@keyframes ls-converge {
+  0% {
+    --ls-split: 0.14em;
+  }
+
+  100% {
+    --ls-split: 0.03em;
+  }
+}
+
+@property --ls-split {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0.055em;
+}
+
+/* --- 入圍標記 --- */
+.ls-awards {
+  margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+  padding: clamp(0.9rem, 2vw, 1.2rem) clamp(1.1rem, 3vw, 1.8rem);
+  border: 1px solid color-mix(in oklch, var(--ls-mag) 38%, transparent);
+  border-radius: 2px;
+  background: color-mix(in oklch, var(--ls-mag) 7%, transparent);
+}
+
+.ls-awards p {
+  margin: 0 0 0.6rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.72rem, 1.1vw, 0.85rem);
+  letter-spacing: 0.24em;
+  color: var(--ls-mag);
+}
+
+.ls-award-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+}
+
+.ls-award-list span {
+  font-size: clamp(0.86rem, 1.3vw, 1rem);
+  color: color-mix(in oklch, var(--foreground) 82%, transparent);
+}
+
+.ls-award-list span::before {
+  content: "▸ ";
+  color: var(--ls-cyan);
+}
+
+/* --- 內文沿中線左右分立，圖片橫跨中線 --- */
+.case-layout-dialogue .work-case-body > h2,
+.case-layout-dialogue .work-case-body > p,
+.case-layout-dialogue .work-case-body > blockquote {
+  max-width: 46ch;
+}
+
+.case-layout-dialogue .work-case-body > h2:nth-of-type(even),
+.case-layout-dialogue .work-case-body > h2:nth-of-type(even) ~ p {
+  margin-inline-start: auto;
+}
+
+.case-layout-dialogue .work-case-body > h2 {
+  border-inline-start: 2px solid var(--ls-cyan);
+  padding-inline-start: 0.9rem;
+}
+
+.case-layout-dialogue .work-case-body > h2:nth-of-type(even) {
+  border-inline-start: 0;
+  border-inline-end: 2px solid var(--ls-mag);
+  padding-inline: 0 0.9rem;
+  text-align: end;
+}
+
+.case-layout-dialogue .work-case-body img {
+  max-width: none;
+  width: 100%;
+}
+
+/* --- 結果：成功併攏，失敗並排 --- */
+.ls-result {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.2rem, 4vw, 3rem);
+  margin: clamp(2rem, 5vw, 3.5rem) 0;
+}
+
+.ls-result-panel {
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+
+.ls-result-panel h3 {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+.ls-result-panel p {
+  max-width: none;
+  margin: 0 0 0.7rem;
+}
+
+.ls-result-panel--pass {
+  border-color: color-mix(in oklch, var(--ls-cyan) 45%, transparent);
+  background: color-mix(in oklch, var(--ls-cyan) 8%, transparent);
+}
+
+.ls-result-panel--pass h3 {
+  color: var(--ls-cyan);
+}
+
+.ls-result-panel--fail {
+  border-color: color-mix(in oklch, var(--ls-mag) 45%, transparent);
+  background: color-mix(in oklch, var(--ls-mag) 8%, transparent);
+}
+
+.ls-result-panel--fail h3 {
+  color: var(--ls-mag);
+}
+
+/* 失敗那一格用錯位的雙重邊界，呼應「兩份分開的摘要」 */
+.ls-result-panel--fail {
+  position: relative;
+}
+
+.ls-result-panel--fail::after {
+  content: "";
+  position: absolute;
+  inset: 0.4rem -0.4rem -0.4rem 0.4rem;
+  border: 1px solid color-mix(in oklch, var(--ls-mag) 22%, transparent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* --- 收尾提問 --- */
+.ls-question {
+  max-width: none !important;
+  margin: clamp(2rem, 5vw, 3rem) 0;
+  text-align: center;
+  font-size: clamp(1.3rem, 3.4vw, 2.4rem);
+  line-height: 1.4;
+  color: color-mix(in oklch, var(--foreground) 92%, transparent);
+  text-shadow:
+    0.03em 0 0 color-mix(in oklch, var(--ls-mag) 46%, transparent),
+    -0.03em 0 0 color-mix(in oklch, var(--ls-cyan) 46%, transparent);
+}
+
+@media (max-width: 860px) {
+  .case-layout-dialogue .case-shell::before {
+    display: none;
+  }
+
+  .case-layout-dialogue .work-case-body > h2,
+  .case-layout-dialogue .work-case-body > p,
+  .case-layout-dialogue .work-case-body > blockquote {
+    max-width: none;
+  }
+
+  .case-layout-dialogue .work-case-body > h2:nth-of-type(even),
+  .case-layout-dialogue .work-case-body > h2:nth-of-type(even) ~ p {
+    margin-inline-start: 0;
+  }
+
+  .case-layout-dialogue .work-case-body > h2:nth-of-type(even) {
+    border-inline-start: 2px solid var(--ls-mag);
+    border-inline-end: 0;
+    padding-inline: 0.9rem 0;
+    text-align: start;
+  }
+
+  .ls-result {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-layout-dialogue .case-title {
+    animation: none;
+  }
+}
