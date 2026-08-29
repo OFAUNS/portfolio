@@ -5592,27 +5592,83 @@ html[data-page-wipe]::view-transition-new(root) {
 }
 
 /* --- 內文沿中線左右分立，圖片橫跨中線 --- */
-.case-layout-dialogue .work-case-body > h2,
-.case-layout-dialogue .work-case-body > p,
-.case-layout-dialogue .work-case-body > blockquote {
-  max-width: 46ch;
+/* --- 左右分欄：文字一側、圖片一側，中線正好落在兩欄的間隙 ---
+   先前用 h2:nth-of-type(even) ~ p 做交錯，但 `~` 會 match 到所有後續段落，
+   造成標題在左、內文卻在右。改成在 mdx 用明確的 .ls-row 包起來。 */
+.ls-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: start;
+  margin: clamp(2.5rem, 7vw, 5rem) 0;
 }
 
-.case-layout-dialogue .work-case-body > h2:nth-of-type(even),
-.case-layout-dialogue .work-case-body > h2:nth-of-type(even) ~ p {
-  margin-inline-start: auto;
+.ls-row--flip .ls-row__text {
+  order: 2;
 }
 
-.case-layout-dialogue .work-case-body > h2 {
+.ls-row--flip .ls-row__media {
+  order: 1;
+}
+
+/* 欄本身已經限寬，裡面的元素不需要再吃 46ch */
+.ls-row__text > * {
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+.ls-row__text > h1,
+.ls-row__text > h2 {
   border-inline-start: 2px solid var(--ls-cyan);
   padding-inline-start: 0.9rem;
 }
 
-.case-layout-dialogue .work-case-body > h2:nth-of-type(even) {
+.ls-row--flip .ls-row__text > h2 {
   border-inline-start: 0;
   border-inline-end: 2px solid var(--ls-mag);
   padding-inline: 0 0.9rem;
   text-align: end;
+}
+
+.ls-row__media > p {
+  max-width: none !important;
+  margin: 0;
+}
+
+.ls-row__media--stack > p {
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1.1rem);
+}
+
+/* 高度交給圖自己決定：配上 object-fit: contain，一旦限制高度，
+   盒子就會比圖高，上下留出黑帶——不是裁切，但一樣讓版面變空。 */
+.ls-row__media img {
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* 方形或直式的圖被拉成整幅寬時，contain 會在左右留白。
+   收尾字標另外收斂寬度並置中。 */
+.ls-endmark {
+  max-width: min(30rem, 60%);
+  margin-inline: auto;
+}
+
+.case-layout-dialogue .work-case-body img {
+  height: auto !important;
+}
+
+/* 沒有被包進 ls-row 的獨立圖片：整幅橫跨中線 */
+.case-layout-dialogue .work-case-body > p:has(img) {
+  max-width: none;
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1.2rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.case-layout-dialogue .work-case-body > blockquote {
+  max-width: none;
 }
 
 .case-layout-dialogue .work-case-body img {
@@ -5694,18 +5750,16 @@ html[data-page-wipe]::view-transition-new(root) {
     display: none;
   }
 
-  .case-layout-dialogue .work-case-body > h2,
-  .case-layout-dialogue .work-case-body > p,
-  .case-layout-dialogue .work-case-body > blockquote {
-    max-width: none;
+  .ls-row {
+    grid-template-columns: 1fr;
   }
 
-  .case-layout-dialogue .work-case-body > h2:nth-of-type(even),
-  .case-layout-dialogue .work-case-body > h2:nth-of-type(even) ~ p {
-    margin-inline-start: 0;
+  .ls-row--flip .ls-row__text,
+  .ls-row--flip .ls-row__media {
+    order: 0;
   }
 
-  .case-layout-dialogue .work-case-body > h2:nth-of-type(even) {
+  .ls-row--flip .ls-row__text > h2 {
     border-inline-start: 2px solid var(--ls-mag);
     border-inline-end: 0;
     padding-inline: 0.9rem 0;
