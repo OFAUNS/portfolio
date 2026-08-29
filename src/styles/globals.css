@@ -6199,7 +6199,10 @@ html.dark {
   filter: drop-shadow(0 0 8px color-mix(in oklch, var(--gg-ink) 45%, transparent));
   stroke-dasharray: var(--arc-len) var(--arc-len);
   stroke-dashoffset: var(--arc-len);
-  animation: gg-arc-draw var(--gg-step, 700ms) var(--gg-ease) var(--gg-delay, 0ms) both;
+  /* 這裡刻意用 linear 而不是 --gg-ease：螺旋是七段各自獨立的動畫接起來的，
+     --gg-ease 的終點斜率是 0（控制點 0.36,1），每段結尾筆速會完全歸零，
+     5 秒內就會出現七次「衝出去再煞停」。段與段之間要連續，只能等速。 */
+  animation: gg-arc-draw var(--gg-step, 700ms) linear var(--gg-delay, 0ms) both;
 }
 
 @keyframes gg-arc-draw {
