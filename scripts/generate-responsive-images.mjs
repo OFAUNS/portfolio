@@ -65,9 +65,17 @@ async function optimizeImage(src) {
     const metadata = await image.metadata();
     if (!metadata.width || !metadata.height) return null;
 
+    // 相機直拍的照片會用 EXIF orientation 標記旋轉，畫素本身沒有轉。
+    // sharp 不會自動套用，resize 又會把 metadata 丟掉，產出的 webp 就是側躺的；
+    // metadata.width/height 也是未旋轉的值，寫進 manifest 會讓長寬比顛倒。
+    // orientation >= 5 代表有 90/270 度的旋轉，寬高要對調。
+    const swapAxes = (metadata.orientation || 1) >= 5;
+    const realWidth = swapAxes ? metadata.height : metadata.width;
+    const realHeight = swapAxes ? metadata.width : metadata.height;
+
     const targetWidths = widths
-        .filter((width) => width < metadata.width)
-        .concat(metadata.width <= widths[0] ? [metadata.width] : [])
+        .filter((width) => width < realWidth)
+        .concat(realWidth <= widths[0] ? [realWidth] : [])
         .filter((width, index, array) => array.indexOf(width) === index);
 
     const variants = [];
@@ -78,6 +86,7 @@ async function optimizeImage(src) {
         const outputPath = path.join(optimizedDir, filename);
 
         await sharp(inputPath, { limitInputPixels: false })
+            .rotate() // 不帶參數 = 依 EXIF orientation 自動轉正
             .resize({ width, withoutEnlargement: true })
             .webp({
                 quality: 76,
@@ -97,9 +106,9 @@ async function optimizeImage(src) {
 
     return {
         src,
-        width: metadata.width,
-        height: metadata.height,
-        aspectRatio: Number((metadata.width / metadata.height).toFixed(5)),
+        width: realWidth,
+        height: realHeight,
+        aspectRatio: Number((realWidth / realHeight).toFixed(5)),
         originalSize: stat.size,
         variants: sortByWidth(variants),
     };

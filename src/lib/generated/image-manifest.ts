@@ -111,6 +111,321 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/ai-resource-hub/hub-01.png": {
+        "src": "/work/ai-resource-hub/hub-01.png",
+        "width": 1919,
+        "height": 1028,
+        "aspectRatio": 1.86673,
+        "originalSize": 363314,
+        "variants": [
+            {
+                "src": "/optimized/hub-01-480.webp",
+                "width": 480,
+                "size": 8906,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-01-800.webp",
+                "width": 800,
+                "size": 22162,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-01-1200.webp",
+                "width": 1200,
+                "size": 45780,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-01-1600.webp",
+                "width": 1600,
+                "size": 78294,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/ai-resource-hub/hub-03.png": {
+        "src": "/work/ai-resource-hub/hub-03.png",
+        "width": 1750,
+        "height": 910,
+        "aspectRatio": 1.92308,
+        "originalSize": 126276,
+        "variants": [
+            {
+                "src": "/optimized/hub-03-480.webp",
+                "width": 480,
+                "size": 4900,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-03-800.webp",
+                "width": 800,
+                "size": 10694,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-03-1200.webp",
+                "width": 1200,
+                "size": 21420,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-03-1600.webp",
+                "width": 1600,
+                "size": 34200,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/ai-resource-hub/hub-05.png": {
+        "src": "/work/ai-resource-hub/hub-05.png",
+        "width": 1752,
+        "height": 914,
+        "aspectRatio": 1.91685,
+        "originalSize": 301284,
+        "variants": [
+            {
+                "src": "/optimized/hub-05-480.webp",
+                "width": 480,
+                "size": 8266,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-05-800.webp",
+                "width": 800,
+                "size": 18198,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-05-1200.webp",
+                "width": 1200,
+                "size": 37120,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-05-1600.webp",
+                "width": 1600,
+                "size": 60262,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/ai-resource-hub/hub-06.png": {
+        "src": "/work/ai-resource-hub/hub-06.png",
+        "width": 1754,
+        "height": 915,
+        "aspectRatio": 1.91694,
+        "originalSize": 225584,
+        "variants": [
+            {
+                "src": "/optimized/hub-06-480.webp",
+                "width": 480,
+                "size": 5908,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-06-800.webp",
+                "width": 800,
+                "size": 15226,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-06-1200.webp",
+                "width": 1200,
+                "size": 33804,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-06-1600.webp",
+                "width": 1600,
+                "size": 56020,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/ai-resource-hub/hub-07.png": {
+        "src": "/work/ai-resource-hub/hub-07.png",
+        "width": 1745,
+        "height": 902,
+        "aspectRatio": 1.93459,
+        "originalSize": 168300,
+        "variants": [
+            {
+                "src": "/optimized/hub-07-480.webp",
+                "width": 480,
+                "size": 3618,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-07-800.webp",
+                "width": 800,
+                "size": 10596,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-07-1200.webp",
+                "width": 1200,
+                "size": 20112,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/hub-07-1600.webp",
+                "width": 1600,
+                "size": 35674,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/bid-automation/bid-01.png": {
+        "src": "/work/bid-automation/bid-01.png",
+        "width": 2176,
+        "height": 1470,
+        "aspectRatio": 1.48027,
+        "originalSize": 275129,
+        "variants": [
+            {
+                "src": "/optimized/bid-01-480.webp",
+                "width": 480,
+                "size": 11784,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-01-800.webp",
+                "width": 800,
+                "size": 29962,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-01-1200.webp",
+                "width": 1200,
+                "size": 59160,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-01-1600.webp",
+                "width": 1600,
+                "size": 89576,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/bid-automation/bid-05.png": {
+        "src": "/work/bid-automation/bid-05.png",
+        "width": 2057,
+        "height": 1463,
+        "aspectRatio": 1.40602,
+        "originalSize": 327659,
+        "variants": [
+            {
+                "src": "/optimized/bid-05-480.webp",
+                "width": 480,
+                "size": 9402,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-05-800.webp",
+                "width": 800,
+                "size": 23622,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-05-1200.webp",
+                "width": 1200,
+                "size": 49214,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-05-1600.webp",
+                "width": 1600,
+                "size": 78116,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/bid-automation/bid-10.png": {
+        "src": "/work/bid-automation/bid-10.png",
+        "width": 657,
+        "height": 846,
+        "aspectRatio": 0.7766,
+        "originalSize": 113560,
+        "variants": [
+            {
+                "src": "/optimized/bid-10-480.webp",
+                "width": 480,
+                "size": 33036,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/bid-automation/bid-12.png": {
+        "src": "/work/bid-automation/bid-12.png",
+        "width": 654,
+        "height": 711,
+        "aspectRatio": 0.91983,
+        "originalSize": 116418,
+        "variants": [
+            {
+                "src": "/optimized/bid-12-480.webp",
+                "width": 480,
+                "size": 42402,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/bid-automation/bid-15.png": {
+        "src": "/work/bid-automation/bid-15.png",
+        "width": 1914,
+        "height": 1029,
+        "aspectRatio": 1.86006,
+        "originalSize": 145026,
+        "variants": [
+            {
+                "src": "/optimized/bid-15-480.webp",
+                "width": 480,
+                "size": 6508,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-15-800.webp",
+                "width": 800,
+                "size": 15726,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-15-1200.webp",
+                "width": 1200,
+                "size": 35016,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-15-1600.webp",
+                "width": 1600,
+                "size": 57530,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/bid-automation/bid-18.png": {
+        "src": "/work/bid-automation/bid-18.png",
+        "width": 1069,
+        "height": 669,
+        "aspectRatio": 1.59791,
+        "originalSize": 183943,
+        "variants": [
+            {
+                "src": "/optimized/bid-18-480.webp",
+                "width": 480,
+                "size": 9198,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/bid-18-800.webp",
+                "width": 800,
+                "size": 24940,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/circle-test/an2.png": {
         "src": "/work/circle-test/an2.png",
         "width": 2560,
@@ -749,6 +1064,171 @@ export const imageManifest = {
                 "src": "/optimized/p24-800.webp",
                 "width": 800,
                 "size": 24754,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/ls-key-01.jpg": {
+        "src": "/work/listen-and-speak/ls-key-01.jpg",
+        "width": 4032,
+        "height": 6048,
+        "aspectRatio": 0.66667,
+        "originalSize": 1381230,
+        "variants": [
+            {
+                "src": "/optimized/ls-key-01-480.webp",
+                "width": 480,
+                "size": 25100,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-01-800.webp",
+                "width": 800,
+                "size": 52164,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-01-1200.webp",
+                "width": 1200,
+                "size": 95126,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-01-1600.webp",
+                "width": 1600,
+                "size": 139590,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/ls-key-03.jpg": {
+        "src": "/work/listen-and-speak/ls-key-03.jpg",
+        "width": 6048,
+        "height": 4032,
+        "aspectRatio": 1.5,
+        "originalSize": 1205377,
+        "variants": [
+            {
+                "src": "/optimized/ls-key-03-480.webp",
+                "width": 480,
+                "size": 12742,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-03-800.webp",
+                "width": 800,
+                "size": 25318,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-03-1200.webp",
+                "width": 1200,
+                "size": 41380,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-03-1600.webp",
+                "width": 1600,
+                "size": 59168,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/ls-key-04.jpg": {
+        "src": "/work/listen-and-speak/ls-key-04.jpg",
+        "width": 4032,
+        "height": 6048,
+        "aspectRatio": 0.66667,
+        "originalSize": 1309398,
+        "variants": [
+            {
+                "src": "/optimized/ls-key-04-480.webp",
+                "width": 480,
+                "size": 26664,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-04-800.webp",
+                "width": 800,
+                "size": 52474,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-04-1200.webp",
+                "width": 1200,
+                "size": 89806,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-key-04-1600.webp",
+                "width": 1600,
+                "size": 128552,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/ls-shot-03.png": {
+        "src": "/work/listen-and-speak/ls-shot-03.png",
+        "width": 2559,
+        "height": 1438,
+        "aspectRatio": 1.77955,
+        "originalSize": 7349658,
+        "variants": [
+            {
+                "src": "/optimized/ls-shot-03-480.webp",
+                "width": 480,
+                "size": 64474,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-shot-03-800.webp",
+                "width": 800,
+                "size": 174578,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-shot-03-1200.webp",
+                "width": 1200,
+                "size": 354262,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-shot-03-1600.webp",
+                "width": 1600,
+                "size": 547340,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/ls-shot-05.png": {
+        "src": "/work/listen-and-speak/ls-shot-05.png",
+        "width": 2559,
+        "height": 1436,
+        "aspectRatio": 1.78203,
+        "originalSize": 1752707,
+        "variants": [
+            {
+                "src": "/optimized/ls-shot-05-480.webp",
+                "width": 480,
+                "size": 3538,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-shot-05-800.webp",
+                "width": 800,
+                "size": 8068,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-shot-05-1200.webp",
+                "width": 1200,
+                "size": 18850,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/ls-shot-05-1600.webp",
+                "width": 1600,
+                "size": 32592,
                 "type": "image/webp"
             }
         ]
@@ -2954,6 +3434,114 @@ export const imageManifest = {
                 "src": "/optimized/typhoon_baby-1600.webp",
                 "width": 1600,
                 "size": 548988,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/vr-learning-telemetry/vr-01.png": {
+        "src": "/work/vr-learning-telemetry/vr-01.png",
+        "width": 1919,
+        "height": 859,
+        "aspectRatio": 2.23399,
+        "originalSize": 169724,
+        "variants": [
+            {
+                "src": "/optimized/vr-01-480.webp",
+                "width": 480,
+                "size": 5766,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/vr-01-800.webp",
+                "width": 800,
+                "size": 11938,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/vr-01-1200.webp",
+                "width": 1200,
+                "size": 23986,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/vr-01-1600.webp",
+                "width": 1600,
+                "size": 37630,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/vr-learning-telemetry/vr-02.png": {
+        "src": "/work/vr-learning-telemetry/vr-02.png",
+        "width": 1902,
+        "height": 854,
+        "aspectRatio": 2.22717,
+        "originalSize": 160091,
+        "variants": [
+            {
+                "src": "/optimized/vr-02-480.webp",
+                "width": 480,
+                "size": 4610,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/vr-02-800.webp",
+                "width": 800,
+                "size": 11184,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/vr-02-1200.webp",
+                "width": 1200,
+                "size": 21748,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/vr-02-1600.webp",
+                "width": 1600,
+                "size": 35494,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/vr-learning-telemetry/vr-03.png": {
+        "src": "/work/vr-learning-telemetry/vr-03.png",
+        "width": 965,
+        "height": 814,
+        "aspectRatio": 1.1855,
+        "originalSize": 97990,
+        "variants": [
+            {
+                "src": "/optimized/vr-03-480.webp",
+                "width": 480,
+                "size": 7276,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/vr-03-800.webp",
+                "width": 800,
+                "size": 16664,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/vr-learning-telemetry/vr-06.png": {
+        "src": "/work/vr-learning-telemetry/vr-06.png",
+        "width": 1040,
+        "height": 750,
+        "aspectRatio": 1.38667,
+        "originalSize": 96755,
+        "variants": [
+            {
+                "src": "/optimized/vr-06-480.webp",
+                "width": 480,
+                "size": 6842,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/vr-06-800.webp",
+                "width": 800,
+                "size": 15532,
                 "type": "image/webp"
             }
         ]
