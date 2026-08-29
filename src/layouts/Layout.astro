@@ -83,6 +83,16 @@ const socialImageURL = new URL(image, Astro.url);
 
             // Initial setting
             setDarkClass();
+
+            // ClientRouter 換頁時會用新文件的 <html> 屬性整組覆蓋，
+            // 執行期加上的 dark class 不在靜態 HTML 裡，所以會被抹掉，
+            // 換頁後一律變成亮色。after-swap 在繪製前觸發，在這裡補回去
+            // 才不會閃一下。document 物件在 SPA 換頁中不會被替換，
+            // 所以這個 listener 只需要註冊一次。
+            if (!window.__portfolioThemeHooked) {
+                window.__portfolioThemeHooked = true;
+                document.addEventListener("astro:after-swap", setDarkClass);
+            }
         </script>
     </head>
     <body
