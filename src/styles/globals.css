@@ -5911,7 +5911,6 @@ html.dark {
   --gg-ink: var(--gg-accent);
 }
 
-
 /* 格線是背景層（z-index 1，低於 #page-content 的 2）。
    能這樣放的前提是下面那段把頁面容器的底色改成半透明——不然不透明的
    容器會把整片格線遮掉，那就是先前「只有 404 看得到」的狀況。 */
@@ -5960,12 +5959,20 @@ html.dark {
 
 /* 進程期間滿強度，畫完之後往下沉一點、退一點。
    因為已經在背景層、又隔著半透明的頁面容器，不必再壓到幾乎看不見。 */
+/* 原本前 68% 完全不動、最後 32% 一次降完，那個轉折點就是突兀感的來源。
+   改成從 34% 起就開始緩慢下沉，中間補一個節點讓曲線更貼近等速衰減。 */
 @keyframes gg-grid-settle {
   0%,
-  68% {
+  34% {
     opacity: 1;
     scale: 1;
     translate: 0 0;
+  }
+
+  62% {
+    opacity: 0.94;
+    scale: 0.998;
+    translate: 0 0.2%;
   }
 
   100% {
@@ -6217,6 +6224,10 @@ html.dark {
    所以畫面很快就能讀、能點，不會被整段動畫鎖住。
    -------------------------------------------------------------------------- */
 
+::view-transition-group(*) {
+  animation-timing-function: var(--gg-ease);
+}
+
 @keyframes gg-flip-out {
   to {
     transform: rotateY(-88deg) scale(0.94);
@@ -6231,9 +6242,86 @@ html.dark {
   }
 }
 
-::view-transition-group(*) {
-  animation-timing-function: var(--gg-ease);
+::view-transition-old(gg-0) {
+  animation: gg-flip-out 1100ms var(--gg-ease) 0ms both;
+  transform-origin: 50% 50%;
 }
+
+::view-transition-new(gg-0) {
+  animation: gg-flip-in 1100ms var(--gg-ease) 90ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-1) {
+  animation: gg-flip-out 990ms var(--gg-ease) 230ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-1) {
+  animation: gg-flip-in 990ms var(--gg-ease) 320ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-2) {
+  animation: gg-flip-out 891ms var(--gg-ease) 460ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-2) {
+  animation: gg-flip-in 891ms var(--gg-ease) 550ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-3) {
+  animation: gg-flip-out 802ms var(--gg-ease) 690ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-3) {
+  animation: gg-flip-in 802ms var(--gg-ease) 780ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-4) {
+  animation: gg-flip-out 722ms var(--gg-ease) 920ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-4) {
+  animation: gg-flip-in 722ms var(--gg-ease) 1010ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-5) {
+  animation: gg-flip-out 650ms var(--gg-ease) 1150ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-5) {
+  animation: gg-flip-in 650ms var(--gg-ease) 1240ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-6) {
+  animation: gg-flip-out 585ms var(--gg-ease) 1380ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-6) {
+  animation: gg-flip-in 585ms var(--gg-ease) 1470ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-old(gg-7) {
+  animation: gg-flip-out 526ms var(--gg-ease) 1610ms both;
+  transform-origin: 50% 50%;
+}
+
+::view-transition-new(gg-7) {
+  animation: gg-flip-in 526ms var(--gg-ease) 1700ms both;
+  transform-origin: 50% 50%;
+}
+
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -6272,77 +6360,19 @@ html[data-theme-switching] .golden-cell {
   view-transition-name: none !important;
 }
 
-::view-transition-old(gg-0) {
-  animation: gg-flip-out 1100ms var(--gg-ease) 0ms both;
-  transform-origin: 50% 50%;
+/* 換頁：方格翻面照舊，另外疊一顆從點擊處擴散的圓形。
+   只中和 root 自己的預設淡入淡出——不然淡入會跟 clip-path 擴散打架，
+   邊界糊掉。方格的 view-transition-name 必須留著，否則就沒有方格可翻。
+   這裡刻意不設 z-index：root 群組本來就排在方格群組下面，動了會把
+   擴散壓到方格上面。 */
+html[data-page-wipe]::view-transition-old(root),
+html[data-page-wipe]::view-transition-new(root) {
+  animation: none;
 }
 
-::view-transition-new(gg-0) {
-  animation: gg-flip-in 1100ms var(--gg-ease) 90ms both;
-  transform-origin: 50% 50%;
-}
-::view-transition-old(gg-1) {
-  animation: gg-flip-out 990ms var(--gg-ease) 230ms both;
-  transform-origin: 50% 50%;
-}
-
-::view-transition-new(gg-1) {
-  animation: gg-flip-in 990ms var(--gg-ease) 320ms both;
-  transform-origin: 50% 50%;
-}
-::view-transition-old(gg-2) {
-  animation: gg-flip-out 891ms var(--gg-ease) 460ms both;
-  transform-origin: 50% 50%;
-}
-
-::view-transition-new(gg-2) {
-  animation: gg-flip-in 891ms var(--gg-ease) 550ms both;
-  transform-origin: 50% 50%;
-}
-::view-transition-old(gg-3) {
-  animation: gg-flip-out 802ms var(--gg-ease) 690ms both;
-  transform-origin: 50% 50%;
-}
-
-::view-transition-new(gg-3) {
-  animation: gg-flip-in 802ms var(--gg-ease) 780ms both;
-  transform-origin: 50% 50%;
-}
-::view-transition-old(gg-4) {
-  animation: gg-flip-out 722ms var(--gg-ease) 920ms both;
-  transform-origin: 50% 50%;
-}
-
-::view-transition-new(gg-4) {
-  animation: gg-flip-in 722ms var(--gg-ease) 1010ms both;
-  transform-origin: 50% 50%;
-}
-::view-transition-old(gg-5) {
-  animation: gg-flip-out 650ms var(--gg-ease) 1150ms both;
-  transform-origin: 50% 50%;
-}
-
-::view-transition-new(gg-5) {
-  animation: gg-flip-in 650ms var(--gg-ease) 1240ms both;
-  transform-origin: 50% 50%;
-}
-::view-transition-old(gg-6) {
-  animation: gg-flip-out 585ms var(--gg-ease) 1380ms both;
-  transform-origin: 50% 50%;
-}
-
-::view-transition-new(gg-6) {
-  animation: gg-flip-in 585ms var(--gg-ease) 1470ms both;
-  transform-origin: 50% 50%;
-}
-::view-transition-old(gg-7) {
-  animation: gg-flip-out 526ms var(--gg-ease) 1610ms both;
-  transform-origin: 50% 50%;
-}
-
-::view-transition-new(gg-7) {
-  animation: gg-flip-in 526ms var(--gg-ease) 1700ms both;
-  transform-origin: 50% 50%;
+html[data-page-wipe]::view-transition-new(root) {
+  mix-blend-mode: normal;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

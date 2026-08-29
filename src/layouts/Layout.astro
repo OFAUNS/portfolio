@@ -93,6 +93,92 @@ const socialImageURL = new URL(image, Astro.url);
                 window.__portfolioThemeHooked = true;
                 document.addEventListener("astro:after-swap", setDarkClass);
             }
+
+            /**
+             * 換頁轉場：借用深淺切換那顆圓形擴散，但不動主題。
+             *
+             * 這樣做同時解掉「格線沉到背景那一刻很突兀」——切換期間方格會
+             * 交出 view-transition-name，整頁連同格線由同一個圓形擴散帶過，
+             * 圖層變化發生在擴散裡面，看不到單獨的跳動。
+             */
+            if (!window.__portfolioPageWipeHooked) {
+                window.__portfolioPageWipeHooked = true;
+
+                let wipeOrigin = null;
+                let wipeActive = false;
+
+                // 跟 dark class 同一個病因：ClientRouter 換頁時用新文件的
+                // <html> 屬性整組覆蓋，data-page-wipe 會被沖掉，CSS 失效，
+                // root 的預設淡入淡出就跑回來跟 clip-path 擴散打架。
+                document.addEventListener("astro:after-swap", () => {
+                    if (wipeActive) {
+                        document.documentElement.dataset.pageWipe = "true";
+                    }
+                });
+
+                // 記下點擊位置當擴散圓心；鍵盤／上一頁沒有座標就用畫面中心
+                document.addEventListener(
+                    "click",
+                    (event) => {
+                        if (!event.target || !event.target.closest) return;
+                        const link = event.target.closest("a[href]");
+                        wipeOrigin =
+                            link && event.clientX
+                                ? { x: event.clientX, y: event.clientY }
+                                : null;
+                    },
+                    true,
+                );
+
+                document.addEventListener("astro:before-swap", (event) => {
+                    const transition = event.viewTransition;
+                    const root = document.documentElement;
+                    if (!transition) return;
+
+                    // 主題切換自己有一套演出，不要疊上來
+                    if (root.dataset.themeSwitching) return;
+
+                    wipeActive = true;
+                    root.dataset.pageWipe = "true";
+
+                    transition.ready
+                        .then(() => {
+                            const x = wipeOrigin
+                                ? wipeOrigin.x
+                                : window.innerWidth / 2;
+                            const y = wipeOrigin
+                                ? wipeOrigin.y
+                                : window.innerHeight / 2;
+                            const radius = Math.hypot(
+                                Math.max(x, window.innerWidth - x),
+                                Math.max(y, window.innerHeight - y),
+                            );
+
+                            root.animate(
+                                {
+                                    clipPath: [
+                                        `circle(0px at ${x}px ${y}px)`,
+                                        `circle(${radius}px at ${x}px ${y}px)`,
+                                    ],
+                                },
+                                {
+                                    duration: 700,
+                                    easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+                                    pseudoElement: "::view-transition-new(root)",
+                                },
+                            );
+                        })
+                        .catch(() => {});
+
+                    transition.finished
+                        .catch(() => {})
+                        .finally(() => {
+                            wipeActive = false;
+                            delete root.dataset.pageWipe;
+                            wipeOrigin = null;
+                        });
+                });
+            }
         </script>
     </head>
     <body
