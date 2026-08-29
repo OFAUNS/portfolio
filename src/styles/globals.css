@@ -5722,3 +5722,97 @@ html[data-page-wipe]::view-transition-new(root) {
     animation: none;
   }
 }
+
+/* --- 聽說：圖片完整呈現 ---
+   全站作品頁的內文圖片預設是 16/9 + object-fit: cover，會把圖裁掉一半。
+   這一件的圖多半是完整構圖（字標、海報、結果畫面），裁掉就沒有意義了，
+   所以整組覆寫。基礎規則的選擇器帶 :has() 比這裡更specific，只能用 important。 */
+.case-layout-dialogue .work-case-body img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: min(86vh, 58rem);
+  padding: 0 !important;
+  background: color-mix(in oklch, var(--background) 90%, #12001a 10%);
+}
+
+/* 結果兩欄裡的截圖跟著欄寬走 */
+.ls-result-panel img {
+  max-height: none;
+  margin: 1rem 0 0;
+}
+
+/* --- 貫穿頁面的「聽」與「說」 ---
+   布幕把畫面切成兩側，這兩個字就是兩側各自的身分：
+   左邊是接收的人，右邊是說話的人。固定在視窗上，捲動時一直都在。 */
+.ls-sides {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: clamp(0.5rem, 3vw, 4rem);
+  overflow: hidden;
+}
+
+.ls-side {
+  font-size: clamp(9rem, 34vh, 26rem);
+  font-weight: 900;
+  line-height: 0.8;
+  color: transparent;
+  user-select: none;
+  -webkit-text-stroke: 1px color-mix(in oklch, var(--foreground) 26%, transparent);
+  opacity: 0.5;
+}
+
+/* 兩個字各自帶一半的色偏——還沒對齊的兩個人 */
+.ls-side--listen {
+  text-shadow: 0.02em 0 0 color-mix(in oklch, var(--ls-cyan) 30%, transparent);
+}
+
+.ls-side--speak {
+  text-shadow: -0.02em 0 0 color-mix(in oklch, var(--ls-mag) 30%, transparent);
+}
+
+/* 內容必須壓在兩個字之上 */
+.case-layout-dialogue .case-shell,
+.case-layout-dialogue .case-nav {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- 說 ≠ 理解 / 聽 ≠ 接收 --- */
+.ls-axiom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2rem;
+  margin: 0 0 clamp(1.4rem, 4vw, 2.4rem) !important;
+  max-width: none !important;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  letter-spacing: 0.08em;
+}
+
+.ls-axiom span:first-child {
+  color: var(--ls-mag);
+}
+
+.ls-axiom span:last-child {
+  color: var(--ls-cyan);
+}
+
+@media (max-width: 860px) {
+  .ls-side {
+    font-size: clamp(6rem, 22vh, 12rem);
+    opacity: 0.32;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-side {
+    text-shadow: none;
+  }
+}

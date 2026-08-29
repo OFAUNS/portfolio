@@ -1068,167 +1068,446 @@ export const imageManifest = {
             }
         ]
     },
-    "/work/listen-and-speak/ls-key-01.jpg": {
-        "src": "/work/listen-and-speak/ls-key-01.jpg",
-        "width": 4032,
-        "height": 6048,
-        "aspectRatio": 0.66667,
-        "originalSize": 1381230,
+    "/work/listen-and-speak/card-face.png": {
+        "src": "/work/listen-and-speak/card-face.png",
+        "width": 1063,
+        "height": 638,
+        "aspectRatio": 1.66614,
+        "originalSize": 1419967,
         "variants": [
             {
-                "src": "/optimized/ls-key-01-480.webp",
+                "src": "/optimized/card-face-480.webp",
                 "width": 480,
-                "size": 25100,
+                "size": 21968,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-key-01-800.webp",
+                "src": "/optimized/card-face-800.webp",
                 "width": 800,
-                "size": 52164,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/ls-key-01-1200.webp",
-                "width": 1200,
-                "size": 95126,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/ls-key-01-1600.webp",
-                "width": 1600,
-                "size": 139590,
+                "size": 74064,
                 "type": "image/webp"
             }
         ]
     },
-    "/work/listen-and-speak/ls-key-03.jpg": {
-        "src": "/work/listen-and-speak/ls-key-03.jpg",
-        "width": 6048,
-        "height": 4032,
-        "aspectRatio": 1.5,
-        "originalSize": 1205377,
+    "/work/listen-and-speak/distortion-field.png": {
+        "src": "/work/listen-and-speak/distortion-field.png",
+        "width": 2559,
+        "height": 1439,
+        "aspectRatio": 1.77832,
+        "originalSize": 7962226,
         "variants": [
             {
-                "src": "/optimized/ls-key-03-480.webp",
+                "src": "/optimized/distortion-field-480.webp",
                 "width": 480,
-                "size": 12742,
+                "size": 67214,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-key-03-800.webp",
+                "src": "/optimized/distortion-field-800.webp",
                 "width": 800,
-                "size": 25318,
+                "size": 189820,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-key-03-1200.webp",
+                "src": "/optimized/distortion-field-1200.webp",
                 "width": 1200,
-                "size": 41380,
+                "size": 404098,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-key-03-1600.webp",
+                "src": "/optimized/distortion-field-1600.webp",
                 "width": 1600,
-                "size": 59168,
+                "size": 634910,
                 "type": "image/webp"
             }
         ]
     },
-    "/work/listen-and-speak/ls-key-04.jpg": {
-        "src": "/work/listen-and-speak/ls-key-04.jpg",
-        "width": 4032,
-        "height": 6048,
-        "aspectRatio": 0.66667,
-        "originalSize": 1309398,
+    "/work/listen-and-speak/distortion-pavilion.png": {
+        "src": "/work/listen-and-speak/distortion-pavilion.png",
+        "width": 1919,
+        "height": 865,
+        "aspectRatio": 2.2185,
+        "originalSize": 3936358,
         "variants": [
             {
-                "src": "/optimized/ls-key-04-480.webp",
+                "src": "/optimized/distortion-pavilion-480.webp",
                 "width": 480,
-                "size": 26664,
+                "size": 25998,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-key-04-800.webp",
+                "src": "/optimized/distortion-pavilion-800.webp",
                 "width": 800,
-                "size": 52474,
+                "size": 81020,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-key-04-1200.webp",
+                "src": "/optimized/distortion-pavilion-1200.webp",
                 "width": 1200,
-                "size": 89806,
+                "size": 178688,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-key-04-1600.webp",
+                "src": "/optimized/distortion-pavilion-1600.webp",
                 "width": 1600,
-                "size": 128552,
+                "size": 300016,
                 "type": "image/webp"
             }
         ]
     },
-    "/work/listen-and-speak/ls-shot-03.png": {
-        "src": "/work/listen-and-speak/ls-shot-03.png",
+    "/work/listen-and-speak/distortion-text.png": {
+        "src": "/work/listen-and-speak/distortion-text.png",
         "width": 2559,
         "height": 1438,
         "aspectRatio": 1.77955,
         "originalSize": 7349658,
         "variants": [
             {
-                "src": "/optimized/ls-shot-03-480.webp",
+                "src": "/optimized/distortion-text-480.webp",
                 "width": 480,
                 "size": 64474,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-shot-03-800.webp",
+                "src": "/optimized/distortion-text-800.webp",
                 "width": 800,
                 "size": 174578,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-shot-03-1200.webp",
+                "src": "/optimized/distortion-text-1200.webp",
                 "width": 1200,
                 "size": 354262,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-shot-03-1600.webp",
+                "src": "/optimized/distortion-text-1600.webp",
                 "width": 1600,
                 "size": 547340,
                 "type": "image/webp"
             }
         ]
     },
-    "/work/listen-and-speak/ls-shot-05.png": {
-        "src": "/work/listen-and-speak/ls-shot-05.png",
+    "/work/listen-and-speak/flow-topic.png": {
+        "src": "/work/listen-and-speak/flow-topic.png",
         "width": 2559,
         "height": 1436,
         "aspectRatio": 1.78203,
         "originalSize": 1752707,
         "variants": [
             {
-                "src": "/optimized/ls-shot-05-480.webp",
+                "src": "/optimized/flow-topic-480.webp",
                 "width": 480,
                 "size": 3538,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-shot-05-800.webp",
+                "src": "/optimized/flow-topic-800.webp",
                 "width": 800,
                 "size": 8068,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-shot-05-1200.webp",
+                "src": "/optimized/flow-topic-1200.webp",
                 "width": 1200,
                 "size": 18850,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/ls-shot-05-1600.webp",
+                "src": "/optimized/flow-topic-1600.webp",
                 "width": 1600,
                 "size": 32592,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/install-01.jpg": {
+        "src": "/work/listen-and-speak/install-01.jpg",
+        "width": 4032,
+        "height": 6048,
+        "aspectRatio": 0.66667,
+        "originalSize": 1381230,
+        "variants": [
+            {
+                "src": "/optimized/install-01-480.webp",
+                "width": 480,
+                "size": 25100,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-01-800.webp",
+                "width": 800,
+                "size": 52164,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-01-1200.webp",
+                "width": 1200,
+                "size": 95126,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-01-1600.webp",
+                "width": 1600,
+                "size": 139590,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/install-02.jpg": {
+        "src": "/work/listen-and-speak/install-02.jpg",
+        "width": 4032,
+        "height": 6048,
+        "aspectRatio": 0.66667,
+        "originalSize": 1363199,
+        "variants": [
+            {
+                "src": "/optimized/install-02-480.webp",
+                "width": 480,
+                "size": 27068,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-02-800.webp",
+                "width": 800,
+                "size": 55798,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-02-1200.webp",
+                "width": 1200,
+                "size": 99550,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-02-1600.webp",
+                "width": 1600,
+                "size": 145600,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/install-03.jpg": {
+        "src": "/work/listen-and-speak/install-03.jpg",
+        "width": 6048,
+        "height": 4032,
+        "aspectRatio": 1.5,
+        "originalSize": 1205377,
+        "variants": [
+            {
+                "src": "/optimized/install-03-480.webp",
+                "width": 480,
+                "size": 12742,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-03-800.webp",
+                "width": 800,
+                "size": 25318,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-03-1200.webp",
+                "width": 1200,
+                "size": 41380,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-03-1600.webp",
+                "width": 1600,
+                "size": 59168,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/install-04.jpg": {
+        "src": "/work/listen-and-speak/install-04.jpg",
+        "width": 4032,
+        "height": 6048,
+        "aspectRatio": 0.66667,
+        "originalSize": 1309398,
+        "variants": [
+            {
+                "src": "/optimized/install-04-480.webp",
+                "width": 480,
+                "size": 26664,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-04-800.webp",
+                "width": 800,
+                "size": 52474,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-04-1200.webp",
+                "width": 1200,
+                "size": 89806,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/install-04-1600.webp",
+                "width": 1600,
+                "size": 128552,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/logo-en.png": {
+        "src": "/work/listen-and-speak/logo-en.png",
+        "width": 1254,
+        "height": 1254,
+        "aspectRatio": 1,
+        "originalSize": 544605,
+        "variants": [
+            {
+                "src": "/optimized/logo-en-480.webp",
+                "width": 480,
+                "size": 35120,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/logo-en-800.webp",
+                "width": 800,
+                "size": 72210,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/logo-en-1200.webp",
+                "width": 1200,
+                "size": 121318,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/logo-mark.png": {
+        "src": "/work/listen-and-speak/logo-mark.png",
+        "width": 3508,
+        "height": 4961,
+        "aspectRatio": 0.70712,
+        "originalSize": 413319,
+        "variants": [
+            {
+                "src": "/optimized/logo-mark-480.webp",
+                "width": 480,
+                "size": 15280,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/logo-mark-800.webp",
+                "width": 800,
+                "size": 27368,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/logo-mark-1200.webp",
+                "width": 1200,
+                "size": 42266,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/logo-mark-1600.webp",
+                "width": 1600,
+                "size": 59538,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/poster.jpg": {
+        "src": "/work/listen-and-speak/poster.jpg",
+        "width": 7016,
+        "height": 9933,
+        "aspectRatio": 0.70633,
+        "originalSize": 6347850,
+        "variants": [
+            {
+                "src": "/optimized/poster-480.webp",
+                "width": 480,
+                "size": 44490,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/poster-800.webp",
+                "width": 800,
+                "size": 105546,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/poster-1200.webp",
+                "width": 1200,
+                "size": 196904,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/poster-1600.webp",
+                "width": 1600,
+                "size": 316744,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/result-fail.png": {
+        "src": "/work/listen-and-speak/result-fail.png",
+        "width": 2556,
+        "height": 1438,
+        "aspectRatio": 1.77747,
+        "originalSize": 2094062,
+        "variants": [
+            {
+                "src": "/optimized/result-fail-480.webp",
+                "width": 480,
+                "size": 12526,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/result-fail-800.webp",
+                "width": 800,
+                "size": 27452,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/result-fail-1200.webp",
+                "width": 1200,
+                "size": 49864,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/result-fail-1600.webp",
+                "width": 1600,
+                "size": 74794,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/listen-and-speak/result-success.png": {
+        "src": "/work/listen-and-speak/result-success.png",
+        "width": 2559,
+        "height": 1438,
+        "aspectRatio": 1.77955,
+        "originalSize": 775598,
+        "variants": [
+            {
+                "src": "/optimized/result-success-480.webp",
+                "width": 480,
+                "size": 2998,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/result-success-800.webp",
+                "width": 800,
+                "size": 6204,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/result-success-1200.webp",
+                "width": 1200,
+                "size": 11362,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/result-success-1600.webp",
+                "width": 1600,
+                "size": 17390,
                 "type": "image/webp"
             }
         ]
