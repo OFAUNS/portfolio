@@ -2,6 +2,7 @@
 import "@/styles/globals.css";
 import { ClientRouter } from "astro:transitions";
 import GoldenGrid from "@/components/GoldenGrid.astro";
+import { buildGoldenCells, resolvePreset } from "@/lib/goldenGrid";
 
 interface Props {
     title: string;
@@ -23,6 +24,10 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = new URL(image, Astro.url);
+// 換頁轉場的遮罩本體＝可見的那組黃金比例方格。用同一份資料算，
+// 座標與大小才會完全對齊（有大有小，不是均分格）。
+const flipCells = buildGoldenCells(resolvePreset(grid));
+
 ---
 
 <!doctype html>
@@ -306,8 +311,11 @@ const socialImageURL = new URL(image, Astro.url);
              swap 之後才能無縫接著把方格翻掉。平常完全不佔畫面。 -->
         <div id="page-flip" class="page-flip" aria-hidden="true">
             {
-                Array.from({ length: 24 }).map((_, i) => (
-                    <span class="page-flip__cell" style={`--pf-i:${i}`} />
+                flipCells.map((cell) => (
+                    <span
+                        class="page-flip__cell"
+                        style={`left:${cell.x}%;top:${cell.y}%;width:${cell.size}%;--pf-i:${cell.index}`}
+                    />
                 ))
             }
         </div>

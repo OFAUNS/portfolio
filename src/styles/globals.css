@@ -7877,52 +7877,55 @@ html[data-page-wipe]::view-transition-new(root) {
 }
 
 /* ==========================================================================
-   換頁轉場：色板覆蓋層
-   第一段　另一套色板從點擊處擴散開來蓋住整個畫面（淺色站就變暗、反之亦然）
-   第二段　方格帶著那套色板做 3D 翻面並淡出，露出底下原本色板的新頁
+   換頁轉場：黃金比例方格＝遮罩本體
+   第一段　另一套色板從點擊處擴散開來，但它只出現在黃金方格裡——
+           方格就是這片色板的遮罩，所以看到的是一組有大有小的色塊。
+   第二段　方格帶著那套色板做 3D 翻面並淡出，露出底下原本色板的新頁。
 
+   幾何用的是可見格線同一份資料（buildGoldenCells），容器也吃同一組
+   --gg-x/y/w/h，所以每一格都跟背景的黃金格對得起來。
    覆蓋層的標記寫在 Layout，新舊兩份文件都有它，swap 之後才接得起來。
-   swap 發生時畫面已經被實色蓋滿，所以接縫看不出來。
    ========================================================================== */
 
 .page-flip {
-  /* 淺色站 → 覆蓋層用暗色板 */
-  --pf-base: oklch(0.12 0.025 255);
-  --pf-cell: oklch(0.17 0.03 255);
-  --pf-line: oklch(0.92 0.012 245 / 22%);
+  /* 淺色站 → 遮罩裡填暗色板 */
+  --pf-cell: oklch(0.14 0.028 255);
+  --pf-line: oklch(0.92 0.012 245 / 28%);
   --pf-x: 50%;
   --pf-y: 50%;
   --pf-r: 0px;
 
   position: fixed;
-  inset: 0;
+  left: var(--gg-x);
+  top: var(--gg-y);
+  width: var(--gg-w);
+  height: var(--gg-h);
   z-index: 90;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  perspective: 1400px;
   pointer-events: none;
-  background: var(--pf-base);
+  perspective: 1600px;
   clip-path: circle(0px at var(--pf-x) var(--pf-y));
   visibility: hidden;
 }
 
-/* 深色站 → 覆蓋層用亮色板 */
+/* 深色站 → 遮罩裡填亮色板 */
 html.dark .page-flip {
-  --pf-base: oklch(0.97 0.018 232);
-  --pf-cell: oklch(0.93 0.022 232);
-  --pf-line: oklch(0.2 0.03 255 / 22%);
+  --pf-cell: oklch(0.95 0.02 232);
+  --pf-line: oklch(0.2 0.03 255 / 28%);
 }
 
+/* 每一格就是遮罩的一塊：位置與大小完全照黃金格，所以有大有小 */
 .page-flip__cell {
+  position: absolute;
+  aspect-ratio: 1;
   background: var(--pf-cell);
   box-shadow: inset 0 0 0 1px var(--pf-line);
   transform-origin: 50% 50%;
+  transform-style: preserve-3d;
   backface-visibility: hidden;
   opacity: 1;
 }
 
-/* 每一格取一點不同的色相，翻起來才像各自獨立的板子而不是一整片 */
+/* 大格與小格各帶一點不同的色偏，翻起來才像各自獨立的板子 */
 .page-flip__cell:nth-child(3n + 1) {
   background: color-mix(in oklch, var(--pf-cell) 88%, var(--gg-accent, #5ddcff) 12%);
 }
@@ -7931,7 +7934,7 @@ html.dark .page-flip {
   background: color-mix(in oklch, var(--pf-cell) 92%, #ff2d95 8%);
 }
 
-/* --- 第一段：擴散 --- */
+/* --- 第一段：色板沿著遮罩擴散開來 --- */
 .page-flip.is-spreading {
   visibility: visible;
   animation: pf-spread 520ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
@@ -7942,16 +7945,18 @@ html.dark .page-flip {
   to { clip-path: circle(var(--pf-r) at var(--pf-x) var(--pf-y)); }
 }
 
-/* --- 接手：swap 後直接停在「已經蓋滿」的狀態，不重播擴散 --- */
+/* --- 接手：swap 後直接停在「已經鋪滿」的狀態，不重播擴散 --- */
 .page-flip.is-covered {
   visibility: visible;
   animation: none;
   clip-path: circle(var(--pf-r) at var(--pf-x) var(--pf-y));
 }
 
-/* --- 第二段：方格翻面變透明 --- */
+/* --- 第二段：方格翻面變透明 ---
+   大格慢、小格快：黃金格是等比遞減的，越小的格子轉得越快才合理。 */
 .page-flip.is-flipping .page-flip__cell {
-  animation: pf-flip 760ms cubic-bezier(0.4, 0, 0.2, 1) var(--pf-d, 0ms) forwards;
+  animation: pf-flip calc(880ms - var(--pf-i, 0) * 70ms)
+    cubic-bezier(0.4, 0, 0.2, 1) var(--pf-d, 0ms) forwards;
 }
 
 @keyframes pf-flip {
@@ -7965,17 +7970,8 @@ html.dark .page-flip {
   }
 }
 
-/* 方格翻掉之後底色也要退場，否則整面實色會留在畫面上 */
-.page-flip.is-flipping {
-  animation: pf-base-out 760ms linear 380ms forwards;
-}
-
-@keyframes pf-base-out {
-  to { background: transparent; }
-}
-
 /* 覆蓋層接手了整段演出，view-transition 那套就不要再各自跑一遍，
-   否則會看到兩次翻面。swap 期間畫面已經被實色蓋住，直接切最乾淨。 */
+   否則會看到兩次翻面。 */
 html[data-page-flip]::view-transition-old(*),
 html[data-page-flip]::view-transition-new(*) {
   animation: none !important;
