@@ -3063,101 +3063,35 @@ export const imageManifest = {
             }
         ]
     },
-    "/work/touchdesigner-canvas/a1.png": {
-        "src": "/work/touchdesigner-canvas/a1.png",
-        "width": 2552,
-        "height": 1439,
-        "aspectRatio": 1.77345,
-        "originalSize": 3940726,
-        "variants": [
-            {
-                "src": "/optimized/a1-480.webp",
-                "width": 480,
-                "size": 22894,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/a1-800.webp",
-                "width": 800,
-                "size": 52578,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/a1-1200.webp",
-                "width": 1200,
-                "size": 95438,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/a1-1600.webp",
-                "width": 1600,
-                "size": 137716,
-                "type": "image/webp"
-            }
-        ]
-    },
-    "/work/touchdesigner-canvas/a2.png": {
-        "src": "/work/touchdesigner-canvas/a2.png",
+    "/work/touchdesigner-canvas/Smoke1.png": {
+        "src": "/work/touchdesigner-canvas/Smoke1.png",
         "width": 2559,
         "height": 1439,
         "aspectRatio": 1.77832,
         "originalSize": 1029023,
         "variants": [
             {
-                "src": "/optimized/a2-480.webp",
+                "src": "/optimized/smoke1-480.webp",
                 "width": 480,
                 "size": 2992,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/a2-800.webp",
+                "src": "/optimized/smoke1-800.webp",
                 "width": 800,
                 "size": 5384,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/a2-1200.webp",
+                "src": "/optimized/smoke1-1200.webp",
                 "width": 1200,
                 "size": 8656,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/a2-1600.webp",
+                "src": "/optimized/smoke1-1600.webp",
                 "width": 1600,
                 "size": 12556,
-                "type": "image/webp"
-            }
-        ]
-    },
-    "/work/touchdesigner-canvas/asdasd.png": {
-        "src": "/work/touchdesigner-canvas/asdasd.png",
-        "width": 4000,
-        "height": 3000,
-        "aspectRatio": 1.33333,
-        "originalSize": 14915314,
-        "variants": [
-            {
-                "src": "/optimized/asdasd-480.webp",
-                "width": 480,
-                "size": 12814,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/asdasd-800.webp",
-                "width": 800,
-                "size": 29984,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/asdasd-1200.webp",
-                "width": 1200,
-                "size": 60752,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/asdasd-1600.webp",
-                "width": 1600,
-                "size": 104042,
                 "type": "image/webp"
             }
         ]
@@ -3195,35 +3129,35 @@ export const imageManifest = {
             }
         ]
     },
-    "/work/touchdesigner-canvas/i2.png": {
-        "src": "/work/touchdesigner-canvas/i2.png",
+    "/work/touchdesigner-canvas/i1.png": {
+        "src": "/work/touchdesigner-canvas/i1.png",
         "width": 2559,
         "height": 1439,
         "aspectRatio": 1.77832,
-        "originalSize": 4261762,
+        "originalSize": 2391531,
         "variants": [
             {
-                "src": "/optimized/i2-480.webp",
+                "src": "/optimized/i1-480.webp",
                 "width": 480,
-                "size": 16498,
+                "size": 18482,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/i2-800.webp",
+                "src": "/optimized/i1-800.webp",
                 "width": 800,
-                "size": 36250,
+                "size": 43688,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/i2-1200.webp",
+                "src": "/optimized/i1-1200.webp",
                 "width": 1200,
-                "size": 80936,
+                "size": 84486,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/i2-1600.webp",
+                "src": "/optimized/i1-1600.webp",
                 "width": 1600,
-                "size": 141112,
+                "size": 130158,
                 "type": "image/webp"
             }
         ]
@@ -3276,6 +3210,39 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/touchdesigner-canvas/sand1.png": {
+        "src": "/work/touchdesigner-canvas/sand1.png",
+        "width": 2552,
+        "height": 1439,
+        "aspectRatio": 1.77345,
+        "originalSize": 3940726,
+        "variants": [
+            {
+                "src": "/optimized/sand1-480.webp",
+                "width": 480,
+                "size": 22894,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/sand1-800.webp",
+                "width": 800,
+                "size": 52578,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/sand1-1200.webp",
+                "width": 1200,
+                "size": 95438,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/sand1-1600.webp",
+                "width": 1600,
+                "size": 137716,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/touchdesigner-canvas/tes1.png": {
         "src": "/work/touchdesigner-canvas/tes1.png",
         "width": 2559,
@@ -3305,6 +3272,72 @@ export const imageManifest = {
                 "src": "/optimized/tes1-1600.webp",
                 "width": 1600,
                 "size": 157398,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/touchdesigner-canvas/water.png": {
+        "src": "/work/touchdesigner-canvas/water.png",
+        "width": 4000,
+        "height": 3000,
+        "aspectRatio": 1.33333,
+        "originalSize": 14915314,
+        "variants": [
+            {
+                "src": "/optimized/water-480.webp",
+                "width": 480,
+                "size": 12814,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water-800.webp",
+                "width": 800,
+                "size": 29984,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water-1200.webp",
+                "width": 1200,
+                "size": 60752,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water-1600.webp",
+                "width": 1600,
+                "size": 104042,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/touchdesigner-canvas/water1.png": {
+        "src": "/work/touchdesigner-canvas/water1.png",
+        "width": 2559,
+        "height": 1439,
+        "aspectRatio": 1.77832,
+        "originalSize": 4261762,
+        "variants": [
+            {
+                "src": "/optimized/water1-480.webp",
+                "width": 480,
+                "size": 16498,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water1-800.webp",
+                "width": 800,
+                "size": 36250,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water1-1200.webp",
+                "width": 1200,
+                "size": 80936,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water1-1600.webp",
+                "width": 1600,
+                "size": 141112,
                 "type": "image/webp"
             }
         ]
