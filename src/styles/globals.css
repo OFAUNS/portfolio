@@ -7554,3 +7554,324 @@ html[data-page-wipe]::view-transition-new(root) {
     opacity: 0.3;
   }
 }
+
+/* ==========================================================================
+   五套專屬版面：把設計過的內文提到「概覽 + focus 卡」之前
+   原本 .case-shell 是普通 block，內文排在共用骨架後面，
+   所以第一眼看到的還是舊版面。改成 flex 直欄再指定順序。
+   ========================================================================== */
+
+.case-layout-film .case-shell,
+.case-layout-cinema .case-shell,
+.case-layout-projection .case-shell,
+.case-layout-motion .case-shell,
+.case-layout-installation .case-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.case-layout-film .case-hero,
+.case-layout-cinema .case-hero,
+.case-layout-projection .case-hero,
+.case-layout-motion .case-hero,
+.case-layout-installation .case-hero { order: 1; }
+
+.case-layout-film .case-content-section,
+.case-layout-cinema .case-content-section,
+.case-layout-projection .case-content-section,
+.case-layout-motion .case-content-section,
+.case-layout-installation .case-content-section { order: 2; }
+
+.case-layout-film .case-overview,
+.case-layout-cinema .case-overview,
+.case-layout-projection .case-overview,
+.case-layout-motion .case-overview,
+.case-layout-installation .case-overview { order: 3; }
+
+.case-layout-film .case-credits,
+.case-layout-cinema .case-credits,
+.case-layout-projection .case-credits,
+.case-layout-motion .case-credits,
+.case-layout-installation .case-credits { order: 4; }
+
+/* 共用骨架的小節標題在設計內文之上會打斷開場，收到最小 */
+.case-layout-film .case-section-heading,
+.case-layout-cinema .case-section-heading,
+.case-layout-projection .case-section-heading,
+.case-layout-motion .case-section-heading,
+.case-layout-installation .case-section-heading {
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.case-layout-film .case-section-heading h2,
+.case-layout-cinema .case-section-heading h2,
+.case-layout-projection .case-section-heading h2,
+.case-layout-motion .case-section-heading h2,
+.case-layout-installation .case-section-heading h2 {
+  display: none;
+}
+
+/* --- 共用的招牌大標基底 --- */
+.fm-statement,
+.td-statement,
+.lm-statement,
+.pj-statement,
+.ct-statement {
+  position: relative;
+  margin: clamp(0.5rem, 2vw, 1.4rem) 0 clamp(1.6rem, 4vw, 2.6rem);
+}
+
+/* 01 龍岡米干 */
+.fm-statement__kicker {
+  display: block;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  letter-spacing: 0.42em;
+  color: var(--fm-amber);
+}
+
+.fm-statement__title {
+  margin: 0.2em 0 0 !important;
+  font-size: clamp(5rem, 17vw, 13rem) !important;
+  font-weight: 900;
+  line-height: 0.78;
+  letter-spacing: -0.055em;
+}
+
+.fm-statement__sub {
+  margin: 0.3em 0 0 !important;
+  max-width: none;
+  font-size: clamp(1.1rem, 2.6vw, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  color: var(--fm-warm);
+}
+
+.fm-statement__note {
+  margin: 0.9rem 0 0 !important;
+  max-width: 34ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* 幕標題也跟著放大 */
+.fm-act__head h2 {
+  font-size: clamp(3rem, 8vw, 6rem) !important;
+}
+
+/* 02 TouchDesigner：三層殘影 */
+.td-statement {
+  min-height: clamp(9rem, 24vw, 19rem);
+}
+
+.td-statement__title,
+.td-statement__ghost {
+  margin: 0 !important;
+  font-size: clamp(3.4rem, 11vw, 8.5rem);
+  font-weight: 900;
+  line-height: 0.84;
+  letter-spacing: -0.035em;
+}
+
+.td-statement__ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  pointer-events: none;
+  color: color-mix(in oklch, #8b5cf6 55%, transparent);
+  transform: translate(0.16em, 0.14em);
+}
+
+.td-statement__ghost--mid {
+  color: color-mix(in oklch, var(--td-sand, #d9f99d) 0%, #d9f99d 62%);
+  transform: translate(0.08em, 0.07em);
+  opacity: 0.55;
+}
+
+.td-statement__title {
+  position: relative;
+  z-index: 2;
+}
+
+.td-statement__note {
+  position: relative;
+  z-index: 2;
+  margin: 1.1rem 0 0 !important;
+  max-width: 34ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* 03 光的記憶：巨大的「光」 */
+.lm-statement {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: clamp(1rem, 4vw, 3rem);
+}
+
+.lm-statement__glyph {
+  margin: 0 !important;
+  font-family: "Noto Serif TC", serif;
+  font-weight: 300;
+  font-size: clamp(7rem, 24vw, 20rem) !important;
+  line-height: 0.7;
+  letter-spacing: -0.02em;
+}
+
+.lm-statement__side {
+  flex: 1 1 16rem;
+  padding-bottom: clamp(0.5rem, 2vw, 1.4rem);
+}
+
+.lm-statement__en {
+  margin: 0 !important;
+  font-family: "Cormorant Garamond", "Noto Serif TC", serif;
+  font-weight: 300;
+  font-size: clamp(1.8rem, 5vw, 3.4rem);
+  line-height: 1;
+}
+
+.lm-statement__sub {
+  margin: 0.4rem 0 0 !important;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.66rem, 1vw, 0.8rem);
+  letter-spacing: 0.32em;
+  color: color-mix(in oklch, var(--lm-gold) 88%, #000 12%) !important;
+}
+
+.lm-statement__note {
+  margin: 0.9rem 0 0 !important;
+  max-width: 32ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* 04 立體光雕：被稜線切開 */
+.pj-statement {
+  display: grid;
+  grid-template-columns: auto 1px auto;
+  align-items: center;
+  justify-content: start;
+  gap: clamp(0.6rem, 2vw, 1.4rem);
+  overflow: hidden;
+}
+
+.pj-statement__a,
+.pj-statement__b {
+  font-size: clamp(3rem, 10vw, 7.5rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  display: block;
+}
+
+.pj-statement__a { transform: skewY(-8deg); }
+.pj-statement__b { transform: skewY(10deg); color: var(--pj-cyan); }
+
+.pj-statement__ridge {
+  align-self: stretch;
+  background: linear-gradient(180deg, transparent, var(--pj-violet), transparent);
+}
+
+.pj-statement__note {
+  grid-column: 1 / -1;
+  margin: 1.1rem 0 0 !important;
+  max-width: 38ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* 05 circle test */
+.ct-statement__title {
+  margin: 0 !important;
+  font-size: clamp(4rem, 14vw, 10rem) !important;
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+}
+
+.ct-statement__title span { color: var(--ct-pink); }
+
+.ct-statement__note {
+  margin: 0.9rem 0 0 !important;
+  max-width: 32ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* ==========================================================================
+   聽說：光束要最顯眼、而且明顯地會動
+   ========================================================================== */
+
+.ls-beam__core {
+  width: clamp(3.5rem, 8vw, 7rem) !important;
+  animation: ls-beam-pulse 3.4s ease-in-out infinite !important;
+}
+
+/* 呼吸幅度拉大，而且會左右微擺——不再只是靜靜地亮著 */
+@keyframes ls-beam-pulse {
+  0% { opacity: 0.42; transform: translateX(-50%) scaleX(0.86); }
+  38% { opacity: 1; transform: translateX(-50%) scaleX(1.14); }
+  62% { opacity: 0.78; transform: translateX(-52%) scaleX(1); }
+  100% { opacity: 0.42; transform: translateX(-48%) scaleX(0.86); }
+}
+
+/* 光束裡多一道更亮、更窄的核心，往下掃 */
+.ls-beam__core::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 30%;
+  height: 34vh;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.85) 46%,
+    color-mix(in oklch, var(--ls-cyan) 70%, transparent) 62%,
+    transparent 100%
+  );
+  animation: ls-beam-sweep 5.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes ls-beam-sweep {
+  0% { top: -36vh; opacity: 0; }
+  12% { opacity: 0.95; }
+  88% { opacity: 0.95; }
+  100% { top: 104vh; opacity: 0; }
+}
+
+/* 粒子加量、加亮、加快 */
+.ls-beam__dust {
+  width: clamp(3.5rem, 8vw, 7rem) !important;
+}
+
+.ls-beam__dust i {
+  width: 3px;
+  height: 3px;
+  box-shadow:
+    0 0 8px 2px color-mix(in oklch, var(--ls-cyan) 80%, transparent),
+    0 0 16px 4px color-mix(in oklch, var(--ls-mag) 40%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-beam__core,
+  .ls-beam__core::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .pj-statement {
+    grid-template-columns: auto;
+  }
+
+  .pj-statement__ridge {
+    display: none;
+  }
+}
