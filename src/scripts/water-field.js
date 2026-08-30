@@ -65,7 +65,16 @@ export const ticker = createTicker();
  * 波場
  * ------------------------------------------------------------------ */
 
+/** 淺色面板走墨水：不是發光的水，是滲進紙裡的墨。 */
+const isInkMode = () => !document.documentElement.classList.contains("dark");
+
+// 墨色：偏冷的深藍黑。不用純黑——純黑在紙上會死，帶一點藍才像墨。
+const INK = [18, 26, 44];
+
 const readAccent = () => {
+    // 墨水模式不吃 accent：整片就是同一缸墨。
+    if (isInkMode()) return INK.slice();
+
     const raw = getComputedStyle(document.documentElement)
         .getPropertyValue("--scene-accent")
         .trim();
@@ -174,6 +183,7 @@ const createWaterField = (canvas) => {
     };
 
     const render = () => {
+        const ink = isInkMode();
         const data = image.data;
 
         for (let y = 1; y < rows - 1; y += 1) {
@@ -199,10 +209,19 @@ const createWaterField = (canvas) => {
                 const offset = i * 4;
 
                 // Uint8ClampedArray 會自動夾在 0-255，不必手動 clamp
-                data[offset] = accent[0] + spec * 120;
-                data[offset + 1] = accent[1] + spec * 60;
-                data[offset + 2] = accent[2] + spec * 30;
-                data[offset + 3] = glow * 300;
+                if (ink) {
+                    // 墨水：波峰不是加亮，是「墨更濃」。顏色維持墨色，
+                    // 由 alpha 承載濃淡，波峰處再壓深一點做出墨聚的深邊。
+                    data[offset] = accent[0] - spec * 10;
+                    data[offset + 1] = accent[1] - spec * 12;
+                    data[offset + 2] = accent[2] - spec * 8;
+                    data[offset + 3] = glow * 470 + spec * 90;
+                } else {
+                    data[offset] = accent[0] + spec * 120;
+                    data[offset + 1] = accent[1] + spec * 60;
+                    data[offset + 2] = accent[2] + spec * 30;
+                    data[offset + 3] = glow * 300;
+                }
             }
         }
 
@@ -211,7 +230,10 @@ const createWaterField = (canvas) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
-        ctx.globalCompositeOperation = "lighter";
+        // lighter 只會加亮——在淺色面板上等於什麼都沒發生，
+        // 這就是「淺色時水不明顯」的原因。墨水模式改回一般疊合，
+        // 讓 CSS 那層的 multiply 去把紙壓暗。
+        ctx.globalCompositeOperation = ink ? "source-over" : "lighter";
         ctx.drawImage(grid, 0, 0, canvas.width, canvas.height);
     };
 
