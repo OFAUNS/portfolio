@@ -7,46 +7,82 @@ genre: "Animation"
 thumbnail: "/work/projection-mapping/vp4.png"
 videoUrl: "https://youtu.be/qzVbiAtYpRE"
 
-description: "2023 Animation"
+description: "投影打在一個五面的立體物上：上面兩個往內收的斜面、前上方一片菱形、下面兩個外緣外斜再收攏的面。p5.js 生成上半部，AE 做中段與底部的延展填充。"
 credits:
   - name: "OFAUNS"
     role: "Animation / Graph Design /Aftermovie "
 
 ---
 
-> 運用p5.js製作上半部側邊邏輯性的動畫以定義圖形random的圖形構成多彩和不規則的特效。
-AE做中間及底部特效展延，以原有的圖形做特效的延伸及填充做動態變化呈現出連貫的動畫。
-多面結合展出二分鐘的立體光雕藝術設計。
+> 運用 **p5.js** 製作上半部側邊邏輯性的動畫，以定義圖形 random 的圖形構成多彩和不規則的特效。
+**AE** 做中間及底部特效展延，以原有的圖形做特效的延伸及填充做動態變化，呈現出連貫的動畫。多面結合展出二分鐘的立體光雕藝術設計。
 
+<div class="pj-object">
 
+<div class="pj-object__shape" aria-hidden="true">
+  <span class="pj-face pj-face--tl"></span>
+  <span class="pj-face pj-face--tr"></span>
+  <span class="pj-face pj-face--mid"></span>
+  <span class="pj-face pj-face--bl"></span>
+  <span class="pj-face pj-face--br"></span>
+  <svg viewBox="0 0 660 520" preserveAspectRatio="none">
+    <g fill="none" stroke="currentColor" stroke-width="1" opacity="0.5">
+      <path d="M284 0 L330 0 L330 260 L139 218 Z"></path>
+      <path d="M330 0 L376 0 L521 218 L330 260 Z"></path>
+      <path d="M112 234 L330 364 L330 520 L172 494 L59 343 Z"></path>
+      <path d="M548 234 L601 343 L488 494 L330 520 L330 364 Z"></path>
+    </g>
+    <path d="M330 198 L548 234 L330 374 L112 234 Z" fill="none" stroke="#ffcf9a" stroke-width="1.4" opacity="0.9"></path>
+  </svg>
+</div>
 
+<div class="pj-object__legend">
+<div class="pj-leg pj-leg--p5"><span>上面兩面</span><strong>p5.js</strong><p>往內收得很陡，在中央稜線交會。</p></div>
+<div class="pj-leg pj-leg--mid"><span>前上方菱形</span><strong>AE 延展</strong><p>壓在上段底部之前，不是夾在中間的分隔帶。</p></div>
+<div class="pj-leg pj-leg--ae"><span>下面兩面</span><strong>AE 填充</strong><p>外緣先往外斜出去，再收攏到底座——五邊形不是梯形。</p></div>
+</div>
 
+</div>
 
----
+![投影物實拍](/work/projection-mapping/VP1.png)
 
+<div class="pj-zone pj-zone--p5">
+<div class="pj-zone__head"><span>PLANE A · B</span><h2>p5.js 生成圖形</h2></div>
 
-<Grid variant="bento">
+random 的圖形構成，多彩而不規則——規則產生不規則，這是整件作品的來源。
 
+![p5.js 生成](/work/projection-mapping/vp5.png)
 
+![p5.js 生成](/work/projection-mapping/vp.png)
 
-</Grid>
+![p5.js 生成](/work/projection-mapping/vp2.png)
 
+</div>
 
+<div class="pj-zone pj-zone--mid">
+<div class="pj-zone__head"><span>PLANE C</span><h2>AE 特效展延</h2></div>
 
+以原有的圖形做特效的延伸，讓上段的生成結果接得下去。這一區的重點是「接得起來」。
 
-![Image01](/work/projection-mapping/vp5.png)
-![Image01](/work/projection-mapping/vp.png)
+![AE 展延](/work/projection-mapping/vp4.png)
 
-![Image01](/work/projection-mapping/vp2.png)
-![Image01](/work/projection-mapping/vp4.png)
-![Image01](/work/projection-mapping/vp3.png)
-![Image01](/work/projection-mapping/vpp.png)
-![Image01](/work/projection-mapping/vpp1.png)
-![Image01](/work/projection-mapping/vpp2.png)
-![Image01](/work/projection-mapping/vpp3.png)
+![AE 展延](/work/projection-mapping/vp3.png)
+
+</div>
+
+<div class="pj-zone pj-zone--ae">
+<div class="pj-zone__head"><span>PLANE D · E</span><h2>填充與動態變化</h2></div>
+
+填充做動態變化，收攏到底座。五面結合，展出二分鐘。
+
+![底部填充](/work/projection-mapping/vpp.png)
+
+![底部填充](/work/projection-mapping/vpp1.png)
+
+![底部填充](/work/projection-mapping/vpp2.png)
+
+![底部填充](/work/projection-mapping/vpp3.png)
+
+</div>
+
 <Video src="/work/projection-mapping/合成演示.mp4" />
-<Grid cols={2}>
-
-</Grid>
-
-

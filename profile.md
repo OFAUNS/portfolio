@@ -63,6 +63,10 @@
 - 影片：https://youtu.be/cHJTyUgpuEU
 - 製作團隊：OFAUNS（Film / Graph Design / Aftermovie）、Prince（3DFilm）
 - 描述：實地取材龍岡當地米干，應用於攝影棚拍攝內容，利用 LED 牆虛擬攝影棚拍攝特效背景與實體融合的效果。加上燈光的掌控，以及 DaVinci Resolve 後製的疊加，呈現高質感的廣告宣傳片。負責燈光以及腳本設計，開頭以特寫食物的鏡頭體現質感，至五言絕句增添詩意，並加上食神的經典橋段，使畫面更有張力。
+- 腳本三幕（版面即依此順序）：
+  - 幕一 質感 `vd`～`vd3`（9 顆）——特寫食物，白棚亮調、淺景深
+  - 幕二 詩意 `vd4`～`vd7`（4 顆）——黑底直排書法字卡（含「一路到臺灣」），全片唯一的休止符；**五言絕句原文待作者提供**
+  - 幕三 張力 `vd8`～`vd13`（6 顆）——上菜與誇張表情，背景換成飽和藍色光柱，對比拉到最大
 
 ### 2. TouchDesigner 元素人形畫布互動設計
 - 分類：Interaction-Design｜客戶：YZU｜日期：2025-10-28
@@ -96,6 +100,8 @@
 - 影片：https://youtu.be/eM8wSplagME
 - 製作團隊：OFAUNS（Animation / Camera / 3D Object / Graph Design / Aftermovie）、Sanctum Luminis（3DAnimation）
 - 描述（英文原文）：The starting point of this project is to build upon elements rich in mythology: a bird, a church, and stained glass. A story is woven from these mythic elements, inviting vast imagination. The bird becomes an explorer — representing an individual, a group, or any form of life, or perhaps simply a bird. The church symbolizes life's journey, and the different colored lights represent the various states and encounters within that life, symbolizing the changes and growth of life.
+- 版面：全站唯一的亮色作品頁（其他皆為深色底），因為作品本身談的就是光。斜射光柱貫穿整頁當結構，鳥的航線橫過版面越飛越大越亮當閱讀動線，教堂只留細線拱窗輪廓。
+- 五段際遇（依現有圖片順序分段，各自一種光色）：GOLD 啟程 / BLUE 探索 / VIOLET 迷失 / COLD 試煉 / WARM 成長。
 
 ### 5. 立體光雕投影 多平面立體動態設計
 - 分類：Animation｜客戶：YZU｜日期：2023-10-28
@@ -103,6 +109,8 @@
 - 影片：https://youtu.be/qzVbiAtYpRE
 - 製作團隊：OFAUNS（Animation / Graph Design / Aftermovie）
 - 描述：運用 p5.js 製作上半部側邊邏輯性的動畫，以定義圖形 random 的圖形構成多彩和不規則的特效。AE 做中間及底部特效展延，以原有的圖形做特效的延伸及填充做動態變化，呈現出連貫的動畫。多面結合展出二分鐘的立體光雕藝術設計。
+- 實體投影物為五面（`VP1.png` 為實拍）：上面兩個往內收的斜面、前上方一片菱形、下面兩個外緣外斜再收攏的五邊形面。版面用 clip-path 照此造型切版。
+- 分工：上面兩面 p5.js 生成圖形；前上方菱形 AE 特效展延；下面兩面 AE 填充與動態變化。
 
 ### 6. circle test1（AE 圓形動畫試作）
 - 分類：Animation｜客戶：YZU｜日期：2023-10-28

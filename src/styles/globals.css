@@ -6353,3 +6353,577 @@ html[data-page-wipe]::view-transition-new(root) {
   display: block;
   border: 1px solid color-mix(in oklch, var(--ls-mag) 22%, transparent);
 }
+
+/* ==========================================================================
+   龍岡米干 專屬版面（.case-layout-film）
+   整頁是一條底片：齒孔貫穿內文兩側、鏡頭號碼壓在每一格底下當結構，
+   三幕依腳本順序往下走，中間那一幕是全片唯一的白場。
+   ========================================================================== */
+
+.case-layout-film {
+  --fm-amber: #e8a765;
+  --fm-warm: #f0c98a;
+  --case-surface: color-mix(in oklch, var(--background) 84%, #150e06 16%);
+}
+
+.fm-strip {
+  position: relative;
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding-inline: clamp(1.6rem, 3.2vw, 2.4rem);
+  counter-reset: fmshot;
+}
+
+/* 片基與齒孔：暗色邊條 + 挖空的圓角齒孔，不是亮色塊上打黑洞 */
+.fm-strip::before,
+.fm-strip::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(1.1rem, 2.2vw, 1.6rem);
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 0.55rem,
+      color-mix(in oklch, var(--background) 96%, #000 4%) 0.55rem 1.35rem,
+      transparent 1.35rem 1.9rem
+    ),
+    color-mix(in oklch, var(--foreground) 9%, transparent);
+  border-inline: 1px solid color-mix(in oklch, var(--fm-amber) 26%, transparent);
+  pointer-events: none;
+}
+
+.fm-strip::before { inset-inline-start: 0; }
+.fm-strip::after { inset-inline-end: 0; }
+
+.fm-act {
+  position: relative;
+  padding-block: clamp(1.4rem, 3vw, 2.2rem);
+  border-top: 1px solid color-mix(in oklch, var(--fm-amber) 24%, transparent);
+}
+
+.fm-act:first-child { border-top: 0; }
+
+.fm-act__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.fm-act__no {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.7rem, 1.1vw, 0.82rem);
+  letter-spacing: 0.32em;
+  color: var(--fm-amber);
+}
+
+.fm-act__head h2 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.fm-act__head em {
+  font-style: normal;
+  font-size: clamp(0.78rem, 1.2vw, 0.9rem);
+  color: color-mix(in oklch, var(--foreground) 55%, transparent);
+}
+
+.fm-act p {
+  max-width: none;
+}
+
+/* 每一格帶鏡頭號碼 */
+.fm-frames {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: clamp(0.35rem, 1vw, 0.6rem);
+  margin-top: clamp(0.9rem, 2vw, 1.4rem);
+}
+
+.fm-frames > p {
+  position: relative;
+  margin: 0 !important;
+  counter-increment: fmshot;
+}
+
+.fm-frames > p::after {
+  content: counter(fmshot, decimal-leading-zero);
+  position: absolute;
+  left: 0.4rem;
+  bottom: 0.25rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.7rem;
+  color: color-mix(in oklch, var(--fm-warm) 82%, transparent);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+/* 幕二：全片唯一的白場 */
+.fm-act--poem {
+  background: #f0e9dd;
+  color: #14100c;
+  padding-inline: clamp(1.4rem, 3vw, 2.2rem);
+}
+
+.fm-act--poem .fm-act__no { color: #a06a1e; }
+.fm-act--poem .fm-act__head em { color: #7d7266; }
+.fm-act--poem p { color: #57503f; }
+
+.fm-poem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(1.2rem, 4vw, 3rem);
+  padding-block: clamp(1.4rem, 4vw, 2.6rem);
+}
+
+.fm-poem__text {
+  margin: 0 !important;
+  font-family: "Noto Serif TC", serif;
+  font-weight: 900;
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  line-height: 1.5;
+  letter-spacing: 0.22em;
+  color: #14100c !important;
+}
+
+.fm-poem__text span {
+  font-size: 0.55em;
+  font-weight: 400;
+  color: #9a8f80;
+  letter-spacing: 0.14em;
+}
+
+.fm-poem__note {
+  flex: 1 1 16rem;
+  margin: 0 !important;
+  font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+  line-height: 1.95;
+  color: #57503f !important;
+}
+
+/* 幕三：對比拉到最大 */
+.fm-act--climax {
+  background: linear-gradient(180deg, color-mix(in oklch, #1a0d12 60%, transparent), transparent 60%);
+}
+
+.fm-act--climax .fm-act__head h2 { color: var(--fm-amber); }
+
+/* 製作段 */
+.fm-craft {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1px;
+  margin: clamp(1.8rem, 4vw, 2.8rem) 0;
+  background: color-mix(in oklch, var(--fm-amber) 24%, transparent);
+  border: 1px solid color-mix(in oklch, var(--fm-amber) 24%, transparent);
+}
+
+.fm-craft__cell {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.1rem, 2.6vw, 1.7rem);
+  background: var(--case-surface);
+}
+
+.fm-craft__cell--led::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--fm-amber) 7%, transparent) 0 1px,
+    transparent 1px 8px
+  );
+  pointer-events: none;
+}
+
+.fm-craft__cell--grade {
+  background: linear-gradient(150deg, #100b0d 0%, #2e1a10 100%);
+}
+
+.fm-craft__cell span {
+  position: relative;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.34em;
+  color: var(--fm-amber);
+}
+
+.fm-craft__cell--grade span { color: var(--fm-warm); }
+
+.fm-craft__cell strong {
+  position: relative;
+  display: block;
+  margin: 0.5rem 0 0.6rem;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  line-height: 1;
+}
+
+.fm-craft__cell--grade strong { color: var(--fm-warm); }
+
+.fm-craft__cell p {
+  position: relative;
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.78rem, 1.2vw, 0.88rem);
+  line-height: 1.85;
+}
+
+/* 分鏡格維持 16:9，格與格之間才讀得出節奏 */
+.case-layout-film .work-case-body img {
+  aspect-ratio: 16 / 9 !important;
+  object-fit: cover !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
+.case-layout-film .work-case-body > p:has(img),
+.case-layout-film .work-case-body > blockquote {
+  max-width: none;
+}
+
+@media (max-width: 720px) {
+  .fm-strip { padding-inline: clamp(0.9rem, 4vw, 1.4rem); }
+  .fm-frames { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ==========================================================================
+   光的記憶 Sanctum Luminis 專屬版面（.case-layout-cinema）
+   全站唯一的亮色作品頁——其他每一件都是深色底，只有這件反過來，
+   因為它談的就是光。光柱是結構、鳥是動線、教堂只留輪廓。
+   做法是就地覆寫主題 token，讓 .work-case 既有的背景公式自己轉成亮色。
+   ========================================================================== */
+
+.case-layout-cinema {
+  --background: oklch(0.96 0.008 250);
+  --foreground: oklch(0.22 0.02 258);
+  --muted-foreground: oklch(0.46 0.02 254);
+  --border: oklch(0.3 0.02 255 / 18%);
+  --case-surface: #eef1f5;
+  --case-line: color-mix(in oklch, #22262e 10%, transparent);
+  --lm-gold: #d9b263;
+  --lm-blue: #6d8fb0;
+  --lm-violet: #8b7ab8;
+  color: var(--foreground);
+  background: linear-gradient(168deg, #fdfaf3 0%, #eef1f5 40%, #dfe5ee 100%) !important;
+}
+
+/* prose-invert 在深色模式下把內文設成亮色，這一頁是亮底，整組要拉回來 */
+.case-layout-cinema .work-case-body,
+.case-layout-cinema .work-case-body p,
+.case-layout-cinema .work-case-body li {
+  color: oklch(0.42 0.02 254) !important;
+}
+
+.case-layout-cinema .work-case-body h1,
+.case-layout-cinema .work-case-body h2,
+.case-layout-cinema .work-case-body h3,
+.case-layout-cinema .work-case-body strong {
+  color: oklch(0.22 0.02 258) !important;
+}
+
+.case-layout-cinema .work-case-body blockquote {
+  max-width: none;
+  border-inline-start: 2px solid var(--lm-gold);
+  color: oklch(0.36 0.02 256) !important;
+}
+
+/* 斜射的光柱：整頁的結構 */
+.lm-rays {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.lm-rays::before,
+.lm-rays::after {
+  content: "";
+  position: absolute;
+  top: -20vh;
+  height: 150vh;
+  filter: blur(14px);
+}
+
+.lm-rays::before {
+  left: 12%;
+  width: 13vw;
+  background: linear-gradient(180deg, rgba(255, 244, 214, 0.95), rgba(255, 244, 214, 0));
+  transform: rotate(12deg);
+}
+
+.lm-rays::after {
+  left: 62%;
+  width: 9vw;
+  background: linear-gradient(180deg, rgba(214, 232, 255, 0.85), rgba(214, 232, 255, 0));
+  transform: rotate(10deg);
+}
+
+.case-layout-cinema .case-shell,
+.case-layout-cinema .case-nav,
+.case-layout-cinema .case-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* 鳥的航線 */
+.lm-flight {
+  position: relative;
+  margin: clamp(1.4rem, 4vw, 2.4rem) 0;
+  color: oklch(0.22 0.02 258);
+}
+
+.lm-flight svg {
+  display: block;
+  width: 100%;
+  height: clamp(4rem, 9vw, 7rem);
+}
+
+.lm-flight span {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.66rem, 1vw, 0.76rem);
+  letter-spacing: 0.28em;
+  color: color-mix(in oklch, var(--lm-gold) 90%, #000 10%);
+}
+
+/* 一段際遇＝一種顏色的光 */
+.lm-pane {
+  position: relative;
+  margin: clamp(1.2rem, 3vw, 2rem) 0;
+  padding: clamp(1.1rem, 2.6vw, 1.8rem);
+  border-top: 2px solid var(--pane, var(--lm-gold));
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--pane, var(--lm-gold)) 22%, transparent) 0%,
+    color-mix(in oklch, var(--pane, var(--lm-gold)) 4%, transparent) 100%
+  );
+}
+
+.lm-pane--gold { --pane: #d9b263; }
+.lm-pane--blue { --pane: #6d8fb0; }
+.lm-pane--violet { --pane: #8b7ab8; }
+.lm-pane--cold { --pane: #5f93b8; }
+.lm-pane--warm { --pane: #d9a94a; }
+
+.lm-pane__head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.lm-pane__head span {
+  font-family: "Cormorant Garamond", "Noto Serif TC", serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  letter-spacing: 0.06em;
+  color: color-mix(in oklch, var(--pane) 70%, #000 30%);
+}
+
+.lm-pane__head h2 {
+  margin: 0 !important;
+  font-family: "Noto Serif TC", serif;
+  font-weight: 600;
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+}
+
+.lm-pane > p:has(img) {
+  margin: 0 0 clamp(0.4rem, 1vw, 0.7rem) !important;
+  max-width: none;
+}
+
+.case-layout-cinema .work-case-body img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: min(84vh, 54rem);
+  padding: 0 !important;
+  background: transparent;
+}
+
+/* 「這是動畫」：時間標記條 */
+.lm-motion {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: clamp(1.6rem, 4vw, 2.4rem) 0 clamp(0.8rem, 2vw, 1.2rem);
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid color-mix(in oklch, #22262e 18%, transparent);
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  letter-spacing: 0.28em;
+}
+
+.lm-motion__label { color: color-mix(in oklch, var(--lm-gold) 88%, #000 12%); }
+.lm-motion__meta { color: oklch(0.5 0.02 254); }
+
+/* ==========================================================================
+   立體光雕 專屬版面（.case-layout-projection）
+   照 VP1.png 的實體造型切版：上面兩面往內收、前上方一片菱形、
+   下面兩面外緣外斜再收攏。用 clip-path，不是 3D transform。
+   ========================================================================== */
+
+.case-layout-projection {
+  --pj-violet: #a78bfa;
+  --pj-cyan: #27f5d2;
+  --pj-amber: #ffcf9a;
+  --case-surface: color-mix(in oklch, var(--background) 84%, #08041a 16%);
+}
+
+.pj-object {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(1.2rem, 3vw, 2.4rem);
+  align-items: center;
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+}
+
+.pj-object__shape {
+  position: relative;
+  aspect-ratio: 660 / 520;
+  color: color-mix(in oklch, var(--foreground) 45%, transparent);
+}
+
+.pj-object__shape svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pj-face {
+  position: absolute;
+  inset: 0;
+}
+
+.pj-face--tl {
+  clip-path: polygon(43% 0%, 50% 0%, 50% 50%, 21% 42%);
+  background: linear-gradient(150deg, color-mix(in oklch, var(--pj-violet) 42%, transparent), color-mix(in oklch, var(--pj-violet) 8%, transparent));
+}
+
+.pj-face--tr {
+  clip-path: polygon(50% 0%, 57% 0%, 79% 42%, 50% 50%);
+  background: linear-gradient(210deg, color-mix(in oklch, var(--pj-violet) 30%, transparent), color-mix(in oklch, var(--pj-violet) 6%, transparent));
+}
+
+.pj-face--mid {
+  clip-path: polygon(50% 38%, 83% 45%, 50% 72%, 17% 45%);
+  background: radial-gradient(ellipse at 50% 54%, color-mix(in oklch, var(--pj-amber) 55%, transparent), transparent 70%);
+}
+
+.pj-face--bl {
+  clip-path: polygon(17% 45%, 50% 70%, 50% 100%, 26% 95%, 9% 66%);
+  background: linear-gradient(160deg, color-mix(in oklch, var(--pj-cyan) 30%, transparent), color-mix(in oklch, var(--pj-cyan) 5%, transparent));
+}
+
+.pj-face--br {
+  clip-path: polygon(83% 45%, 91% 66%, 74% 95%, 50% 100%, 50% 70%);
+  background: linear-gradient(200deg, color-mix(in oklch, var(--pj-cyan) 22%, transparent), color-mix(in oklch, var(--pj-cyan) 4%, transparent));
+}
+
+.pj-object__legend {
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1rem);
+}
+
+.pj-leg {
+  padding: clamp(0.8rem, 2vw, 1.1rem);
+  border-inline-start: 2px solid var(--leg, var(--pj-violet));
+  background: color-mix(in oklch, var(--leg, var(--pj-violet)) 6%, transparent);
+}
+
+.pj-leg--p5 { --leg: var(--pj-violet); }
+.pj-leg--mid { --leg: var(--pj-amber); }
+.pj-leg--ae { --leg: var(--pj-cyan); }
+
+.pj-leg span {
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  color: var(--leg);
+}
+
+.pj-leg strong {
+  display: block;
+  margin: 0.3rem 0 0.35rem;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+}
+
+.pj-leg p {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.76rem, 1.2vw, 0.86rem);
+  line-height: 1.8;
+}
+
+.pj-zone {
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding-inline-start: clamp(0.9rem, 2.4vw, 1.6rem);
+  border-inline-start: 2px solid var(--zone, var(--pj-violet));
+}
+
+.pj-zone--p5 { --zone: var(--pj-violet); }
+.pj-zone--mid { --zone: var(--pj-amber); }
+.pj-zone--ae { --zone: var(--pj-cyan); }
+
+.pj-zone__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.7rem;
+}
+
+.pj-zone__head span {
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  color: var(--zone);
+}
+
+.pj-zone__head h2 {
+  margin: 0 !important;
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+}
+
+.pj-zone p {
+  max-width: none;
+}
+
+.pj-zone > p:has(img) {
+  margin: clamp(0.4rem, 1.2vw, 0.7rem) 0 !important;
+}
+
+.case-layout-projection .work-case-body img {
+  aspect-ratio: 16 / 9 !important;
+  object-fit: cover !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
+.case-layout-projection .work-case-body > p:has(img),
+.case-layout-projection .work-case-body > blockquote {
+  max-width: none;
+}
+
+@media (max-width: 860px) {
+  .pj-object {
+    grid-template-columns: 1fr;
+  }
+}
