@@ -6927,3 +6927,211 @@ html[data-page-wipe]::view-transition-new(root) {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   circle test1 專屬版面（.case-layout-motion）
+   圓形是主題、循環是動畫的本質——接觸印樣不排成方格，沿著一圈排開。
+   走完一圈就是一個 loop，底下用 easing 曲線講節拍。
+   ========================================================================== */
+
+.case-layout-motion {
+  --ct-pink: #ff8fb3;
+  --ct-yellow: #ffe66d;
+  --case-surface: color-mix(in oklch, var(--background) 86%, #14090c 14%);
+}
+
+.ct-loop {
+  position: relative;
+  width: min(100%, 46rem);
+  aspect-ratio: 1 / 1;
+  margin: clamp(2rem, 6vw, 4rem) auto;
+  --ct-r: 38%;
+}
+
+.ct-loop__rings {
+  position: absolute;
+  inset: 0;
+  color: var(--ct-pink);
+  pointer-events: none;
+}
+
+.ct-loop__rings svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 圓心：loop 的長度 */
+.ct-loop__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 38%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklch, var(--ct-pink) 40%, transparent);
+  background: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--ct-pink) 10%, transparent) 0%,
+    transparent 72%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  text-align: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.ct-loop__core span {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.6rem, 1vw, 0.72rem);
+  letter-spacing: 0.32em;
+  color: var(--ct-pink);
+}
+
+.ct-loop__core strong {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  line-height: 1;
+}
+
+.ct-loop__core em {
+  font-style: normal;
+  font-size: clamp(0.62rem, 1vw, 0.74rem);
+  line-height: 1.6;
+  color: color-mix(in oklch, var(--foreground) 55%, transparent);
+}
+
+/* 七張定格沿圓周等分排開，圖片本身保持正立 */
+.ct-loop > p {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 21%;
+  margin: 0 !important;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--ct-a))
+    translate(0, calc(var(--ct-r) * -1 * 2.38))
+    rotate(calc(var(--ct-a) * -1));
+}
+
+.ct-loop > p:nth-of-type(1) { --ct-a: 0deg; }
+.ct-loop > p:nth-of-type(2) { --ct-a: 51.43deg; }
+.ct-loop > p:nth-of-type(3) { --ct-a: 102.86deg; }
+.ct-loop > p:nth-of-type(4) { --ct-a: 154.29deg; }
+.ct-loop > p:nth-of-type(5) { --ct-a: 205.71deg; }
+.ct-loop > p:nth-of-type(6) { --ct-a: 257.14deg; }
+.ct-loop > p:nth-of-type(7) { --ct-a: 308.57deg; }
+
+.ct-loop > p::after {
+  content: counter(ctframe, decimal-leading-zero);
+  position: absolute;
+  left: 0.3rem;
+  bottom: 0.2rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.66rem;
+  color: var(--ct-pink);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
+}
+
+.ct-loop { counter-reset: ctframe; }
+.ct-loop > p { counter-increment: ctframe; }
+
+.case-layout-motion .work-case-body img {
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  width: 100%;
+  border: 1px solid color-mix(in oklch, var(--ct-pink) 22%, transparent);
+}
+
+.case-layout-motion .work-case-body > p:has(img),
+.case-layout-motion .work-case-body > blockquote {
+  max-width: none;
+}
+
+/* --- easing 曲線 --- */
+.ct-easing {
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding: clamp(1rem, 2.6vw, 1.6rem);
+  border: 1px solid color-mix(in oklch, var(--ct-pink) 22%, var(--border));
+  background: color-mix(in oklch, var(--ct-pink) 4%, transparent);
+  color: var(--foreground);
+}
+
+.ct-easing__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.ct-easing__head span {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.64rem, 1vw, 0.76rem);
+  letter-spacing: 0.3em;
+  color: color-mix(in oklch, var(--foreground) 52%, transparent);
+}
+
+.ct-easing__head em {
+  font-style: normal;
+  font-size: clamp(0.74rem, 1.1vw, 0.85rem);
+  color: var(--ct-pink);
+}
+
+.ct-easing > svg {
+  display: block;
+  width: 100%;
+  height: clamp(5rem, 12vw, 8rem);
+}
+
+.ct-easing__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2rem;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.64rem, 1vw, 0.74rem);
+  letter-spacing: 0.18em;
+  color: color-mix(in oklch, var(--foreground) 55%, transparent);
+}
+
+/* 窄螢幕：圓周排不下，退回兩欄格線，但保留編號與圓形裁切 */
+@media (max-width: 640px) {
+  .ct-loop {
+    aspect-ratio: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .ct-loop__rings {
+    display: none;
+  }
+
+  .ct-loop__core {
+    position: static;
+    width: auto;
+    aspect-ratio: auto;
+    transform: none;
+    grid-column: 1 / -1;
+    border-radius: 0;
+  }
+
+  .ct-loop > p {
+    position: static;
+    width: auto;
+    transform: none;
+  }
+}
