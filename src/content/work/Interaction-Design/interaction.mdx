@@ -8,49 +8,110 @@ genre: "Interaction-Design"
 thumbnail: "/work/touchdesigner-canvas/SAND.jpg"
 videoUrl: "https://youtu.be/jTVDYr7yCNI"
 
-description: "2025 3DInteraction-Design"
+description: "觀者在三分鐘內以自身動作於虛擬畫布上創作。沙、煙、水三種元素各有自己的物理——重力堆積、浮力擴散、波動傳遞，痕跡因此以三種速度消散。"
 credits:
   - name: "OFAUNS"
     role: "Interaction-Design / Graph Design /Aftermovie "
 
 ---
-# TouchDesigner
-# 元素人形畫布互動設計
 
->本作品以「存在主義與時間」為核心主題，結合互動投影
-與感測裝置，讓觀者在三分鐘內，以自身的動作於虛擬畫
-布上創作。作品藉由「存在的消逝與痕跡的留存」探討時
-間的意義，並以帶有殘影感的極簡光影美學。 
-體驗「存在的瞬間性」與「痕跡的延續性」 
-人的形體會消散，但行為留下的痕跡仍被世界記錄，與他
-人共構時間的網絡，這件作品的關係美學，不只發生在人
-與人之間，更存在於「人與時間」的互動之中
+![字標](/work/touchdesigner-canvas/logo1.png)
 
+> 本作品以「存在主義與時間」為核心主題，結合互動投影與感測裝置，讓觀者在三分鐘內，以自身的動作於虛擬畫布上創作。作品藉由「存在的消逝與痕跡的留存」探討時間的意義，並以帶有殘影感的極簡光影美學。
 
----
+> 體驗「存在的瞬間性」與「痕跡的延續性」——人的形體會消散，但行為留下的痕跡仍被世界記錄，與他人共構時間的網絡。這件作品的關係美學，不只發生在人與人之間，更存在於「人與時間」的互動之中。
 
+![人形](/work/touchdesigner-canvas/person1.png)
 
-![Image01](/work/touchdesigner-canvas/logo1.png)
+## 三種元素，三種物理
 
-![Image01](/work/touchdesigner-canvas/person1.png)
+同樣是「留下痕跡」，沙、煙、水的行為完全不同。元素的身分不是靠外形認出來的，
+是靠**它怎麼動**——所以下面每一格的畫面都在跑該元素真實的物理行為。
 
-<Grid cols={2}>
-![Image01](/work/touchdesigner-canvas/SAND.jpg)
-![Image01](/work/touchdesigner-canvas/sand1.png)
-</Grid>
+<div class="td-elements">
 
-<Grid cols={2}>
-![Image01](/work/touchdesigner-canvas/SMOKE.jpg)
-![Image01](/work/touchdesigner-canvas/Smoke1.png)
-</Grid>
+<div class="td-el td-el--sand">
+<div class="td-el__media">
 
-<Grid cols={2}>
-![Image01](/work/touchdesigner-canvas/water.png)
-![Image01](/work/touchdesigner-canvas/water1.png)
-</Grid>
+![沙](/work/touchdesigner-canvas/SAND.jpg)
 
-![Image01](/work/touchdesigner-canvas/i1.png)
-![Image01](/work/touchdesigner-canvas/asds.png)
-![Image01](/work/touchdesigner-canvas/tes1.png)
+![沙 · 集中構圖](/work/touchdesigner-canvas/sand1.png)
+
+<span class="td-fx td-fx--sand" aria-hidden="true"><i style="left:9%;animation-delay:0s"></i><i style="left:21%;animation-delay:.6s"></i><i style="left:34%;animation-delay:1.2s"></i><i style="left:47%;animation-delay:.3s"></i><i style="left:59%;animation-delay:1.7s"></i><i style="left:72%;animation-delay:.9s"></i><i style="left:85%;animation-delay:2.1s"></i><b></b></span>
+
+</div>
+<div class="td-el__text">
+<div class="td-el__head"><span class="td-el__glyph">沙</span><span class="td-el__code">SAND</span><span class="td-el__phys">重力 · 堆積</span></div>
+
+顆粒**加速下墜**——越接近底部越快，那就是重力。落到底不會消失，而是堆起來，
+沙堆隨時間變厚。**三者裡痕跡留最久的。**
+
+</div>
+</div>
+
+<div class="td-el td-el--smoke">
+<div class="td-el__media">
+
+![煙](/work/touchdesigner-canvas/SMOKE.jpg)
+
+![煙 · 集中構圖](/work/touchdesigner-canvas/Smoke1.png)
+
+<span class="td-fx td-fx--smoke" aria-hidden="true"><i style="left:12%;animation-delay:0s"></i><i style="left:36%;animation-delay:1.8s"></i><i style="left:57%;animation-delay:3.2s"></i><i style="left:79%;animation-delay:1s"></i></span>
+
+</div>
+<div class="td-el__text">
+<div class="td-el__head"><span class="td-el__glyph">煙</span><span class="td-el__code">SMOKE</span><span class="td-el__phys">浮力 · 擴散</span></div>
+
+沒有重量，所以**往上飄**；一邊上升一邊膨脹、一邊變淡，三件事同時發生。
+沒有邊界可言。**消散得最快的一種。**
+
+</div>
+</div>
+
+<div class="td-el td-el--water">
+<div class="td-el__media">
+
+![水](/work/touchdesigner-canvas/water.png)
+
+![水 · 集中構圖](/work/touchdesigner-canvas/water1.png)
+
+<span class="td-fx td-fx--water" aria-hidden="true"><u></u><i style="animation-delay:0s"></i><i style="animation-delay:1.1s"></i><i style="animation-delay:2.2s"></i></span>
+
+</div>
+<div class="td-el__text">
+<div class="td-el__head"><span class="td-el__glyph">水</span><span class="td-el__code">WATER</span><span class="td-el__phys">波動 · 傳遞</span></div>
+
+動作過去了，水面還在晃。痕跡不是留在原地的形狀，是**一圈圈往外推的波紋**——
+擾動會傳遞出去再慢慢衰減。**速度居中。**
+
+</div>
+</div>
+
+</div>
+
+<div class="td-decay">
+<span class="td-decay__label">衰減速度</span>
+<span class="td-decay__bar"></span>
+<span class="td-decay__k td-decay__k--sand">沙　留最久</span>
+<span class="td-decay__k td-decay__k--water">水</span>
+<span class="td-decay__k td-decay__k--smoke">煙　最快</span>
+</div>
+
+## 三分鐘
 
 <Video src="/work/touchdesigner-canvas/TEST1.mp4" />
+
+## 後台
+
+三個元素各自是一份獨立的 TouchDesigner 專案，節點網路直接接感測輸入與音訊，
+即時運算後輸出到投影。
+
+<div class="td-backstage">
+
+![TouchDesigner · sand man V2.2.toe](/work/touchdesigner-canvas/i1.png)
+
+![TouchDesigner · water V2.3.toe](/work/touchdesigner-canvas/tes1.png)
+
+![TouchDesigner 專案節點](/work/touchdesigner-canvas/asds.png)
+
+</div>

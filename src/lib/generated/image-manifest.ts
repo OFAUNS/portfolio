@@ -2205,6 +2205,21 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/projection-mapping/VP1.png": {
+        "src": "/work/projection-mapping/VP1.png",
+        "width": 726,
+        "height": 937,
+        "aspectRatio": 0.77481,
+        "originalSize": 414038,
+        "variants": [
+            {
+                "src": "/optimized/vp1-480.webp",
+                "width": 480,
+                "size": 12462,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/projection-mapping/vp.png": {
         "src": "/work/projection-mapping/vp.png",
         "width": 2560,
@@ -2667,6 +2682,39 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/sanctum-luminis/14.png": {
+        "src": "/work/sanctum-luminis/14.png",
+        "width": 1920,
+        "height": 1080,
+        "aspectRatio": 1.77778,
+        "originalSize": 1696867,
+        "variants": [
+            {
+                "src": "/optimized/14-480.webp",
+                "width": 480,
+                "size": 2348,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/14-800.webp",
+                "width": 800,
+                "size": 4446,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/14-1200.webp",
+                "width": 1200,
+                "size": 7240,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/14-1600.webp",
+                "width": 1600,
+                "size": 10272,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/sanctum-luminis/2.png": {
         "src": "/work/sanctum-luminis/2.png",
         "width": 1920,
@@ -2960,6 +3008,39 @@ export const imageManifest = {
                 "src": "/optimized/anime1-1600.webp",
                 "width": 1600,
                 "size": 31596,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/sanctum-luminis/LIGHT.jpg": {
+        "src": "/work/sanctum-luminis/LIGHT.jpg",
+        "width": 2467,
+        "height": 1107,
+        "aspectRatio": 2.22855,
+        "originalSize": 374052,
+        "variants": [
+            {
+                "src": "/optimized/light-480.webp",
+                "width": 480,
+                "size": 5662,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/light-800.webp",
+                "width": 800,
+                "size": 10510,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/light-1200.webp",
+                "width": 1200,
+                "size": 17850,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/light-1600.webp",
+                "width": 1600,
+                "size": 28312,
                 "type": "image/webp"
             }
         ]
