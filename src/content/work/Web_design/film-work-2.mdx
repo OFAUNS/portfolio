@@ -1,45 +1,199 @@
 ---
-title: "風視台情-颱風救災後端PHP網頁"
+title: "風視颱情-颱風救災後端PHP網頁"
 client: "YZU"
 role: ["Web Design", "Graph Design", "Backend Framework "]
 date: 2024-10-28
 genre: "Web-Design"
 thumbnail: "/work/typhoon-web/WED1.png"
 
-description: "2023 Web Design"
+description: "以颱風災害救援為核心的資訊網站。HTML + jQuery 前端串接 PHP 與 MySQL，把民眾回報的災情收進資料庫，審核後回到公開的災情索引與地圖上。"
 credits:
   - name: "OFAUNS"
     role: "Web Design / Graph Design /Backend Framework "
 
 ---
 
-> 以颱風災害救援為核心，架設**HTML+jquery**設計網站，連結PHP後端和MySQL資料庫，做儲存資料以上傳資料在網站上
+# 風視颱情
 
+> 以颱風災害救援為核心，架設 **HTML + jQuery** 設計網站，連結 PHP 後端和 MySQL 資料庫，做儲存資料以上傳資料在網站上
 
----
+災害資訊網站真正的難處不在畫面，在**資料從哪裡來、存到哪裡、又怎麼回到畫面上**。
+這個網站同時處理三種來源完全不同的資料，它們在頁面上看起來一樣，
+在系統裡卻走三條不同的路徑。
 
+<div class="sys-strata">
 
-![Image01](/work/typhoon-web/SIGN.png)
-<Grid variant="bento">
-![Image01](/work/typhoon-web/LOGOALL.png)
+<div class="sys-stratum sys-stratum--live">
 
+<span class="sys-stratum__tag">來源 A</span>
 
-</Grid>
+### 外部即時資料
 
-  ![Image01](/work/typhoon-web/Scene8.png)
+中央氣象署的累積雨量圖、Windy 的風速動態、衛星雲圖。
+這一層不自己造資料，也不進資料庫——直接引用與嵌入，
+時間軸交給資料源本身。
 
-<Grid cols={2}>
-  ![Image01](/work/typhoon-web/LOGO@.png)
-  ![Image01](/work/typhoon-web/typhoon_baby.png)
-</Grid>
+</div>
 
-![Image01](/work/typhoon-web/WED1.png)
-![Image01](/work/typhoon-web/WED2.png)
-![Image01](/work/typhoon-web/WED3.png)
-![Image01](/work/typhoon-web/WED4.png)
-![Image01](/work/typhoon-web/WED5.png)
-![Image01](/work/typhoon-web/WED6.png)
-![Image01](/work/typhoon-web/WED7.png)
-![Image01](/work/typhoon-web/WED8.png)
-![Image01](/work/typhoon-web/title.png)
-![Image01](/work/typhoon-web/aaa.png)
+<div class="sys-stratum sys-stratum--static">
+
+<span class="sys-stratum__tag">來源 B</span>
+
+### 編輯內容
+
+災害知識拆成災前預防、災中應對、災後援助三類，加上防颱準備。
+內容是預先寫好的，不會變動，所以走靜態頁。
+
+</div>
+
+<div class="sys-stratum sys-stratum--ugc">
+
+<span class="sys-stratum__tag">來源 C</span>
+
+### 使用者回報
+
+災害回報表單送出的內容。這一層才是 PHP 與 MySQL 真正在做的事——
+收進來、存起來、等審核、再放回公開頁面。
+
+</div>
+
+</div>
+
+## 網站架構
+
+![風視颱情 網站資訊架構圖](/work/typhoon-web/SIGN.png)
+
+七個區塊：header、首頁、颱風消息、災害知識、災情報告資訊、災害回報表單、關於我們、footer。
+把每個節點展開後可以看到欄位層級——災情報告資訊底下是受災人數與災害級別的簡介、
+實拍圖，以及災害類別、受災地點、狀況描述、回報人聯絡方式；
+災害回報表單底下則是同一組欄位的輸入端。
+
+**索引頁顯示什麼，表單就收什麼。** 這張圖是先畫的，欄位對應是照著它做的。
+
+<div class="sys-row">
+<div class="sys-row__text">
+
+## 颱風消息
+
+左側是各縣市即時溫度與天氣狀態的清單，右側嵌入中央氣象署的累積雨量圖，
+並附一個時間下拉選單，可以切換要看哪一個小時的累積值。
+
+風速另外做一頁全幅的即時動態，嵌 Windy 的風場圖層，
+底部保留原本的時間軸與播放鍵，可以往前後刷。
+
+</div>
+<div class="sys-row__media sys-row__media--stack">
+
+![各地資訊與雨量分布圖](/work/typhoon-web/WED2.png)
+![風速即時動態](/work/typhoon-web/WED6.png)
+
+</div>
+</div>
+
+<div class="sys-row sys-row--flip">
+<div class="sys-row__text">
+
+## 災害知識
+
+版面把衛星雲圖放在正中央，四個知識分類散在四角——
+災前預防、災中應對、災後援助，加上一段防颱準備的引言。
+
+排成環繞而不是清單，是因為這四件事沒有先後，
+使用者是在颱風的哪一個階段進來，就從哪一個角落開始讀。
+
+</div>
+<div class="sys-row__media">
+
+![災害知識頁：衛星雲圖與四個分類](/work/typhoon-web/WED3.png)
+
+</div>
+</div>
+
+<div class="sys-row">
+<div class="sys-row__text">
+
+## 災情報告索引
+
+通過審核的回報會排成卡片牆：縣市標籤、災情類型、狀況描述、實拍圖。
+右側固定一張台灣圖，滑到哪一縣市就highlight哪一塊，
+並顯示該縣市的災情筆數。卡片下方分頁。
+
+點任一張卡片會開啟燈箱，把完整描述與未縮小的實拍圖放大——
+索引頁只給摘要，細節留給點進去的人。
+
+</div>
+<div class="sys-row__media sys-row__media--stack">
+
+![災情報告索引：卡片牆與災情地圖](/work/typhoon-web/WED7.png)
+![點開卡片後的燈箱](/work/typhoon-web/WED4.png)
+
+</div>
+</div>
+
+## 資料回到畫面上
+
+<div class="sys-loop">
+
+<div class="sys-node">
+<span>01</span>
+<strong>災害回報表單</strong>
+<p>實拍圖上傳、狀況描述、受災地點、發生時間、聯絡資訊、現場人員與器具。災害類別與受災縣市用下拉選單，讓後續能以固定值分類。</p>
+</div>
+
+<div class="sys-node">
+<span>02</span>
+<strong>PHP 接收</strong>
+<p>表單送出後由後端接手，處理欄位與上傳的圖檔。</p>
+</div>
+
+<div class="sys-node">
+<span>03</span>
+<strong>MySQL 儲存</strong>
+<p>一筆回報就是一列資料，欄位對應索引頁要顯示的每一格。</p>
+</div>
+
+<div class="sys-node sys-node--gate">
+<span>04</span>
+<strong>人工審核</strong>
+<p>表單頁上寫得很清楚：「靜待審核後，將會立即上傳至災情報告索引。」災情資訊不能收到就發，這一關是刻意留的。</p>
+</div>
+
+<div class="sys-node">
+<span>05</span>
+<strong>回到索引與地圖</strong>
+<p>通過的資料成為卡片牆上的一張卡，同時計入該縣市的災情筆數。回路在這裡閉合。</p>
+</div>
+
+</div>
+
+![災害回報表單](/work/typhoon-web/WED8.png)
+
+<div class="sys-row sys-row--flip">
+<div class="sys-row__text">
+
+## 識別設計
+
+標誌把颱風眼直接畫成一隻眼睛——「風視」兩個字的視覺解釋。
+做了明底、暗底、純標誌與組合標四種版本，因為網站本身同時有淺色與深色頁面。
+
+首頁的主視覺讓標語斜向穿過畫面：拯救台灣從你我做起、鄰家俊仔來救援、
+宥新哥哥到你家、HELP TAIWN、ONE HAND ONE⋯⋯像連續滾動的警示帶。
+
+另外畫了一隻颱風角色，作為災害本身的擬人化形象。
+
+</div>
+<div class="sys-row__media sys-row__media--stack">
+
+![標誌的四種版本](/work/typhoon-web/LOGOALL.png)
+![中文字標](/work/typhoon-web/title.png)
+
+</div>
+</div>
+
+![颱風角色](/work/typhoon-web/typhoon_baby.png)
+
+## 整體
+
+![多頁面配置](/work/typhoon-web/Scene8.png)
+![首頁主視覺](/work/typhoon-web/aaa.png)
+![頁尾](/work/typhoon-web/WED5.png)

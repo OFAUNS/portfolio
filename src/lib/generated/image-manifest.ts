@@ -1353,6 +1353,39 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/listen-and-speak/listen-speak-showcase-en.png": {
+        "src": "/work/listen-and-speak/listen-speak-showcase-en.png",
+        "width": 3507,
+        "height": 4966,
+        "aspectRatio": 0.7062,
+        "originalSize": 5954663,
+        "variants": [
+            {
+                "src": "/optimized/listen-speak-showcase-en-480.webp",
+                "width": 480,
+                "size": 44244,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/listen-speak-showcase-en-800.webp",
+                "width": 800,
+                "size": 110600,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/listen-speak-showcase-en-1200.webp",
+                "width": 1200,
+                "size": 214602,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/listen-speak-showcase-en-1600.webp",
+                "width": 1600,
+                "size": 327742,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/listen-and-speak/logo-en.png": {
         "src": "/work/listen-and-speak/logo-en.png",
         "width": 1254,
@@ -2172,6 +2205,21 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/projection-mapping/VP1.png": {
+        "src": "/work/projection-mapping/VP1.png",
+        "width": 726,
+        "height": 937,
+        "aspectRatio": 0.77481,
+        "originalSize": 414038,
+        "variants": [
+            {
+                "src": "/optimized/vp1-480.webp",
+                "width": 480,
+                "size": 12462,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/projection-mapping/vp.png": {
         "src": "/work/projection-mapping/vp.png",
         "width": 2560,
@@ -2634,6 +2682,39 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/sanctum-luminis/14.png": {
+        "src": "/work/sanctum-luminis/14.png",
+        "width": 1920,
+        "height": 1080,
+        "aspectRatio": 1.77778,
+        "originalSize": 1696867,
+        "variants": [
+            {
+                "src": "/optimized/14-480.webp",
+                "width": 480,
+                "size": 2348,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/14-800.webp",
+                "width": 800,
+                "size": 4446,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/14-1200.webp",
+                "width": 1200,
+                "size": 7240,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/14-1600.webp",
+                "width": 1600,
+                "size": 10272,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/sanctum-luminis/2.png": {
         "src": "/work/sanctum-luminis/2.png",
         "width": 1920,
@@ -2931,6 +3012,39 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/sanctum-luminis/LIGHT.jpg": {
+        "src": "/work/sanctum-luminis/LIGHT.jpg",
+        "width": 2467,
+        "height": 1107,
+        "aspectRatio": 2.22855,
+        "originalSize": 374052,
+        "variants": [
+            {
+                "src": "/optimized/light-480.webp",
+                "width": 480,
+                "size": 5662,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/light-800.webp",
+                "width": 800,
+                "size": 10510,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/light-1200.webp",
+                "width": 1200,
+                "size": 17850,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/light-1600.webp",
+                "width": 1600,
+                "size": 28312,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/sanctum-luminis/Untitled.png": {
         "src": "/work/sanctum-luminis/Untitled.png",
         "width": 1920,
@@ -3030,101 +3144,35 @@ export const imageManifest = {
             }
         ]
     },
-    "/work/touchdesigner-canvas/a1.png": {
-        "src": "/work/touchdesigner-canvas/a1.png",
-        "width": 2552,
-        "height": 1439,
-        "aspectRatio": 1.77345,
-        "originalSize": 3940726,
-        "variants": [
-            {
-                "src": "/optimized/a1-480.webp",
-                "width": 480,
-                "size": 22894,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/a1-800.webp",
-                "width": 800,
-                "size": 52578,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/a1-1200.webp",
-                "width": 1200,
-                "size": 95438,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/a1-1600.webp",
-                "width": 1600,
-                "size": 137716,
-                "type": "image/webp"
-            }
-        ]
-    },
-    "/work/touchdesigner-canvas/a2.png": {
-        "src": "/work/touchdesigner-canvas/a2.png",
+    "/work/touchdesigner-canvas/Smoke1.png": {
+        "src": "/work/touchdesigner-canvas/Smoke1.png",
         "width": 2559,
         "height": 1439,
         "aspectRatio": 1.77832,
         "originalSize": 1029023,
         "variants": [
             {
-                "src": "/optimized/a2-480.webp",
+                "src": "/optimized/smoke1-480.webp",
                 "width": 480,
                 "size": 2992,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/a2-800.webp",
+                "src": "/optimized/smoke1-800.webp",
                 "width": 800,
                 "size": 5384,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/a2-1200.webp",
+                "src": "/optimized/smoke1-1200.webp",
                 "width": 1200,
                 "size": 8656,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/a2-1600.webp",
+                "src": "/optimized/smoke1-1600.webp",
                 "width": 1600,
                 "size": 12556,
-                "type": "image/webp"
-            }
-        ]
-    },
-    "/work/touchdesigner-canvas/asdasd.png": {
-        "src": "/work/touchdesigner-canvas/asdasd.png",
-        "width": 4000,
-        "height": 3000,
-        "aspectRatio": 1.33333,
-        "originalSize": 14915314,
-        "variants": [
-            {
-                "src": "/optimized/asdasd-480.webp",
-                "width": 480,
-                "size": 12814,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/asdasd-800.webp",
-                "width": 800,
-                "size": 29984,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/asdasd-1200.webp",
-                "width": 1200,
-                "size": 60752,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/asdasd-1600.webp",
-                "width": 1600,
-                "size": 104042,
                 "type": "image/webp"
             }
         ]
@@ -3162,35 +3210,35 @@ export const imageManifest = {
             }
         ]
     },
-    "/work/touchdesigner-canvas/i2.png": {
-        "src": "/work/touchdesigner-canvas/i2.png",
+    "/work/touchdesigner-canvas/i1.png": {
+        "src": "/work/touchdesigner-canvas/i1.png",
         "width": 2559,
         "height": 1439,
         "aspectRatio": 1.77832,
-        "originalSize": 4261762,
+        "originalSize": 2391531,
         "variants": [
             {
-                "src": "/optimized/i2-480.webp",
+                "src": "/optimized/i1-480.webp",
                 "width": 480,
-                "size": 16498,
+                "size": 18482,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/i2-800.webp",
+                "src": "/optimized/i1-800.webp",
                 "width": 800,
-                "size": 36250,
+                "size": 43688,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/i2-1200.webp",
+                "src": "/optimized/i1-1200.webp",
                 "width": 1200,
-                "size": 80936,
+                "size": 84486,
                 "type": "image/webp"
             },
             {
-                "src": "/optimized/i2-1600.webp",
+                "src": "/optimized/i1-1600.webp",
                 "width": 1600,
-                "size": 141112,
+                "size": 130158,
                 "type": "image/webp"
             }
         ]
@@ -3243,6 +3291,39 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/touchdesigner-canvas/sand1.png": {
+        "src": "/work/touchdesigner-canvas/sand1.png",
+        "width": 2552,
+        "height": 1439,
+        "aspectRatio": 1.77345,
+        "originalSize": 3940726,
+        "variants": [
+            {
+                "src": "/optimized/sand1-480.webp",
+                "width": 480,
+                "size": 22894,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/sand1-800.webp",
+                "width": 800,
+                "size": 52578,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/sand1-1200.webp",
+                "width": 1200,
+                "size": 95438,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/sand1-1600.webp",
+                "width": 1600,
+                "size": 137716,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/touchdesigner-canvas/tes1.png": {
         "src": "/work/touchdesigner-canvas/tes1.png",
         "width": 2559,
@@ -3272,6 +3353,72 @@ export const imageManifest = {
                 "src": "/optimized/tes1-1600.webp",
                 "width": 1600,
                 "size": 157398,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/touchdesigner-canvas/water.png": {
+        "src": "/work/touchdesigner-canvas/water.png",
+        "width": 4000,
+        "height": 3000,
+        "aspectRatio": 1.33333,
+        "originalSize": 14915314,
+        "variants": [
+            {
+                "src": "/optimized/water-480.webp",
+                "width": 480,
+                "size": 12814,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water-800.webp",
+                "width": 800,
+                "size": 29984,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water-1200.webp",
+                "width": 1200,
+                "size": 60752,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water-1600.webp",
+                "width": 1600,
+                "size": 104042,
+                "type": "image/webp"
+            }
+        ]
+    },
+    "/work/touchdesigner-canvas/water1.png": {
+        "src": "/work/touchdesigner-canvas/water1.png",
+        "width": 2559,
+        "height": 1439,
+        "aspectRatio": 1.77832,
+        "originalSize": 4261762,
+        "variants": [
+            {
+                "src": "/optimized/water1-480.webp",
+                "width": 480,
+                "size": 16498,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water1-800.webp",
+                "width": 800,
+                "size": 36250,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water1-1200.webp",
+                "width": 1200,
+                "size": 80936,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/water1-1600.webp",
+                "width": 1600,
+                "size": 141112,
                 "type": "image/webp"
             }
         ]

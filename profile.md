@@ -63,6 +63,10 @@
 - 影片：https://youtu.be/cHJTyUgpuEU
 - 製作團隊：OFAUNS（Film / Graph Design / Aftermovie）、Prince（3DFilm）
 - 描述：實地取材龍岡當地米干，應用於攝影棚拍攝內容，利用 LED 牆虛擬攝影棚拍攝特效背景與實體融合的效果。加上燈光的掌控，以及 DaVinci Resolve 後製的疊加，呈現高質感的廣告宣傳片。負責燈光以及腳本設計，開頭以特寫食物的鏡頭體現質感，至五言絕句增添詩意，並加上食神的經典橋段，使畫面更有張力。
+- 腳本三幕（版面即依此順序）：
+  - 幕一 質感 `vd`～`vd3`（9 顆）——特寫食物，白棚亮調、淺景深
+  - 幕二 詩意 `vd4`～`vd7`（4 顆）——黑底直排書法字卡（含「一路到臺灣」），全片唯一的休止符；**五言絕句原文待作者提供**
+  - 幕三 張力 `vd8`～`vd13`（6 顆）——上菜與誇張表情，背景換成飽和藍色光柱，對比拉到最大
 
 ### 2. TouchDesigner 元素人形畫布互動設計
 - 分類：Interaction-Design｜客戶：YZU｜日期：2025-10-28
@@ -70,12 +74,27 @@
 - 影片：https://youtu.be/jTVDYr7yCNI
 - 製作團隊：OFAUNS（Interaction-Design / Graph Design / Aftermovie）
 - 描述：以「存在主義與時間」為核心主題，結合互動投影與感測裝置，讓觀者在三分鐘內以自身動作於虛擬畫布上創作。作品藉由「存在的消逝與痕跡的留存」探討時間的意義，並以帶有殘影感的極簡光影美學呈現。體驗「存在的瞬間性」與「痕跡的延續性」——人的形體會消散，但行為留下的痕跡仍被世界記錄，與他人共構時間的網絡；此作品的關係美學不只發生在人與人之間，更存在於「人與時間」的互動之中。
+- 三種元素（各有兩版素材，第二版為集中在畫面中央的構圖）：
+  - 沙 `SAND.jpg` / `sand1.png`——金黃顆粒聚成人形，顆粒往下堆積，三者中痕跡留存最久
+  - 煙 `SMOKE.jpg` / `Smoke1.png`——灰白色放射狀擴散，沒有邊界，消散最快
+  - 水 `water.png` / `water1.png`——藍色流體漩渦帶等高線紋路，痕跡是持續外推的波紋
+- 版面：圖框維持一般方框，元素身分由動畫承擔並照真實物理——沙 ease-in 加速下墜且落底堆積、煙上升同時膨脹變淡、水的同心波紋外推衰減。
+- 後台製作畫面：`i1.png`（TouchDesigner sand man V2.2.toe 節點網路）、`tes1.png`（water V2.3.toe）、`asds.png`。三個元素各自是獨立專案，節點接感測輸入與音訊即時運算後輸出投影。
 
-### 3. 風視台情 - 颱風救災後端 PHP 網頁
+### 3. 風視颱情 - 颱風救災後端 PHP 網頁
 - 分類：Web-Design｜客戶：YZU｜日期：2024-10-28
 - 角色：Web Design, Graph Design, Backend Framework
 - 製作團隊：OFAUNS（Web Design / Graph Design / Backend Framework）
 - 描述：以颱風災害救援為核心，架設 HTML + jQuery 設計網站，連結 PHP 後端和 MySQL 資料庫，儲存並上傳資料至網站。
+- 三種資料來源（頁面依資料路徑編排）：
+  - 外部即時資料：中央氣象署累積雨量圖（附時段下拉選單）、Windy 風速動態、衛星雲圖——引用與嵌入，不進資料庫
+  - 編輯內容：災害知識分為災前預防／災中應對／災後援助，另有防颱準備引言，走靜態頁
+  - 使用者回報：災害回報表單送出後由 PHP 接收、寫入 MySQL，經人工審核才出現在公開頁面
+- 資料回路：回報表單 → PHP 接收 → MySQL 儲存 → 人工審核 → 災情報告索引與災情地圖
+- 站台功能：颱風消息（各縣市溫度、雨量分布圖、風速即時動態）、災害知識、災情報告索引（縣市標籤卡片牆＋台灣災情地圖＋分頁＋燈箱）、災害回報表單、關於我們
+- 表單欄位：實拍圖上傳、狀況描述、受災地點、發生時間、聯絡資訊、現場人員與器具；災害類別與受災縣市為下拉選單
+- 資訊架構：`/work/typhoon-web/SIGN.png` 為作者自繪的完整站台架構圖，索引頁顯示欄位與回報表單收集欄位照同一張圖對應
+- 識別設計：標誌把颱風眼畫成眼睛（明底／暗底／純標誌／組合標四版）、中文字標、斜向滾動標語主視覺、颱風角色
 
 ### 4. Blender 3D動畫 - 光的記憶 - Sanctum Luminis
 - 分類：Animation｜客戶：YZU｜日期：2025-10-28
@@ -83,6 +102,8 @@
 - 影片：https://youtu.be/eM8wSplagME
 - 製作團隊：OFAUNS（Animation / Camera / 3D Object / Graph Design / Aftermovie）、Sanctum Luminis（3DAnimation）
 - 描述（英文原文）：The starting point of this project is to build upon elements rich in mythology: a bird, a church, and stained glass. A story is woven from these mythic elements, inviting vast imagination. The bird becomes an explorer — representing an individual, a group, or any form of life, or perhaps simply a bird. The church symbolizes life's journey, and the different colored lights represent the various states and encounters within that life, symbolizing the changes and growth of life.
+- 版面：全站唯一的亮色作品頁（其他皆為深色底），因為作品本身談的就是光。斜射光柱貫穿整頁當結構，鳥的航線橫過版面越飛越大越亮當閱讀動線，教堂只留細線拱窗輪廓。
+- 五段際遇（依現有圖片順序分段，各自一種光色）：GOLD 啟程 / BLUE 探索 / VIOLET 迷失 / COLD 試煉 / WARM 成長。
 
 ### 5. 立體光雕投影 多平面立體動態設計
 - 分類：Animation｜客戶：YZU｜日期：2023-10-28
@@ -90,6 +111,8 @@
 - 影片：https://youtu.be/qzVbiAtYpRE
 - 製作團隊：OFAUNS（Animation / Graph Design / Aftermovie）
 - 描述：運用 p5.js 製作上半部側邊邏輯性的動畫，以定義圖形 random 的圖形構成多彩和不規則的特效。AE 做中間及底部特效展延，以原有的圖形做特效的延伸及填充做動態變化，呈現出連貫的動畫。多面結合展出二分鐘的立體光雕藝術設計。
+- 實體投影物為五面（`VP1.png` 為實拍）：上面兩個往內收的斜面、前上方一片菱形、下面兩個外緣外斜再收攏的五邊形面。版面用 clip-path 照此造型切版。
+- 分工：上面兩面 p5.js 生成圖形；前上方菱形 AE 特效展延；下面兩面 AE 填充與動態變化。
 
 ### 6. circle test1（AE 圓形動畫試作）
 - 分類：Animation｜客戶：YZU｜日期：2023-10-28

@@ -2,6 +2,7 @@
 import "@/styles/globals.css";
 import { ClientRouter } from "astro:transitions";
 import GoldenGrid from "@/components/GoldenGrid.astro";
+import { buildGoldenCells, resolvePreset } from "@/lib/goldenGrid";
 
 interface Props {
     title: string;
@@ -23,6 +24,10 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = new URL(image, Astro.url);
+// 換頁轉場的遮罩本體＝可見的那組黃金比例方格。用同一份資料算，
+// 座標與大小才會完全對齊（有大有小，不是均分格）。
+const flipCells = buildGoldenCells(resolvePreset(grid));
+
 ---
 
 <!doctype html>
@@ -130,45 +135,87 @@ const socialImageURL = new URL(image, Astro.url);
                     true,
                 );
 
+                // 覆蓋層的方格：依離點擊處的距離排先後，近的先翻掉
+                const primeCells = (origin) => {
+                    const layer = document.getElementById("page-flip");
+                    if (!layer) return null;
+                    const cells = layer.querySelectorAll(".page-flip__cell");
+                    // 座標一定要夾在視窗內：鍵盤操作、或連結本身在畫面外時，
+                    // clientX/Y 可能是負的或遠超過視窗高度，
+                    // 圓心跑出去會讓半徑與每格的延遲全部算爆。
+                    const clamp = (v, max) => Math.min(Math.max(v, 0), max);
+                    const x = origin
+                        ? clamp(origin.x, window.innerWidth)
+                        : window.innerWidth / 2;
+                    const y = origin
+                        ? clamp(origin.y, window.innerHeight)
+                        : window.innerHeight / 2;
+                    const far = Math.hypot(window.innerWidth, window.innerHeight);
+                    cells.forEach((cell) => {
+                        const r = cell.getBoundingClientRect();
+                        const d = Math.hypot(
+                            r.left + r.width / 2 - x,
+                            r.top + r.height / 2 - y,
+                        );
+                        cell.style.setProperty("--pf-d", `${Math.round((d / far) * 420)}ms`);
+                    });
+                    layer.style.setProperty("--pf-x", `${x}px`);
+                    layer.style.setProperty("--pf-y", `${y}px`);
+                    layer.style.setProperty(
+                        "--pf-r",
+                        `${Math.hypot(
+                            Math.max(x, window.innerWidth - x),
+                            Math.max(y, window.innerHeight - y),
+                        )}px`,
+                    );
+                    return layer;
+                };
+
+                const PF_SPREAD_MS = 520;
+                const prefersReduced = () =>
+                    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+                // 旗標放在 closure，不放 <html> dataset——ClientRouter 換頁時
+                // 會用新文件的 <html> 屬性整組覆蓋，dataset 會被沖掉。
+                let flipPending = false;
+
+                // 擴散要跑完才換頁，否則 swap 會在半路把它切斷。
+                // before-preparation 的 loader 可以包起來延後。
+                document.addEventListener("astro:before-preparation", (event) => {
+                    if (document.documentElement.dataset.themeSwitching) return;
+                    if (prefersReduced()) return;
+
+                    const layer = primeCells(wipeOrigin);
+                    if (!layer) return;
+
+                    flipPending = true;
+                    layer.classList.remove("is-covered", "is-flipping");
+                    layer.classList.add("is-spreading");
+
+                    const original = event.loader;
+                    event.loader = async () => {
+                        await original();
+                        await new Promise((resolve) =>
+                            window.setTimeout(resolve, PF_SPREAD_MS),
+                        );
+                    };
+                });
+
                 document.addEventListener("astro:before-swap", (event) => {
                     const transition = event.viewTransition;
                     const root = document.documentElement;
                     if (!transition) return;
-
-                    // 主題切換自己有一套演出，不要疊上來
                     if (root.dataset.themeSwitching) return;
 
                     wipeActive = true;
                     root.dataset.pageWipe = "true";
+                    if (flipPending) root.dataset.pageFlip = "spread";
 
-                    transition.ready
-                        .then(() => {
-                            const x = wipeOrigin
-                                ? wipeOrigin.x
-                                : window.innerWidth / 2;
-                            const y = wipeOrigin
-                                ? wipeOrigin.y
-                                : window.innerHeight / 2;
-                            const radius = Math.hypot(
-                                Math.max(x, window.innerWidth - x),
-                                Math.max(y, window.innerHeight - y),
-                            );
-
-                            root.animate(
-                                {
-                                    clipPath: [
-                                        `circle(0px at ${x}px ${y}px)`,
-                                        `circle(${radius}px at ${x}px ${y}px)`,
-                                    ],
-                                },
-                                {
-                                    duration: 700,
-                                    easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
-                                    pseudoElement: "::view-transition-new(root)",
-                                },
-                            );
-                        })
-                        .catch(() => {});
+                    // 覆蓋層接手整段演出後，view transition 的動畫被 CSS 停用，
+                    // 這顆 promise 會以 AbortError / InvalidStateError 被 reject。
+                    // 沒人接就會變成 unhandled rejection，每導覽一次噴一次。
+                    transition.ready.catch(() => {});
+                    transition.updateCallbackDone?.catch(() => {});
 
                     transition.finished
                         .catch(() => {})
@@ -177,6 +224,41 @@ const socialImageURL = new URL(image, Astro.url);
                             delete root.dataset.pageWipe;
                             wipeOrigin = null;
                         });
+                });
+
+                // swap 之後接手新文件裡的同一層覆蓋層。此刻它已經是全滿的色板，
+                // 所以接縫看不出來；接著方格帶著這個色板做 3D 翻面並淡出，
+                // 露出底下原本色板的新頁。
+                document.addEventListener("astro:after-swap", () => {
+                    const root = document.documentElement;
+                    if (!flipPending) return;
+
+                    // dataset 被新文件覆蓋掉了，要重新標上，
+                    // 否則停用 view-transition 動畫的 CSS 會失效。
+                    root.dataset.pageFlip = "spread";
+
+                    const layer = primeCells(wipeOrigin);
+                    if (!layer) {
+                        flipPending = false;
+                        delete root.dataset.pageFlip;
+                        return;
+                    }
+
+                    layer.classList.remove("is-spreading");
+                    layer.classList.add("is-covered");
+
+                    // 用 timeout 不用 requestAnimationFrame：頁面若在背景分頁
+                    // （或視窗被收合），rAF 會整個停住，這一段就永遠不會開始。
+                    // 只是要讓瀏覽器先畫出「已蓋滿」那一格，timeout 就夠了。
+                    window.setTimeout(() => {
+                        layer.classList.add("is-flipping");
+                    }, 32);
+
+                    window.setTimeout(() => {
+                        layer.classList.remove("is-covered", "is-flipping");
+                        flipPending = false;
+                        delete root.dataset.pageFlip;
+                    }, 1500);
                 });
             }
         </script>
@@ -224,6 +306,19 @@ const socialImageURL = new URL(image, Astro.url);
             <span></span>
         </div>
         <GoldenGrid preset={grid} accent={accent} />
+
+        <!-- 換頁轉場的色板覆蓋層。標記必須寫在 Layout，新舊兩份文件才都有它，
+             swap 之後才能無縫接著把方格翻掉。平常完全不佔畫面。 -->
+        <div id="page-flip" class="page-flip" aria-hidden="true">
+            {
+                flipCells.map((cell) => (
+                    <span
+                        class="page-flip__cell"
+                        style={`left:${cell.x}%;top:${cell.y}%;width:${cell.size}%;--pf-i:${cell.index}`}
+                    />
+                ))
+            }
+        </div>
 
         <div id="page-content">
             <slot />

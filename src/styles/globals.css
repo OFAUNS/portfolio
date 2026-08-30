@@ -5592,27 +5592,83 @@ html[data-page-wipe]::view-transition-new(root) {
 }
 
 /* --- 內文沿中線左右分立，圖片橫跨中線 --- */
-.case-layout-dialogue .work-case-body > h2,
-.case-layout-dialogue .work-case-body > p,
-.case-layout-dialogue .work-case-body > blockquote {
-  max-width: 46ch;
+/* --- 左右分欄：文字一側、圖片一側，中線正好落在兩欄的間隙 ---
+   先前用 h2:nth-of-type(even) ~ p 做交錯，但 `~` 會 match 到所有後續段落，
+   造成標題在左、內文卻在右。改成在 mdx 用明確的 .ls-row 包起來。 */
+.ls-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: start;
+  margin: clamp(2.5rem, 7vw, 5rem) 0;
 }
 
-.case-layout-dialogue .work-case-body > h2:nth-of-type(even),
-.case-layout-dialogue .work-case-body > h2:nth-of-type(even) ~ p {
-  margin-inline-start: auto;
+.ls-row--flip .ls-row__text {
+  order: 2;
 }
 
-.case-layout-dialogue .work-case-body > h2 {
+.ls-row--flip .ls-row__media {
+  order: 1;
+}
+
+/* 欄本身已經限寬，裡面的元素不需要再吃 46ch */
+.ls-row__text > * {
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+.ls-row__text > h1,
+.ls-row__text > h2 {
   border-inline-start: 2px solid var(--ls-cyan);
   padding-inline-start: 0.9rem;
 }
 
-.case-layout-dialogue .work-case-body > h2:nth-of-type(even) {
+.ls-row--flip .ls-row__text > h2 {
   border-inline-start: 0;
   border-inline-end: 2px solid var(--ls-mag);
   padding-inline: 0 0.9rem;
   text-align: end;
+}
+
+.ls-row__media > p {
+  max-width: none !important;
+  margin: 0;
+}
+
+.ls-row__media--stack > p {
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1.1rem);
+}
+
+/* 高度交給圖自己決定：配上 object-fit: contain，一旦限制高度，
+   盒子就會比圖高，上下留出黑帶——不是裁切，但一樣讓版面變空。 */
+.ls-row__media img {
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* 方形或直式的圖被拉成整幅寬時，contain 會在左右留白。
+   收尾字標另外收斂寬度並置中。 */
+.ls-endmark {
+  max-width: min(30rem, 60%);
+  margin-inline: auto;
+}
+
+.case-layout-dialogue .work-case-body img {
+  height: auto !important;
+}
+
+/* 沒有被包進 ls-row 的獨立圖片：整幅橫跨中線 */
+.case-layout-dialogue .work-case-body > p:has(img) {
+  max-width: none;
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1.2rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.case-layout-dialogue .work-case-body > blockquote {
+  max-width: none;
 }
 
 .case-layout-dialogue .work-case-body img {
@@ -5694,18 +5750,16 @@ html[data-page-wipe]::view-transition-new(root) {
     display: none;
   }
 
-  .case-layout-dialogue .work-case-body > h2,
-  .case-layout-dialogue .work-case-body > p,
-  .case-layout-dialogue .work-case-body > blockquote {
-    max-width: none;
+  .ls-row {
+    grid-template-columns: 1fr;
   }
 
-  .case-layout-dialogue .work-case-body > h2:nth-of-type(even),
-  .case-layout-dialogue .work-case-body > h2:nth-of-type(even) ~ p {
-    margin-inline-start: 0;
+  .ls-row--flip .ls-row__text,
+  .ls-row--flip .ls-row__media {
+    order: 0;
   }
 
-  .case-layout-dialogue .work-case-body > h2:nth-of-type(even) {
+  .ls-row--flip .ls-row__text > h2 {
     border-inline-start: 2px solid var(--ls-mag);
     border-inline-end: 0;
     padding-inline: 0.9rem 0;
@@ -5815,4 +5869,2135 @@ html[data-page-wipe]::view-transition-new(root) {
   .ls-side {
     text-shadow: none;
   }
+}
+
+/* ==========================================================================
+   風視颱情 專屬版面（.case-layout-system）
+   這件作品的重點是資料的路徑，不是畫面本身，所以版面照著路徑排：
+   先把三種來源疊成剖面，再用左右分欄逐段對照介面，
+   最後用一條閉合的回路把「回報 → 儲存 → 審核 → 回到索引」收起來。
+   ========================================================================== */
+
+.case-layout-system {
+  --sys-live: #60a5fa;
+  --sys-static: #94a3b8;
+  --sys-ugc: #34d399;
+  --case-surface: color-mix(in oklch, var(--background) 84%, #04141b 16%);
+}
+
+/* --- 三種來源疊成剖面 --- */
+.sys-strata {
+  display: grid;
+  gap: 2px;
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  border-inline-start: 2px solid color-mix(in oklch, var(--sys-static) 40%, transparent);
+}
+
+.sys-stratum {
+  position: relative;
+  padding: clamp(1rem, 2.4vw, 1.6rem) clamp(1.1rem, 3vw, 2rem);
+  background: color-mix(in oklch, var(--tier, var(--sys-static)) 7%, transparent);
+  border-inline-start: 4px solid var(--tier, var(--sys-static));
+}
+
+.sys-stratum--live {
+  --tier: var(--sys-live);
+}
+
+.sys-stratum--static {
+  --tier: var(--sys-static);
+}
+
+.sys-stratum--ugc {
+  --tier: var(--sys-ugc);
+}
+
+.sys-stratum__tag {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  letter-spacing: 0.26em;
+  color: var(--tier);
+}
+
+.sys-stratum h3 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.05rem, 1.9vw, 1.35rem);
+}
+
+.sys-stratum p {
+  margin: 0;
+  max-width: none;
+}
+
+/* --- 說明與畫面左右對照 --- */
+.sys-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.2rem, 3.6vw, 3rem);
+  align-items: start;
+  margin: clamp(2rem, 5vw, 3.4rem) 0;
+}
+
+.sys-row--flip .sys-row__text {
+  order: 2;
+}
+
+.sys-row__text > h2 {
+  margin-top: 0;
+  padding-inline-start: 0.9rem;
+  border-inline-start: 2px solid var(--sys-ugc);
+}
+
+.sys-row__text p {
+  max-width: none;
+}
+
+.sys-row__media {
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1.1rem);
+}
+
+.sys-row__media img {
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* --- 閉合的回路 --- */
+.sys-loop {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: clamp(0.7rem, 2vw, 1.2rem);
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0 clamp(2.4rem, 5vw, 3.4rem);
+  position: relative;
+}
+
+.sys-node {
+  padding: clamp(0.9rem, 2.2vw, 1.3rem);
+  border: 1px solid color-mix(in oklch, var(--sys-ugc) 32%, var(--border));
+  background: color-mix(in oklch, var(--sys-ugc) 5%, transparent);
+}
+
+.sys-node span {
+  display: block;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  color: var(--sys-ugc);
+}
+
+.sys-node strong {
+  display: block;
+  margin: 0.35rem 0 0.5rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+}
+
+.sys-node p {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.82rem, 1.3vw, 0.92rem);
+  line-height: 1.7;
+}
+
+/* 審核那一關是刻意停下來的，用虛線邊界跟其他節點區分 */
+.sys-node--gate {
+  border-style: dashed;
+  border-color: color-mix(in oklch, var(--sys-live) 55%, transparent);
+  background: color-mix(in oklch, var(--sys-live) 7%, transparent);
+}
+
+.sys-node--gate span,
+.sys-node--gate strong {
+  color: var(--sys-live);
+}
+
+/* 回路的閉合：最後一格自己指回第一格。
+   節點會依容器寬度換行，所以不用跨欄的線去畫閉合——換行後那條線一定是錯的。 */
+.sys-node:last-child {
+  border-color: color-mix(in oklch, var(--sys-ugc) 60%, transparent);
+}
+
+.sys-node:last-child::after {
+  content: "↺ 回到 01";
+  display: block;
+  margin-top: 0.7rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  color: var(--sys-ugc);
+}
+
+/* --- 圖片一律完整呈現 ---
+   全站預設 16/9 + cover 會把截圖裁掉，這件作品每一張都是網站畫面或架構圖，
+   裁掉就看不出在講什麼。基礎規則帶 :has() 比這裡 specific，只能用 important。 */
+.case-layout-system .work-case-body img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: min(86vh, 58rem);
+  padding: 0 !important;
+  background: color-mix(in oklch, var(--background) 92%, #04141b 8%);
+}
+
+.case-layout-system .work-case-body > p:has(img) {
+  max-width: none;
+}
+
+.case-layout-system .work-case-body > blockquote {
+  max-width: none;
+}
+
+@media (max-width: 860px) {
+  .sys-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sys-row--flip .sys-row__text {
+    order: 0;
+  }
+
+  .sys-node:last-child::after {
+    margin-top: 0.5rem;
+  }
+}
+
+/* ==========================================================================
+   密碼學學習遊戲 專屬版面（.case-layout-product）
+   作品的結構是一條線：四關逐漸揭露真相、密碼技術同步加難，
+   而第一關可略過的謎題決定第四關的結局。
+   所以版面沿著一條貫穿的流線往下走，並把那個分歧點畫出來。
+   ========================================================================== */
+
+.case-layout-product {
+  --cg-peer: #5ddcff;
+  --cg-mentor: #b8ff70;
+  --cg-grader: #ffb35d;
+  --case-surface: color-mix(in oklch, var(--background) 84%, #030f18 16%);
+}
+
+/* --- 論文標記 --- */
+.cg-paper {
+  margin: 0 0 clamp(1.4rem, 4vw, 2.2rem);
+  padding: clamp(0.8rem, 2vw, 1.1rem) clamp(1.1rem, 3vw, 1.7rem);
+  border: 1px solid color-mix(in oklch, var(--cg-peer) 38%, transparent);
+  background: color-mix(in oklch, var(--cg-peer) 7%, transparent);
+}
+
+.cg-paper p {
+  margin: 0;
+  max-width: none;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.74rem, 1.1vw, 0.86rem);
+  letter-spacing: 0.16em;
+  color: var(--cg-peer);
+}
+
+/* --- 技術棧 --- */
+.cg-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: clamp(0.6rem, 1.8vw, 1rem);
+  margin: clamp(1.6rem, 4vw, 2.4rem) 0;
+}
+
+.cg-stack__item {
+  padding: clamp(0.9rem, 2.2vw, 1.2rem);
+  border: 1px solid color-mix(in oklch, var(--cg-peer) 22%, var(--border));
+}
+
+.cg-stack__item span {
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  color: color-mix(in oklch, var(--foreground) 52%, transparent);
+}
+
+.cg-stack__item strong {
+  display: block;
+  margin: 0.3rem 0 0.2rem;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  color: var(--cg-peer);
+}
+
+.cg-stack__item p {
+  margin: 0;
+  max-width: none;
+  font-size: 0.85rem;
+}
+
+/* --- 三重角色 --- */
+.cg-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: clamp(0.7rem, 2vw, 1.2rem);
+  margin: clamp(1.4rem, 3.5vw, 2.2rem) 0;
+}
+
+.cg-role {
+  padding: clamp(1rem, 2.4vw, 1.4rem);
+  border-top: 3px solid var(--role, var(--cg-peer));
+  background: color-mix(in oklch, var(--role, var(--cg-peer)) 6%, transparent);
+}
+
+.cg-role--peer {
+  --role: var(--cg-peer);
+}
+
+.cg-role--mentor {
+  --role: var(--cg-mentor);
+}
+
+.cg-role--grader {
+  --role: var(--cg-grader);
+}
+
+.cg-role span {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 900;
+  color: var(--role);
+}
+
+.cg-role p {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.85rem, 1.35vw, 0.95rem);
+  line-height: 1.75;
+}
+
+/* --- 關卡流線：左側一條線貫穿四關 --- */
+.cg-track {
+  position: relative;
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding-inline-start: clamp(1.6rem, 4vw, 2.8rem);
+}
+
+.cg-track::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.9rem;
+  inset-inline-start: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--cg-peer) 0%,
+    var(--cg-mentor) 62%,
+    var(--cg-grader) 100%
+  );
+}
+
+.cg-stage {
+  position: relative;
+  margin-bottom: clamp(2rem, 5vw, 3.2rem);
+}
+
+/* 節點：坐在流線上 */
+.cg-stage::before {
+  content: "";
+  position: absolute;
+  top: 0.85rem;
+  inset-inline-start: calc(clamp(1.6rem, 4vw, 2.8rem) * -1 - 5px);
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--cg-peer);
+  background: var(--background);
+}
+
+.cg-stage--final::before {
+  border-color: var(--cg-grader);
+  background: var(--cg-grader);
+}
+
+.cg-stage__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
+}
+
+.cg-stage__no {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  color: var(--cg-peer);
+}
+
+.cg-stage__head h3 {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+}
+
+.cg-stage__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-inline-start: auto;
+}
+
+.cg-stage__tags span {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid color-mix(in oklch, var(--cg-mentor) 40%, transparent);
+  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
+  color: var(--cg-mentor);
+}
+
+.cg-stage--final .cg-stage__tags span {
+  border-color: color-mix(in oklch, var(--cg-grader) 45%, transparent);
+  color: var(--cg-grader);
+}
+
+.cg-stage__body p {
+  max-width: none;
+}
+
+/* --- 結局分歧 --- */
+.cg-branch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem clamp(1rem, 3vw, 2.4rem);
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding: clamp(1rem, 2.6vw, 1.5rem);
+  border: 1px dashed color-mix(in oklch, var(--cg-grader) 50%, transparent);
+  text-align: center;
+}
+
+.cg-branch span {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.78rem, 1.2vw, 0.9rem);
+  letter-spacing: 0.16em;
+  color: var(--cg-grader);
+}
+
+.cg-branch em {
+  font-style: normal;
+  font-size: clamp(0.9rem, 1.7vw, 1.15rem);
+}
+
+/* --- 圖組 --- */
+.cg-shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: clamp(0.5rem, 1.4vw, 0.9rem);
+  margin: clamp(1rem, 2.6vw, 1.6rem) 0;
+}
+
+.cg-shots--pair {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.cg-shots p {
+  margin: 0;
+}
+
+/* --- 圖片完整呈現 ---
+   遊戲截圖是直式手機畫面，被裁掉就看不到謎題本身。 */
+.case-layout-product .work-case-body img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: min(80vh, 46rem);
+  padding: 0 !important;
+  background: color-mix(in oklch, var(--background) 92%, #030f18 8%);
+}
+
+.case-layout-product .work-case-body > p:has(img),
+.case-layout-product .work-case-body > blockquote {
+  max-width: none;
+}
+
+/* --- 研究結果 --- */
+.cg-findings {
+  margin: clamp(1.4rem, 3.5vw, 2.2rem) 0;
+}
+
+.cg-findings blockquote {
+  margin: 0;
+  padding: clamp(1.1rem, 3vw, 1.8rem);
+  border-inline-start: 3px solid var(--cg-mentor);
+  background: color-mix(in oklch, var(--cg-mentor) 6%, transparent);
+}
+
+.cg-findings blockquote p {
+  max-width: none;
+  line-height: 1.9;
+}
+
+@media (max-width: 720px) {
+  .cg-stage__tags {
+    margin-inline-start: 0;
+  }
+
+  .cg-shots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 聽說：英文展示板是一張直式長海報，比內文其他圖都高。
+   走全站的 contain 規則會被 58rem 的上限壓到很小，所以單獨放寬。 */
+.ls-board {
+  margin: clamp(2rem, 5vw, 3.5rem) 0;
+}
+
+.case-layout-dialogue .ls-board img {
+  max-height: none !important;
+  max-width: min(52rem, 100%);
+  margin-inline: auto;
+  display: block;
+  border: 1px solid color-mix(in oklch, var(--ls-mag) 22%, transparent);
+}
+
+/* ==========================================================================
+   龍岡米干 專屬版面（.case-layout-film）
+   整頁是一條底片：齒孔貫穿內文兩側、鏡頭號碼壓在每一格底下當結構，
+   三幕依腳本順序往下走，中間那一幕是全片唯一的白場。
+   ========================================================================== */
+
+.case-layout-film {
+  --fm-amber: #e8a765;
+  --fm-warm: #f0c98a;
+  --case-surface: color-mix(in oklch, var(--background) 84%, #150e06 16%);
+}
+
+.fm-strip {
+  position: relative;
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding-inline: clamp(1.6rem, 3.2vw, 2.4rem);
+  counter-reset: fmshot;
+}
+
+/* 片基與齒孔：暗色邊條 + 挖空的圓角齒孔，不是亮色塊上打黑洞 */
+.fm-strip::before,
+.fm-strip::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(1.1rem, 2.2vw, 1.6rem);
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 0.55rem,
+      color-mix(in oklch, var(--background) 96%, #000 4%) 0.55rem 1.35rem,
+      transparent 1.35rem 1.9rem
+    ),
+    color-mix(in oklch, var(--foreground) 9%, transparent);
+  border-inline: 1px solid color-mix(in oklch, var(--fm-amber) 26%, transparent);
+  pointer-events: none;
+}
+
+.fm-strip::before { inset-inline-start: 0; }
+.fm-strip::after { inset-inline-end: 0; }
+
+.fm-act {
+  position: relative;
+  padding-block: clamp(1.4rem, 3vw, 2.2rem);
+  border-top: 1px solid color-mix(in oklch, var(--fm-amber) 24%, transparent);
+}
+
+.fm-act:first-child { border-top: 0; }
+
+.fm-act__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.fm-act__no {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.7rem, 1.1vw, 0.82rem);
+  letter-spacing: 0.32em;
+  color: var(--fm-amber);
+}
+
+.fm-act__head h2 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.fm-act__head em {
+  font-style: normal;
+  font-size: clamp(0.78rem, 1.2vw, 0.9rem);
+  color: color-mix(in oklch, var(--foreground) 55%, transparent);
+}
+
+.fm-act p {
+  max-width: none;
+}
+
+/* 每一格帶鏡頭號碼 */
+.fm-frames {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: clamp(0.35rem, 1vw, 0.6rem);
+  margin-top: clamp(0.9rem, 2vw, 1.4rem);
+}
+
+.fm-frames > p {
+  position: relative;
+  margin: 0 !important;
+  counter-increment: fmshot;
+}
+
+.fm-frames > p::after {
+  content: counter(fmshot, decimal-leading-zero);
+  position: absolute;
+  left: 0.4rem;
+  bottom: 0.25rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.7rem;
+  color: color-mix(in oklch, var(--fm-warm) 82%, transparent);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+/* 幕二：全片唯一的白場 */
+.fm-act--poem {
+  background: #f0e9dd;
+  color: #14100c;
+  padding-inline: clamp(1.4rem, 3vw, 2.2rem);
+}
+
+.fm-act--poem .fm-act__no { color: #a06a1e; }
+.fm-act--poem .fm-act__head em { color: #7d7266; }
+.fm-act--poem p { color: #57503f; }
+
+.fm-poem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(1.2rem, 4vw, 3rem);
+  padding-block: clamp(1.4rem, 4vw, 2.6rem);
+}
+
+.fm-poem__text {
+  margin: 0 !important;
+  font-family: "Noto Serif TC", serif;
+  font-weight: 900;
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  line-height: 1.5;
+  letter-spacing: 0.22em;
+  color: #14100c !important;
+}
+
+.fm-poem__text span {
+  font-size: 0.55em;
+  font-weight: 400;
+  color: #9a8f80;
+  letter-spacing: 0.14em;
+}
+
+.fm-poem__note {
+  flex: 1 1 16rem;
+  margin: 0 !important;
+  font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+  line-height: 1.95;
+  color: #57503f !important;
+}
+
+/* 幕三：對比拉到最大 */
+.fm-act--climax {
+  background: linear-gradient(180deg, color-mix(in oklch, #1a0d12 60%, transparent), transparent 60%);
+}
+
+.fm-act--climax .fm-act__head h2 { color: var(--fm-amber); }
+
+/* 製作段 */
+.fm-craft {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1px;
+  margin: clamp(1.8rem, 4vw, 2.8rem) 0;
+  background: color-mix(in oklch, var(--fm-amber) 24%, transparent);
+  border: 1px solid color-mix(in oklch, var(--fm-amber) 24%, transparent);
+}
+
+.fm-craft__cell {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.1rem, 2.6vw, 1.7rem);
+  background: var(--case-surface);
+}
+
+.fm-craft__cell--led::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--fm-amber) 7%, transparent) 0 1px,
+    transparent 1px 8px
+  );
+  pointer-events: none;
+}
+
+.fm-craft__cell--grade {
+  background: linear-gradient(150deg, #100b0d 0%, #2e1a10 100%);
+}
+
+.fm-craft__cell span {
+  position: relative;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.34em;
+  color: var(--fm-amber);
+}
+
+.fm-craft__cell--grade span { color: var(--fm-warm); }
+
+.fm-craft__cell strong {
+  position: relative;
+  display: block;
+  margin: 0.5rem 0 0.6rem;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  line-height: 1;
+}
+
+.fm-craft__cell--grade strong { color: var(--fm-warm); }
+
+.fm-craft__cell p {
+  position: relative;
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.78rem, 1.2vw, 0.88rem);
+  line-height: 1.85;
+}
+
+/* 分鏡格維持 16:9，格與格之間才讀得出節奏 */
+.case-layout-film .work-case-body img {
+  aspect-ratio: 16 / 9 !important;
+  object-fit: cover !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
+.case-layout-film .work-case-body > p:has(img),
+.case-layout-film .work-case-body > blockquote {
+  max-width: none;
+}
+
+@media (max-width: 720px) {
+  .fm-strip { padding-inline: clamp(0.9rem, 4vw, 1.4rem); }
+  .fm-frames { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ==========================================================================
+   光的記憶 Sanctum Luminis 專屬版面（.case-layout-cinema）
+   全站唯一的亮色作品頁——其他每一件都是深色底，只有這件反過來，
+   因為它談的就是光。光柱是結構、鳥是動線、教堂只留輪廓。
+   做法是就地覆寫主題 token，讓 .work-case 既有的背景公式自己轉成亮色。
+   ========================================================================== */
+
+.case-layout-cinema {
+  --background: oklch(0.96 0.008 250);
+  --foreground: oklch(0.22 0.02 258);
+  --muted-foreground: oklch(0.46 0.02 254);
+  --border: oklch(0.3 0.02 255 / 18%);
+  --case-surface: #eef1f5;
+  --case-line: color-mix(in oklch, #22262e 10%, transparent);
+  --lm-gold: #d9b263;
+  --lm-blue: #6d8fb0;
+  --lm-violet: #8b7ab8;
+  color: var(--foreground);
+  background: linear-gradient(168deg, #fdfaf3 0%, #eef1f5 40%, #dfe5ee 100%) !important;
+}
+
+/* prose-invert 在深色模式下把內文設成亮色，這一頁是亮底，整組要拉回來 */
+.case-layout-cinema .work-case-body,
+.case-layout-cinema .work-case-body p,
+.case-layout-cinema .work-case-body li {
+  color: oklch(0.42 0.02 254) !important;
+}
+
+.case-layout-cinema .work-case-body h1,
+.case-layout-cinema .work-case-body h2,
+.case-layout-cinema .work-case-body h3,
+.case-layout-cinema .work-case-body strong {
+  color: oklch(0.22 0.02 258) !important;
+}
+
+.case-layout-cinema .work-case-body blockquote {
+  max-width: none;
+  border-inline-start: 2px solid var(--lm-gold);
+  color: oklch(0.36 0.02 256) !important;
+}
+
+/* 斜射的光柱：整頁的結構 */
+.lm-rays {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.lm-rays::before,
+.lm-rays::after {
+  content: "";
+  position: absolute;
+  top: -20vh;
+  height: 150vh;
+  filter: blur(14px);
+}
+
+.lm-rays::before {
+  left: 12%;
+  width: 13vw;
+  background: linear-gradient(180deg, rgba(255, 244, 214, 0.95), rgba(255, 244, 214, 0));
+  transform: rotate(12deg);
+}
+
+.lm-rays::after {
+  left: 62%;
+  width: 9vw;
+  background: linear-gradient(180deg, rgba(214, 232, 255, 0.85), rgba(214, 232, 255, 0));
+  transform: rotate(10deg);
+}
+
+.case-layout-cinema .case-shell,
+.case-layout-cinema .case-nav,
+.case-layout-cinema .case-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* 鳥的航線 */
+.lm-flight {
+  position: relative;
+  margin: clamp(1.4rem, 4vw, 2.4rem) 0;
+  color: oklch(0.22 0.02 258);
+}
+
+.lm-flight svg {
+  display: block;
+  width: 100%;
+  height: clamp(4rem, 9vw, 7rem);
+}
+
+.lm-flight span {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.66rem, 1vw, 0.76rem);
+  letter-spacing: 0.28em;
+  color: color-mix(in oklch, var(--lm-gold) 90%, #000 10%);
+}
+
+/* 一段際遇＝一種顏色的光 */
+.lm-pane {
+  position: relative;
+  margin: clamp(1.2rem, 3vw, 2rem) 0;
+  padding: clamp(1.1rem, 2.6vw, 1.8rem);
+  border-top: 2px solid var(--pane, var(--lm-gold));
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--pane, var(--lm-gold)) 22%, transparent) 0%,
+    color-mix(in oklch, var(--pane, var(--lm-gold)) 4%, transparent) 100%
+  );
+}
+
+.lm-pane--gold { --pane: #d9b263; }
+.lm-pane--blue { --pane: #6d8fb0; }
+.lm-pane--violet { --pane: #8b7ab8; }
+.lm-pane--cold { --pane: #5f93b8; }
+.lm-pane--warm { --pane: #d9a94a; }
+
+.lm-pane__head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.lm-pane__head span {
+  font-family: "Cormorant Garamond", "Noto Serif TC", serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  letter-spacing: 0.06em;
+  color: color-mix(in oklch, var(--pane) 70%, #000 30%);
+}
+
+.lm-pane__head h2 {
+  margin: 0 !important;
+  font-family: "Noto Serif TC", serif;
+  font-weight: 600;
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+}
+
+.lm-pane > p:has(img) {
+  margin: 0 0 clamp(0.4rem, 1vw, 0.7rem) !important;
+  max-width: none;
+}
+
+.case-layout-cinema .work-case-body img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: min(84vh, 54rem);
+  padding: 0 !important;
+  background: transparent;
+}
+
+/* 「這是動畫」：時間標記條 */
+.lm-motion {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: clamp(1.6rem, 4vw, 2.4rem) 0 clamp(0.8rem, 2vw, 1.2rem);
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid color-mix(in oklch, #22262e 18%, transparent);
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  letter-spacing: 0.28em;
+}
+
+.lm-motion__label { color: color-mix(in oklch, var(--lm-gold) 88%, #000 12%); }
+.lm-motion__meta { color: oklch(0.5 0.02 254); }
+
+/* ==========================================================================
+   立體光雕 專屬版面（.case-layout-projection）
+   照 VP1.png 的實體造型切版：上面兩面往內收、前上方一片菱形、
+   下面兩面外緣外斜再收攏。用 clip-path，不是 3D transform。
+   ========================================================================== */
+
+.case-layout-projection {
+  --pj-violet: #a78bfa;
+  --pj-cyan: #27f5d2;
+  --pj-amber: #ffcf9a;
+  --case-surface: color-mix(in oklch, var(--background) 84%, #08041a 16%);
+}
+
+.pj-object {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(1.2rem, 3vw, 2.4rem);
+  align-items: center;
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+}
+
+.pj-object__shape {
+  position: relative;
+  aspect-ratio: 660 / 520;
+  color: color-mix(in oklch, var(--foreground) 45%, transparent);
+}
+
+.pj-object__shape svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pj-face {
+  position: absolute;
+  inset: 0;
+}
+
+.pj-face--tl {
+  clip-path: polygon(43% 0%, 50% 0%, 50% 50%, 21% 42%);
+  background: linear-gradient(150deg, color-mix(in oklch, var(--pj-violet) 42%, transparent), color-mix(in oklch, var(--pj-violet) 8%, transparent));
+}
+
+.pj-face--tr {
+  clip-path: polygon(50% 0%, 57% 0%, 79% 42%, 50% 50%);
+  background: linear-gradient(210deg, color-mix(in oklch, var(--pj-violet) 30%, transparent), color-mix(in oklch, var(--pj-violet) 6%, transparent));
+}
+
+.pj-face--mid {
+  clip-path: polygon(50% 38%, 83% 45%, 50% 72%, 17% 45%);
+  background: radial-gradient(ellipse at 50% 54%, color-mix(in oklch, var(--pj-amber) 55%, transparent), transparent 70%);
+}
+
+.pj-face--bl {
+  clip-path: polygon(17% 45%, 50% 70%, 50% 100%, 26% 95%, 9% 66%);
+  background: linear-gradient(160deg, color-mix(in oklch, var(--pj-cyan) 30%, transparent), color-mix(in oklch, var(--pj-cyan) 5%, transparent));
+}
+
+.pj-face--br {
+  clip-path: polygon(83% 45%, 91% 66%, 74% 95%, 50% 100%, 50% 70%);
+  background: linear-gradient(200deg, color-mix(in oklch, var(--pj-cyan) 22%, transparent), color-mix(in oklch, var(--pj-cyan) 4%, transparent));
+}
+
+.pj-object__legend {
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1rem);
+}
+
+.pj-leg {
+  padding: clamp(0.8rem, 2vw, 1.1rem);
+  border-inline-start: 2px solid var(--leg, var(--pj-violet));
+  background: color-mix(in oklch, var(--leg, var(--pj-violet)) 6%, transparent);
+}
+
+.pj-leg--p5 { --leg: var(--pj-violet); }
+.pj-leg--mid { --leg: var(--pj-amber); }
+.pj-leg--ae { --leg: var(--pj-cyan); }
+
+.pj-leg span {
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  color: var(--leg);
+}
+
+.pj-leg strong {
+  display: block;
+  margin: 0.3rem 0 0.35rem;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+}
+
+.pj-leg p {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.76rem, 1.2vw, 0.86rem);
+  line-height: 1.8;
+}
+
+.pj-zone {
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding-inline-start: clamp(0.9rem, 2.4vw, 1.6rem);
+  border-inline-start: 2px solid var(--zone, var(--pj-violet));
+}
+
+.pj-zone--p5 { --zone: var(--pj-violet); }
+.pj-zone--mid { --zone: var(--pj-amber); }
+.pj-zone--ae { --zone: var(--pj-cyan); }
+
+.pj-zone__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.7rem;
+}
+
+.pj-zone__head span {
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  color: var(--zone);
+}
+
+.pj-zone__head h2 {
+  margin: 0 !important;
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+}
+
+.pj-zone p {
+  max-width: none;
+}
+
+.pj-zone > p:has(img) {
+  margin: clamp(0.4rem, 1.2vw, 0.7rem) 0 !important;
+}
+
+.case-layout-projection .work-case-body img {
+  aspect-ratio: 16 / 9 !important;
+  object-fit: cover !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
+.case-layout-projection .work-case-body > p:has(img),
+.case-layout-projection .work-case-body > blockquote {
+  max-width: none;
+}
+
+@media (max-width: 860px) {
+  .pj-object {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   circle test1 專屬版面（.case-layout-motion）
+   圓形是主題、循環是動畫的本質——接觸印樣不排成方格，沿著一圈排開。
+   走完一圈就是一個 loop，底下用 easing 曲線講節拍。
+   ========================================================================== */
+
+.case-layout-motion {
+  --ct-pink: #ff8fb3;
+  --ct-yellow: #ffe66d;
+  --case-surface: color-mix(in oklch, var(--background) 86%, #14090c 14%);
+}
+
+.ct-loop {
+  position: relative;
+  width: min(100%, 46rem);
+  aspect-ratio: 1 / 1;
+  margin: clamp(2rem, 6vw, 4rem) auto;
+  --ct-r: 38%;
+}
+
+.ct-loop__rings {
+  position: absolute;
+  inset: 0;
+  color: var(--ct-pink);
+  pointer-events: none;
+}
+
+.ct-loop__rings svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 圓心：loop 的長度 */
+.ct-loop__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 38%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklch, var(--ct-pink) 40%, transparent);
+  background: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--ct-pink) 10%, transparent) 0%,
+    transparent 72%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  text-align: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.ct-loop__core span {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.6rem, 1vw, 0.72rem);
+  letter-spacing: 0.32em;
+  color: var(--ct-pink);
+}
+
+.ct-loop__core strong {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  line-height: 1;
+}
+
+.ct-loop__core em {
+  font-style: normal;
+  font-size: clamp(0.62rem, 1vw, 0.74rem);
+  line-height: 1.6;
+  color: color-mix(in oklch, var(--foreground) 55%, transparent);
+}
+
+/* 七張定格沿圓周等分排開，圖片本身保持正立 */
+.ct-loop > p {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 21%;
+  margin: 0 !important;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--ct-a))
+    translate(0, calc(var(--ct-r) * -1 * 2.38))
+    rotate(calc(var(--ct-a) * -1));
+}
+
+.ct-loop > p:nth-of-type(1) { --ct-a: 0deg; }
+.ct-loop > p:nth-of-type(2) { --ct-a: 51.43deg; }
+.ct-loop > p:nth-of-type(3) { --ct-a: 102.86deg; }
+.ct-loop > p:nth-of-type(4) { --ct-a: 154.29deg; }
+.ct-loop > p:nth-of-type(5) { --ct-a: 205.71deg; }
+.ct-loop > p:nth-of-type(6) { --ct-a: 257.14deg; }
+.ct-loop > p:nth-of-type(7) { --ct-a: 308.57deg; }
+
+.ct-loop > p::after {
+  content: counter(ctframe, decimal-leading-zero);
+  position: absolute;
+  left: 0.3rem;
+  bottom: 0.2rem;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.66rem;
+  color: var(--ct-pink);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
+}
+
+.ct-loop { counter-reset: ctframe; }
+.ct-loop > p { counter-increment: ctframe; }
+
+.case-layout-motion .work-case-body img {
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  width: 100%;
+  border: 1px solid color-mix(in oklch, var(--ct-pink) 22%, transparent);
+}
+
+.case-layout-motion .work-case-body > p:has(img),
+.case-layout-motion .work-case-body > blockquote {
+  max-width: none;
+}
+
+/* --- easing 曲線 --- */
+.ct-easing {
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+  padding: clamp(1rem, 2.6vw, 1.6rem);
+  border: 1px solid color-mix(in oklch, var(--ct-pink) 22%, var(--border));
+  background: color-mix(in oklch, var(--ct-pink) 4%, transparent);
+  color: var(--foreground);
+}
+
+.ct-easing__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.ct-easing__head span {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.64rem, 1vw, 0.76rem);
+  letter-spacing: 0.3em;
+  color: color-mix(in oklch, var(--foreground) 52%, transparent);
+}
+
+.ct-easing__head em {
+  font-style: normal;
+  font-size: clamp(0.74rem, 1.1vw, 0.85rem);
+  color: var(--ct-pink);
+}
+
+.ct-easing > svg {
+  display: block;
+  width: 100%;
+  height: clamp(5rem, 12vw, 8rem);
+}
+
+.ct-easing__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2rem;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.64rem, 1vw, 0.74rem);
+  letter-spacing: 0.18em;
+  color: color-mix(in oklch, var(--foreground) 55%, transparent);
+}
+
+/* 窄螢幕：圓周排不下，退回兩欄格線，但保留編號與圓形裁切 */
+@media (max-width: 640px) {
+  .ct-loop {
+    aspect-ratio: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .ct-loop__rings {
+    display: none;
+  }
+
+  .ct-loop__core {
+    position: static;
+    width: auto;
+    aspect-ratio: auto;
+    transform: none;
+    grid-column: 1 / -1;
+    border-radius: 0;
+  }
+
+  .ct-loop > p {
+    position: static;
+    width: auto;
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   TouchDesigner 元素人形畫布（.case-layout-installation）
+   元素的身分不是靠外形認出來的，是靠它怎麼動：
+   圖框維持一般的方框，物理特性全部交給動畫。
+   ========================================================================== */
+
+.case-layout-installation {
+  --td-sand: #e6be5a;
+  --td-smoke: #c4cee0;
+  --td-water: #7ad8f0;
+}
+
+.td-elements {
+  display: grid;
+  gap: clamp(1.4rem, 3.4vw, 2.4rem);
+  margin: clamp(1.6rem, 4vw, 2.6rem) 0;
+}
+
+.td-el {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: clamp(1rem, 2.6vw, 1.8rem);
+  align-items: center;
+}
+
+.td-el--smoke {
+  direction: rtl;
+}
+
+.td-el--smoke > * {
+  direction: ltr;
+}
+
+/* 一般的方框圖，兩張並排（全景 + 集中構圖） */
+.td-el__media {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  overflow: hidden;
+}
+
+.td-el__media > p {
+  margin: 0 !important;
+}
+
+.case-layout-installation .td-el__media img {
+  aspect-ratio: 16 / 10 !important;
+  object-fit: cover !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  width: 100%;
+  border: 1px solid color-mix(in oklch, var(--el, var(--td-sand)) 22%, transparent);
+}
+
+.td-el--sand { --el: var(--td-sand); }
+.td-el--smoke { --el: var(--td-smoke); }
+.td-el--water { --el: var(--td-water); }
+
+/* --- 物理動畫層 --- */
+.td-fx {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 沙：有重量。ease-in 加速下墜，落底後堆積 */
+.td-fx--sand i {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 3px;
+  background: #ffd98a;
+  box-shadow: 0 0 5px rgba(255, 217, 138, 0.85);
+  animation: td-sand-fall 2.8s cubic-bezier(0.55, 0, 1, 0.45) infinite;
+}
+
+@keyframes td-sand-fall {
+  0% { transform: translateY(-8%); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateY(2000%); opacity: 0; }
+}
+
+.td-fx--sand b {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  background: linear-gradient(0deg, rgba(255, 206, 110, 0.5), transparent);
+  animation: td-sand-pile 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes td-sand-pile {
+  from { height: 8%; opacity: 0.5; }
+  to { height: 18%; opacity: 0.9; }
+}
+
+/* 煙：沒有重量。上升同時膨脹、變淡 */
+.td-fx--smoke i {
+  position: absolute;
+  bottom: -12%;
+  width: 26%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  filter: blur(16px);
+  background: radial-gradient(circle, rgba(214, 224, 240, 0.7), rgba(214, 224, 240, 0));
+  animation: td-smoke-rise 5.6s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+
+@keyframes td-smoke-rise {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  18% { opacity: 0.7; }
+  100% { transform: translate(8%, -230%) scale(2.2); opacity: 0; }
+}
+
+/* 水：擾動會傳遞。同心波紋外推並衰減 */
+.td-fx--water i {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 10%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1.5px solid rgba(122, 216, 240, 0.9);
+  animation: td-water-ripple 3.6s cubic-bezier(0.15, 0.5, 0.3, 1) infinite;
+}
+
+@keyframes td-water-ripple {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+  12% { opacity: 0.95; }
+  100% { transform: translate(-50%, -50%) scale(9); opacity: 0; }
+}
+
+.td-fx--water u {
+  position: absolute;
+  inset: -6px;
+  display: block;
+  background: repeating-linear-gradient(0deg, rgba(122, 216, 240, 0.11) 0 1px, transparent 1px 10px);
+  animation: td-water-sway 4.2s ease-in-out infinite alternate;
+}
+
+@keyframes td-water-sway {
+  from { transform: translateY(-3px); }
+  to { transform: translateY(3px); }
+}
+
+/* --- 元素說明 --- */
+.td-el__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.9rem;
+  margin-bottom: 0.7rem;
+}
+
+.td-el__glyph {
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--el);
+}
+
+.td-el__code {
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.66rem, 1vw, 0.78rem);
+  letter-spacing: 0.3em;
+  color: var(--el);
+}
+
+.td-el__phys {
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  padding: 0.15rem 0.55rem;
+  border: 1px solid color-mix(in oklch, var(--foreground) 22%, transparent);
+  color: color-mix(in oklch, var(--foreground) 62%, transparent);
+}
+
+.td-el__text p {
+  max-width: none;
+  margin-block: 0;
+}
+
+/* --- 衰減軸 --- */
+.td-decay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  margin: clamp(1.4rem, 3.4vw, 2.2rem) 0;
+}
+
+.td-decay__label {
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  color: color-mix(in oklch, var(--foreground) 45%, transparent);
+  white-space: nowrap;
+}
+
+.td-decay__bar {
+  flex: 1 1 8rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--td-sand) 0%, var(--td-water) 52%, var(--td-smoke) 100%);
+}
+
+.td-decay__k { font-size: 0.76rem; white-space: nowrap; }
+.td-decay__k--sand { color: var(--td-sand); }
+.td-decay__k--water { color: var(--td-water); }
+.td-decay__k--smoke { color: var(--td-smoke); }
+
+/* --- 後台：節點網路是寬幅截圖，不裁切 --- */
+.td-backstage {
+  display: grid;
+  gap: clamp(0.6rem, 1.6vw, 1rem);
+  margin: clamp(1.2rem, 3vw, 2rem) 0;
+}
+
+.td-backstage > p {
+  margin: 0 !important;
+}
+
+.case-layout-installation .td-backstage img {
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  width: 100%;
+  border: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
+  background: #05070c;
+}
+
+@media (max-width: 860px) {
+  .td-el {
+    grid-template-columns: 1fr;
+  }
+
+  .td-el--smoke {
+    direction: ltr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .td-fx i,
+  .td-fx b,
+  .td-fx u {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   聽說：把布幕中線做成一道貫穿到底的粒子光束，
+   再加一層隨機閃動的像素雜訊。兩者都在內容之下，不會擋到文字。
+   ========================================================================== */
+
+.ls-beam {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ls-beam__core {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: clamp(2rem, 5vw, 4rem);
+  transform: translateX(-50%);
+  /* 柔邊用漸層做，不用 filter: blur()——這條元素跟整頁一樣高，
+     blur 會讓瀏覽器每幀重繪整條，捲動時直接掉幀。 */
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in oklch, var(--ls-cyan) 10%, transparent) 22%,
+      color-mix(in oklch, var(--ls-cyan) 22%, transparent) 38%,
+      color-mix(in oklch, #ffffff 46%, transparent) 50%,
+      color-mix(in oklch, var(--ls-mag) 22%, transparent) 62%,
+      color-mix(in oklch, var(--ls-mag) 10%, transparent) 78%,
+      transparent 100%
+    );
+  will-change: opacity;
+  animation: ls-beam-breathe 6.5s ease-in-out infinite alternate;
+}
+
+@keyframes ls-beam-breathe {
+  from { opacity: 0.5; }
+  to { opacity: 0.92; }
+}
+
+.ls-beam__dust {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: clamp(2rem, 5vw, 4rem);
+  transform: translateX(-50%);
+  display: block;
+}
+
+/* 粒子沿光束往上飄，各自帶不同的橫向偏移、延遲與週期 */
+.ls-beam__dust i {
+  position: absolute;
+  left: 50%;
+  bottom: -4%;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px 1px color-mix(in oklch, var(--ls-cyan) 70%, transparent);
+  animation: ls-dust-rise var(--t, 11s) linear var(--d, 0s) infinite;
+}
+
+@keyframes ls-dust-rise {
+  0% { transform: translate(-50%, 0) translateX(0); opacity: 0; }
+  8% { opacity: 0.95; }
+  92% { opacity: 0.7; }
+  100% { transform: translate(-50%, -108vh) translateX(var(--x, 0px)); opacity: 0; }
+}
+
+/* 像素雜訊：三層不同尺度的點陣各自閃動，讀起來像隨機出現。
+   z-index 0 壓在內容之下，絕不會蓋到文字。 */
+.ls-static {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ls-static > span {
+  position: absolute;
+  inset: -10%;
+  display: block;
+}
+
+.ls-static__a {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.5) 0 1px, transparent 1.4px) 0 0 / 7px 7px,
+    radial-gradient(circle at 70% 65%, rgba(34, 227, 255, 0.45) 0 1px, transparent 1.4px) 0 0 / 11px 11px;
+  animation: ls-static-flicker 0.9s steps(2, end) infinite;
+}
+
+.ls-static__b {
+  background:
+    radial-gradient(circle at 45% 15%, rgba(255, 47, 208, 0.4) 0 1px, transparent 1.4px) 0 0 / 17px 17px,
+    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.4) 0 1px, transparent 1.4px) 0 0 / 23px 23px;
+  animation: ls-static-flicker 1.7s steps(3, end) 0.4s infinite;
+}
+
+.ls-static__c {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.05) 0 1px,
+    transparent 1px 4px
+  );
+  animation: ls-static-roll 9s linear infinite;
+}
+
+@keyframes ls-static-flicker {
+  0% { opacity: 0.5; transform: translate(0, 0); }
+  50% { opacity: 0.22; transform: translate(1px, -1px); }
+  100% { opacity: 0.42; transform: translate(-1px, 1px); }
+}
+
+@keyframes ls-static-roll {
+  from { transform: translateY(0); }
+  to { transform: translateY(4px); }
+}
+
+/* 原本那條 1px 中線退場——光束已經取代它 */
+.case-layout-dialogue .case-shell::before {
+  display: none;
+}
+
+/* --- 收尾：展場實景 + 得獎 --- */
+.ls-scene {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: clamp(0.5rem, 1.4vw, 0.9rem);
+  margin: clamp(1.2rem, 3vw, 2rem) 0;
+}
+
+.ls-scene > p {
+  margin: 0 !important;
+}
+
+.case-layout-dialogue .ls-scene img {
+  aspect-ratio: 4 / 3 !important;
+  object-fit: cover !important;
+  max-height: none !important;
+  background: transparent;
+}
+
+.ls-awards--closing {
+  margin-block: clamp(1.2rem, 3vw, 2rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-beam__core,
+  .ls-beam__dust i,
+  .ls-static > span {
+    animation: none;
+  }
+
+  .ls-static {
+    opacity: 0.3;
+  }
+}
+
+/* ==========================================================================
+   五套專屬版面：把設計過的內文提到「概覽 + focus 卡」之前
+   原本 .case-shell 是普通 block，內文排在共用骨架後面，
+   所以第一眼看到的還是舊版面。改成 flex 直欄再指定順序。
+   ========================================================================== */
+
+.case-layout-film .case-shell,
+.case-layout-cinema .case-shell,
+.case-layout-projection .case-shell,
+.case-layout-motion .case-shell,
+.case-layout-installation .case-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.case-layout-film .case-hero,
+.case-layout-cinema .case-hero,
+.case-layout-projection .case-hero,
+.case-layout-motion .case-hero,
+.case-layout-installation .case-hero { order: 1; }
+
+.case-layout-film .case-content-section,
+.case-layout-cinema .case-content-section,
+.case-layout-projection .case-content-section,
+.case-layout-motion .case-content-section,
+.case-layout-installation .case-content-section { order: 2; }
+
+.case-layout-film .case-overview,
+.case-layout-cinema .case-overview,
+.case-layout-projection .case-overview,
+.case-layout-motion .case-overview,
+.case-layout-installation .case-overview { order: 3; }
+
+.case-layout-film .case-credits,
+.case-layout-cinema .case-credits,
+.case-layout-projection .case-credits,
+.case-layout-motion .case-credits,
+.case-layout-installation .case-credits { order: 4; }
+
+/* 共用骨架的小節標題在設計內文之上會打斷開場，收到最小 */
+.case-layout-film .case-section-heading,
+.case-layout-cinema .case-section-heading,
+.case-layout-projection .case-section-heading,
+.case-layout-motion .case-section-heading,
+.case-layout-installation .case-section-heading {
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.case-layout-film .case-section-heading h2,
+.case-layout-cinema .case-section-heading h2,
+.case-layout-projection .case-section-heading h2,
+.case-layout-motion .case-section-heading h2,
+.case-layout-installation .case-section-heading h2 {
+  display: none;
+}
+
+/* --- 共用的招牌大標基底 --- */
+.fm-statement,
+.td-statement,
+.lm-statement,
+.pj-statement,
+.ct-statement {
+  position: relative;
+  margin: clamp(0.5rem, 2vw, 1.4rem) 0 clamp(1.6rem, 4vw, 2.6rem);
+}
+
+/* 01 龍岡米干 */
+.fm-statement__kicker {
+  display: block;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  letter-spacing: 0.42em;
+  color: var(--fm-amber);
+}
+
+.fm-statement__title {
+  margin: 0.2em 0 0 !important;
+  font-size: clamp(5rem, 17vw, 13rem) !important;
+  font-weight: 900;
+  line-height: 0.78;
+  letter-spacing: -0.055em;
+}
+
+.fm-statement__sub {
+  margin: 0.3em 0 0 !important;
+  max-width: none;
+  font-size: clamp(1.1rem, 2.6vw, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  color: var(--fm-warm);
+}
+
+.fm-statement__note {
+  margin: 0.9rem 0 0 !important;
+  max-width: 34ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* 幕標題也跟著放大 */
+.fm-act__head h2 {
+  font-size: clamp(3rem, 8vw, 6rem) !important;
+}
+
+/* 02 TouchDesigner：三層殘影 */
+.td-statement {
+  min-height: clamp(9rem, 24vw, 19rem);
+}
+
+.td-statement__title,
+.td-statement__ghost {
+  margin: 0 !important;
+  font-size: clamp(3.4rem, 11vw, 8.5rem);
+  font-weight: 900;
+  line-height: 0.84;
+  letter-spacing: -0.035em;
+}
+
+.td-statement__ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  pointer-events: none;
+  color: color-mix(in oklch, #8b5cf6 55%, transparent);
+  transform: translate(0.16em, 0.14em);
+}
+
+.td-statement__ghost--mid {
+  color: color-mix(in oklch, var(--td-sand, #d9f99d) 0%, #d9f99d 62%);
+  transform: translate(0.08em, 0.07em);
+  opacity: 0.55;
+}
+
+.td-statement__title {
+  position: relative;
+  z-index: 2;
+}
+
+.td-statement__note {
+  position: relative;
+  z-index: 2;
+  margin: 1.1rem 0 0 !important;
+  max-width: 34ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* 03 光的記憶：巨大的「光」 */
+.lm-statement {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: clamp(1rem, 4vw, 3rem);
+}
+
+.lm-statement__glyph {
+  margin: 0 !important;
+  font-family: "Noto Serif TC", serif;
+  font-weight: 300;
+  font-size: clamp(7rem, 24vw, 20rem) !important;
+  line-height: 0.7;
+  letter-spacing: -0.02em;
+}
+
+.lm-statement__side {
+  flex: 1 1 16rem;
+  padding-bottom: clamp(0.5rem, 2vw, 1.4rem);
+}
+
+.lm-statement__en {
+  margin: 0 !important;
+  font-family: "Cormorant Garamond", "Noto Serif TC", serif;
+  font-weight: 300;
+  font-size: clamp(1.8rem, 5vw, 3.4rem);
+  line-height: 1;
+}
+
+.lm-statement__sub {
+  margin: 0.4rem 0 0 !important;
+  font-family: "Space Grotesk", monospace;
+  font-size: clamp(0.66rem, 1vw, 0.8rem);
+  letter-spacing: 0.32em;
+  color: color-mix(in oklch, var(--lm-gold) 88%, #000 12%) !important;
+}
+
+.lm-statement__note {
+  margin: 0.9rem 0 0 !important;
+  max-width: 32ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* 04 立體光雕：被稜線切開 */
+.pj-statement {
+  display: grid;
+  grid-template-columns: auto 1px auto;
+  align-items: center;
+  justify-content: start;
+  gap: clamp(0.6rem, 2vw, 1.4rem);
+  overflow: hidden;
+}
+
+.pj-statement__a,
+.pj-statement__b {
+  font-size: clamp(3rem, 10vw, 7.5rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  display: block;
+}
+
+.pj-statement__a { transform: skewY(-8deg); }
+.pj-statement__b { transform: skewY(10deg); color: var(--pj-cyan); }
+
+.pj-statement__ridge {
+  align-self: stretch;
+  background: linear-gradient(180deg, transparent, var(--pj-violet), transparent);
+}
+
+.pj-statement__note {
+  grid-column: 1 / -1;
+  margin: 1.1rem 0 0 !important;
+  max-width: 38ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* 05 circle test */
+.ct-statement__title {
+  margin: 0 !important;
+  font-size: clamp(4rem, 14vw, 10rem) !important;
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+}
+
+.ct-statement__title span { color: var(--ct-pink); }
+
+.ct-statement__note {
+  margin: 0.9rem 0 0 !important;
+  max-width: 32ch;
+  font-size: clamp(0.8rem, 1.2vw, 0.92rem);
+  line-height: 1.9;
+}
+
+/* ==========================================================================
+   聽說：光束要最顯眼、而且明顯地會動
+   ========================================================================== */
+
+.ls-beam__core {
+  width: clamp(3.5rem, 8vw, 7rem) !important;
+  animation: ls-beam-pulse 3.4s ease-in-out infinite !important;
+}
+
+/* 呼吸幅度拉大，而且會左右微擺——不再只是靜靜地亮著 */
+@keyframes ls-beam-pulse {
+  0% { opacity: 0.42; transform: translateX(-50%) scaleX(0.86); }
+  38% { opacity: 1; transform: translateX(-50%) scaleX(1.14); }
+  62% { opacity: 0.78; transform: translateX(-52%) scaleX(1); }
+  100% { opacity: 0.42; transform: translateX(-48%) scaleX(0.86); }
+}
+
+/* 光束裡多一道更亮、更窄的核心，往下掃 */
+.ls-beam__core::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 30%;
+  height: 34vh;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.85) 46%,
+    color-mix(in oklch, var(--ls-cyan) 70%, transparent) 62%,
+    transparent 100%
+  );
+  animation: ls-beam-sweep 5.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes ls-beam-sweep {
+  0% { top: -36vh; opacity: 0; }
+  12% { opacity: 0.95; }
+  88% { opacity: 0.95; }
+  100% { top: 104vh; opacity: 0; }
+}
+
+/* 粒子加量、加亮、加快 */
+.ls-beam__dust {
+  width: clamp(3.5rem, 8vw, 7rem) !important;
+}
+
+.ls-beam__dust i {
+  width: 3px;
+  height: 3px;
+  box-shadow:
+    0 0 8px 2px color-mix(in oklch, var(--ls-cyan) 80%, transparent),
+    0 0 16px 4px color-mix(in oklch, var(--ls-mag) 40%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-beam__core,
+  .ls-beam__core::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .pj-statement {
+    grid-template-columns: auto;
+  }
+
+  .pj-statement__ridge {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   換頁轉場：黃金比例方格＝遮罩本體
+   第一段　另一套色板從點擊處擴散開來，但它只出現在黃金方格裡——
+           方格就是這片色板的遮罩，所以看到的是一組有大有小的色塊。
+   第二段　方格帶著那套色板做 3D 翻面並淡出，露出底下原本色板的新頁。
+
+   幾何用的是可見格線同一份資料（buildGoldenCells），容器也吃同一組
+   --gg-x/y/w/h，所以每一格都跟背景的黃金格對得起來。
+   覆蓋層的標記寫在 Layout，新舊兩份文件都有它，swap 之後才接得起來。
+   ========================================================================== */
+
+.page-flip {
+  /* 淺色站 → 遮罩裡填暗色板 */
+  --pf-cell: oklch(0.14 0.028 255);
+  --pf-line: oklch(0.92 0.012 245 / 28%);
+  --pf-x: 50%;
+  --pf-y: 50%;
+  --pf-r: 0px;
+
+  position: fixed;
+  left: var(--gg-x);
+  top: var(--gg-y);
+  width: var(--gg-w);
+  height: var(--gg-h);
+  z-index: 90;
+  pointer-events: none;
+  perspective: 1600px;
+  clip-path: circle(0px at var(--pf-x) var(--pf-y));
+  visibility: hidden;
+}
+
+/* 深色站 → 遮罩裡填亮色板 */
+html.dark .page-flip {
+  --pf-cell: oklch(0.95 0.02 232);
+  --pf-line: oklch(0.2 0.03 255 / 28%);
+}
+
+/* 每一格就是遮罩的一塊：位置與大小完全照黃金格，所以有大有小 */
+.page-flip__cell {
+  position: absolute;
+  aspect-ratio: 1;
+  background: var(--pf-cell);
+  box-shadow: inset 0 0 0 1px var(--pf-line);
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  opacity: 1;
+}
+
+/* 大格與小格各帶一點不同的色偏，翻起來才像各自獨立的板子 */
+.page-flip__cell:nth-child(3n + 1) {
+  background: color-mix(in oklch, var(--pf-cell) 88%, var(--gg-accent, #5ddcff) 12%);
+}
+
+.page-flip__cell:nth-child(3n + 2) {
+  background: color-mix(in oklch, var(--pf-cell) 92%, #ff2d95 8%);
+}
+
+/* --- 第一段：色板沿著遮罩擴散開來 --- */
+.page-flip.is-spreading {
+  visibility: visible;
+  animation: pf-spread 520ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes pf-spread {
+  from { clip-path: circle(0px at var(--pf-x) var(--pf-y)); }
+  to { clip-path: circle(var(--pf-r) at var(--pf-x) var(--pf-y)); }
+}
+
+/* --- 接手：swap 後直接停在「已經鋪滿」的狀態，不重播擴散 --- */
+.page-flip.is-covered {
+  visibility: visible;
+  animation: none;
+  clip-path: circle(var(--pf-r) at var(--pf-x) var(--pf-y));
+}
+
+/* --- 第二段：方格翻面變透明 ---
+   大格慢、小格快：黃金格是等比遞減的，越小的格子轉得越快才合理。 */
+.page-flip.is-flipping .page-flip__cell {
+  animation: pf-flip calc(880ms - var(--pf-i, 0) * 70ms)
+    cubic-bezier(0.4, 0, 0.2, 1) var(--pf-d, 0ms) forwards;
+}
+
+@keyframes pf-flip {
+  0% {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateY(-92deg) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* 覆蓋層接手了整段演出，view-transition 那套就不要再各自跑一遍，
+   否則會看到兩次翻面。 */
+html[data-page-flip]::view-transition-old(*),
+html[data-page-flip]::view-transition-new(*) {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-flip,
+  .page-flip.is-spreading,
+  .page-flip.is-covered,
+  .page-flip.is-flipping,
+  .page-flip.is-flipping .page-flip__cell {
+    animation: none !important;
+    visibility: hidden;
+  }
+}
+
+/* 淺色面板：水改成墨水。
+   原本的 mix-blend-mode: screen 只會加亮，在亮底上等於沒作用，
+   這就是「淺色時水看不出來」的原因。墨要讓紙變暗，所以改 multiply，
+   再壓低飽和、拉高對比，做出墨滲進紙裡的濃淡。 */
+html:not(.dark) #water-field {
+  mix-blend-mode: multiply;
+  opacity: 0.62;
+  filter: url("#water-refraction") saturate(0.35) contrast(1.35);
+}
+
+html:not(.dark)[data-fx-calm="true"] #water-field {
+  opacity: 0.26;
 }
