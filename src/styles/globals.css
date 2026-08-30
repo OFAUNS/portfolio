@@ -6339,3 +6339,17 @@ html[data-page-wipe]::view-transition-new(root) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* 聽說：英文展示板是一張直式長海報，比內文其他圖都高。
+   走全站的 contain 規則會被 58rem 的上限壓到很小，所以單獨放寬。 */
+.ls-board {
+  margin: clamp(2rem, 5vw, 3.5rem) 0;
+}
+
+.case-layout-dialogue .ls-board img {
+  max-height: none !important;
+  max-width: min(52rem, 100%);
+  margin-inline: auto;
+  display: block;
+  border: 1px solid color-mix(in oklch, var(--ls-mag) 22%, transparent);
+}

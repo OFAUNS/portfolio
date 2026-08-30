@@ -1353,6 +1353,39 @@ export const imageManifest = {
             }
         ]
     },
+    "/work/listen-and-speak/listen-speak-showcase-en.png": {
+        "src": "/work/listen-and-speak/listen-speak-showcase-en.png",
+        "width": 3507,
+        "height": 4966,
+        "aspectRatio": 0.7062,
+        "originalSize": 5954663,
+        "variants": [
+            {
+                "src": "/optimized/listen-speak-showcase-en-480.webp",
+                "width": 480,
+                "size": 44244,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/listen-speak-showcase-en-800.webp",
+                "width": 800,
+                "size": 110600,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/listen-speak-showcase-en-1200.webp",
+                "width": 1200,
+                "size": 214602,
+                "type": "image/webp"
+            },
+            {
+                "src": "/optimized/listen-speak-showcase-en-1600.webp",
+                "width": 1600,
+                "size": 327742,
+                "type": "image/webp"
+            }
+        ]
+    },
     "/work/listen-and-speak/logo-en.png": {
         "src": "/work/listen-and-speak/logo-en.png",
         "width": 1254,
