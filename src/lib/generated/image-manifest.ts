@@ -38,33 +38,21 @@ export const imageManifest = {
     },
     "/header.jpg": {
         "src": "/header.jpg",
-        "width": 6048,
-        "height": 4032,
-        "aspectRatio": 1.5,
-        "originalSize": 1014758,
+        "width": 1122,
+        "height": 1402,
+        "aspectRatio": 0.80029,
+        "originalSize": 266037,
         "variants": [
             {
                 "src": "/optimized/header-480.webp",
                 "width": 480,
-                "size": 25466,
+                "size": 9846,
                 "type": "image/webp"
             },
             {
                 "src": "/optimized/header-800.webp",
                 "width": 800,
-                "size": 48424,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/header-1200.webp",
-                "width": 1200,
-                "size": 80550,
-                "type": "image/webp"
-            },
-            {
-                "src": "/optimized/header-1600.webp",
-                "width": 1600,
-                "size": 119312,
+                "size": 23140,
                 "type": "image/webp"
             }
         ]

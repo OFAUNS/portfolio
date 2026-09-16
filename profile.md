@@ -26,6 +26,11 @@
 
 ### 經歷
 
+**匯智教育科技實習 (Educational Technology Intern)**
+- 時間：2026/07 - 2026/09｜單位：匯智教育科技
+- 結合公司資料建立標案工作流，並製作評估工作流程自動化效益的 AI skill。
+- 細項：公司資料整合與標案工作流開發／可重複使用的自動化效益評估 skill
+
 **企業說明會總召 (Enterprise Information Session Coordinator)**
 - 時間：2026/03｜單位：Pacific Cable, Chao Mei Microcomputer
 - 擔任企業說明會活動總召，管理廠商合作關係、規劃活動流程、協調人員分工以確保活動順利執行。
