@@ -6481,7 +6481,7 @@ html[data-page-wipe]::view-transition-new(root) {
   padding-block: clamp(1.4rem, 4vw, 2.6rem);
 }
 
-.fm-poem__text {
+.work-case-body .fm-poem__text {
   margin: 0 !important;
   font-family: "Noto Serif TC", serif;
   font-weight: 900;
@@ -6498,7 +6498,7 @@ html[data-page-wipe]::view-transition-new(root) {
   letter-spacing: 0.14em;
 }
 
-.fm-poem__note {
+.work-case-body .fm-poem__note {
   flex: 1 1 16rem;
   margin: 0 !important;
   font-size: clamp(0.8rem, 1.2vw, 0.9rem);
@@ -6566,7 +6566,7 @@ html[data-page-wipe]::view-transition-new(root) {
 
 .fm-craft__cell--grade strong { color: var(--fm-warm); }
 
-.fm-craft__cell p {
+.work-case-body .fm-craft__cell p {
   position: relative;
   margin: 0;
   max-width: none;
@@ -7632,24 +7632,25 @@ html[data-page-wipe]::view-transition-new(root) {
   color: var(--fm-amber);
 }
 
-.fm-statement__title {
+.work-case-body .fm-statement__title {
   margin: 0.2em 0 0 !important;
   font-size: clamp(5rem, 17vw, 13rem) !important;
   font-weight: 900;
-  line-height: 0.78;
+  line-height: 1.1;
   letter-spacing: -0.055em;
 }
 
-.fm-statement__sub {
+.work-case-body .fm-statement__sub {
   margin: 0.3em 0 0 !important;
   max-width: none;
   font-size: clamp(1.1rem, 2.6vw, 2rem);
   font-weight: 900;
+  line-height: 1.5;
   letter-spacing: 0.16em;
   color: var(--fm-warm);
 }
 
-.fm-statement__note {
+.work-case-body .fm-statement__note {
   margin: 0.9rem 0 0 !important;
   max-width: 34ch;
   font-size: clamp(0.8rem, 1.2vw, 0.92rem);
